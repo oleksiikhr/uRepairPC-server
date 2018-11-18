@@ -4,8 +4,10 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class Pc extends Model
 {
+    protected $table = 'pc';
+
     protected $guarded = [];
 
     protected $dates = [
