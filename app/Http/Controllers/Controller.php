@@ -10,4 +10,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    /** @var int */
+    const DAY_SECONDS = 86400;
 }

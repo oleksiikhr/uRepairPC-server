@@ -7,13 +7,23 @@ Route::get('/', function () {
 });
 
 /*
+ * Auth
+ */
+
+Route::post('/auth', 'AuthController@login');
+Route::post('/auth/logout', 'AuthController@logout');
+
+/*
+ * Service
+ */
+
+Route::get('/service/windows', 'ServiceController@getWindows');
+
+/*
  *  Websocket
  */
 
 Route::get('/websocket', 'WebsocketController@index');
-
-// SERVICE
-Route::get('/service/windows', 'ServiceController@getWindows');
 
 // Auth
 Route::post('/websocket/auth/user', 'WebsocketController@userAuth');
