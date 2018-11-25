@@ -3,6 +3,7 @@
 // FIXME Example
 Route::get('/', function () {
     \App\Events\NewEvent::dispatch(['test' => '123']);
+    return response()->json(['test' => 123]);
 });
 
 /*
