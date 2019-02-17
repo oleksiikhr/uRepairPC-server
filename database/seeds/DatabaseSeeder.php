@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
 
         // Equipments
         $this->call(EquipmentTypesTableSeeder::class);
-        $this->call(EquipmentManufacturesTableSeeder::class);
+        $this->call(EquipmentManufacturersTableSeeder::class);
         $this->call(EquipmentModelsTableSeeder::class);
         $this->call(EquipmentsTableSeeder::class);
     }

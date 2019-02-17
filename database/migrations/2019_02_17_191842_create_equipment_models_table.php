@@ -23,7 +23,7 @@ class CreateEquipmentModelsTable extends Migration
 
             $table->foreign('type_id')->references('id')->on('equipment_types')
                 ->onDelete('cascade');
-            $table->foreign('manufacturer_id')->references('id')->on('equipment_manufactures')
+            $table->foreign('manufacturer_id')->references('id')->on('equipment_manufacturers')
                 ->onDelete('cascade');
 
             $table->index(['type_id', 'manufacturer_id']);

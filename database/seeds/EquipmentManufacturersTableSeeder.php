@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class EquipmentManufacturesTableSeeder extends Seeder
+class EquipmentManufacturersTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,7 +14,7 @@ class EquipmentManufacturesTableSeeder extends Seeder
         $names = ['Acer', 'Apple', 'Asus', 'Dell', 'HP', 'Lenovo', 'Samsung'];
 
         foreach ($names as $name) {
-            DB::table('equipment_manufactures')->insert([
+            DB::table('equipment_manufacturers')->insert([
                 'name' => $name,
             ]);
         }

@@ -22,7 +22,7 @@ class CreateEquipmentsTable extends Migration
             $table->unsignedInteger('model_id')->nullable();
             $table->timestamps();
 
-            $table->foreign('manufacturer_id')->references('id')->on('equipment_manufactures')
+            $table->foreign('manufacturer_id')->references('id')->on('equipment_manufacturers')
                 ->onDelete('cascade');
             $table->foreign('type_id')->references('id')->on('equipment_types')
                 ->onDelete('set null');
