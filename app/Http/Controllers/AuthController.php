@@ -4,28 +4,76 @@ namespace App\Http\Controllers;
 
 use JWTAuth;
 use Illuminate\Http\Request;
-use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 
 class AuthController extends Controller
 {
+    use SendsPasswordResetEmails;
+
     /**
      * Auth the user by login and email.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function login(Request $request) {
-        $data = $request->only('email', 'password');
-        $jwtToken = null;
+    public function login(Request $request)
+    {
+        $this->validate($request, [
+            'email' => 'required|email|max:191',
+            'password' => 'required|between:6,191'
+        ]);
 
-        try {
-            if (!$jwtToken = JWTAuth::attempt($data)) {
-                return response()->json([ 'message' => 'Invalid Credentials'], 400);
-            }
-        } catch (JWTException $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+        if (!$token = JWTAuth::attempt($request->only('email', 'password'))) {
+            return response()->json(['message' => 'Дані невірні'], 401);
         }
 
-        return response()->json(['token' => $jwtToken]);
+        return response()->json(['token' => $token]);
+    }
+
+    /**
+     * Refresh token to user.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function refresh()
+    {
+        $token = JWTAuth::getToken();
+
+        if (! $token) {
+            return response()->json(['message' => 'Токен не дійсний'], 401);
+        }
+
+        return response()->json(['token' => JWTAuth::refresh($token)]);
+    }
+
+    /**
+     * @param  Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function forgot(Request $request) {
+        $this->validateEmail($request);
+
+        // We will send the password reset link to this user. Once we have attempted
+        // to send the link, we will examine the response then see the message we
+        // need to show to the user. Finally, we'll send out a proper response.
+        $response = $this->broker()->sendResetLink(
+            $request->only('email')
+        );
+
+        return $response == Password::RESET_LINK_SENT
+            ? response()->json(['message' => 'Лист відправлено на вашу пошту'], 201)
+            : response()->json(['message' => 'Неможливо відправити на пошту'], 401);
+    }
+
+    /**
+     * Invalidate current JWT Token.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout() {
+        JWTAuth::invalidate(JWTAuth::getToken());
+        return response()->json(['message', 'Ви вийшли з системи']);
     }
 }
