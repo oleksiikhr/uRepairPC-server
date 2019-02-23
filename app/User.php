@@ -9,6 +9,21 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
+    /** @var string - DB */
+    const ROLE_ADMIN = 'admin';
+
+    /** @var string - DB */
+    const ROLE_MODERATOR = 'moderator';
+
+    /** @var string - DB */
+    const ROLE_WORKER = 'worker';
+
+    /** @var string - DB */
+    const ROLE_USER = 'user';
+
+    /** @var array */
+    const ROLES = [self::ROLE_ADMIN, self::ROLE_MODERATOR, self::ROLE_WORKER, self::ROLE_USER];
+
     use Notifiable;
 
     /**
@@ -47,6 +62,57 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    /**
+     * Role of the user is Admin.
+     *
+     * @return bool
+     */
+    public function isAdminRole()
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    /**
+     * Role of the user is Moderator.
+     *
+     * @return bool
+     */
+    public function isModeratorRole()
+    {
+        return $this->role === self::ROLE_MODERATOR;
+    }
+
+    /**
+     * Role of the user is Worker.
+     *
+     * @return bool
+     */
+    public function isWorkerRole()
+    {
+        return $this->role === self::ROLE_WORKER;
+    }
+
+    /**
+     * Role of the user is User.
+     *
+     * @return bool
+     */
+    public function isUserRole()
+    {
+        return $this->role === self::ROLE_USER;
+    }
+
+    /**
+     * User role is Admin.
+     *
+     * @param  string  $role
+     * @return bool
+     */
+    public function hasRole($role)
+    {
+        return $this->role === $role;
     }
 
     /**

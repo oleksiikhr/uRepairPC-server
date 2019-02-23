@@ -27,7 +27,16 @@ Route::group(['prefix' => 'auth'], function () {
 });
 
 Route::group(['middleware' => ['jwt.auth']], function () {
-    Route::get('user', function() {
-        return response()->json(['user' => \Illuminate\Support\Facades\Auth::user()]);
+
+    /*
+     * Section: Users
+     */
+    Route::group(['prefix' => 'users'], function () {
+        Route::apiResource('/', 'UserController');
+        // TODO email, password
+        Route::get('{id}/image', 'UserController@getImage')->where('id', '[0-9]+');
+        Route::post('{id}/image', 'UserController@updateImage')->where('id', '[0-9]+');
+        Route::delete('{id}/image', 'UserController@destroyImage')->where('id', '[0-9]+');
     });
+
 });
