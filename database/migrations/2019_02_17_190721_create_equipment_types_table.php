@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePcTable extends Migration
+class CreateEquipmentTypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreatePcTable extends Migration
      */
     public function up()
     {
-        Schema::create('pc', function (Blueprint $table) {
-            $table->bigInteger('id')->primary();
-            $table->string('name')->nullable();
-            $table->string('socket_token')->nullable();
-            $table->dateTime('last_seen')->nullable();
+        Schema::create('equipment_types', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name')->unique();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ class CreatePcTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pc');
+        Schema::dropIfExists('equipment_types');
     }
 }

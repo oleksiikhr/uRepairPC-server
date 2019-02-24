@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUserTable extends Migration
+class CreateUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -18,25 +18,14 @@ class CreateUserTable extends Migration
             $table->string('first_name');
             $table->string('middle_name')->nullable();
             $table->string('last_name');
-            $table->string('login');
+            $table->string('email')->unique();
             $table->string('password');
-            $table->tinyInteger('role')->default(0);
-            $table->string('socket_token')->nullable();
-            $table->string('secret')->nullable();
             $table->string('image')->nullable();
-            $table->dateTime('last_seen')->nullable();
+            $table->string('role')->default('user');
+            $table->string('phone')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
-
-        // TODO Remove, quick example -> seeder*
-        App\User::create([
-            'id' => 325325,
-            'first_name' => 'First name',
-            'last_name' => 'Last name',
-            'login' => 'admin',
-            'password' => Illuminate\Support\Facades\Hash::make('admin123'),
-            'secret' => 'secret123'
-        ]);
     }
 
     /**
@@ -46,6 +35,6 @@ class CreateUserTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user');
+        Schema::dropIfExists('users');
     }
 }

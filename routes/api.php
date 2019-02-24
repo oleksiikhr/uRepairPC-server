@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,6 +11,41 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+/*
+ * Section: Auth
+ */
+Route::group(['prefix' => 'auth'], function () {
+    Route::group(['middleware' => 'guest'], function () {
+        Route::post('login', 'AuthController@login');
+        Route::post('forgot', 'AuthController@forgot');
+        Route::post('refresh', 'AuthController@refresh');
+    });
+
+    Route::group(['middleware' => ['jwt.auth']], function () {
+        Route::post('logout', 'AuthController@logout');
+    });
+});
+
+Route::group(['middleware' => ['jwt.auth']], function () {
+
+    /*
+     * Section: Users
+     */
+    Route::apiResource('users', 'UserController');
+    Route::group(['prefix' => 'users'], function () {
+        Route::post('{id}/email', 'UserController@updateEmail')->where('id', '[0-9]+');
+        Route::post('{id}/password', 'UserController@updatePassword')->where('id', '[0-9]+');
+        Route::get('{id}/image', 'UserController@getImage')->where('id', '[0-9]+');
+        Route::post('{id}/image', 'UserController@updateImage')->where('id', '[0-9]+');
+        Route::delete('{id}/image', 'UserController@destroyImage')->where('id', '[0-9]+');
+    });
+
+    /*
+     * Section: Equipments
+     */
+    Route::apiResource('equipments', 'EquipmentController');
+    Route::apiResource('equipments/types', 'EquipmentTypeController');
+    Route::apiResource('equipments/manufacturers', 'EquipmentManufacturerController');
+    Route::apiResource('equipments/models', 'EquipmentModelController');
+
 });
