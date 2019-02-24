@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\User;
-use App\EquipmentType;
-use App\Http\Requests\EquipmentTypeRequest;
+use App\EquipmentManufacturer;
+use App\Http\Requests\EquipmentManufacturerRequest;
 
-class EquipmentTypeController extends Controller
+class EquipmentManufacturerController extends Controller
 {
     public function __construct()
     {
@@ -30,7 +30,7 @@ class EquipmentTypeController extends Controller
      */
     public function index()
     {
-        $list = EquipmentType::paginate(self::PAGINATE_DEFAULT);
+        $list = EquipmentManufacturer::paginate(self::PAGINATE_DEFAULT);
 
         return response()->json($list);
     }
@@ -38,12 +38,12 @@ class EquipmentTypeController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  EquipmentTypeRequest  $request
+     * @param  EquipmentManufacturerRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(EquipmentTypeRequest $request)
+    public function store(EquipmentManufacturerRequest $request)
     {
-        $model = new EquipmentType;
+        $model = new EquipmentManufacturer;
         $model->name = $request->name;
         $model->description = $request->description;
 
@@ -62,21 +62,24 @@ class EquipmentTypeController extends Controller
      */
     public function show($id)
     {
-        $model = EquipmentType::findOrFail($id);
+        $model = EquipmentManufacturer::findOrFail($id);
 
-        return response()->json(['message' => 'Тип обладнання отриман', 'model' => $model]);
+        return response()->json([
+            'message' => 'Виробник обладнання отриман',
+            'model' => $model,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  EquipmentTypeRequest  $request
+     * @param  EquipmentManufacturerRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(EquipmentTypeRequest $request, $id)
+    public function update(EquipmentManufacturerRequest $request, $id)
     {
-        $model = EquipmentType::findOrFail($id);
+        $model = EquipmentManufacturer::findOrFail($id);
         $model->name = $request->has('name') ? $request->name : $model->name;
         $model->description = $request->has('description') ? $request->description : $model->description;
 
@@ -95,8 +98,8 @@ class EquipmentTypeController extends Controller
      */
     public function destroy($id)
     {
-        if (EquipmentType::destroy($id)) {
-            return response()->json(['message' => 'Тип обладнання видалений']);
+        if (EquipmentManufacturer::destroy($id)) {
+            return response()->json(['message' => 'Виробник обладнання видалений']);
         }
 
         return response()->json(['message' => 'Виникла помилка при видаленні'], 422);
