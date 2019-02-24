@@ -46,6 +46,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::group(['prefix' => 'equipments'], function () {
         Route::apiResource('types', 'EquipmentTypeController');
         Route::apiResource('manufacturers', 'EquipmentManufacturerController');
+        Route::apiResource('models', 'EquipmentModelController');
     });
 
 });
