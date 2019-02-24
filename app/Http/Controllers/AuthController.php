@@ -26,7 +26,7 @@ class AuthController extends Controller
         ]);
 
         if (!$token = JWTAuth::attempt($request->only('email', 'password'))) {
-            return response()->json(['message' => 'Дані невірні'], 401);
+            return response()->json(['message' => 'Дані невірні'], 422);
         }
 
         return response()->json([
@@ -46,7 +46,7 @@ class AuthController extends Controller
         $token = JWTAuth::getToken();
 
         if (! $token) {
-            return response()->json(['message' => 'Токен не дійсний'], 401);
+            return response()->json(['message' => 'Токен не дійсний'], 422);
         }
 
         return response()->json(['token' => JWTAuth::refresh($token)]);
@@ -68,7 +68,7 @@ class AuthController extends Controller
 
         return $response == Password::RESET_LINK_SENT
             ? response()->json(['message' => 'Лист відправлено на вашу пошту'], 201)
-            : response()->json(['message' => 'Неможливо відправити на пошту'], 401);
+            : response()->json(['message' => 'Неможливо відправити на пошту'], 422);
     }
 
     /**
