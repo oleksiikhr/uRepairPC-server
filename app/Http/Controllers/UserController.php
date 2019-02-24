@@ -20,13 +20,13 @@ class UserController extends Controller
     {
         $this->allowRoles([
             User::ROLE_MODERATOR => [
-                'index', 'show', 'store', 'update', 'updateEmail', 'getImage', 'updateImage', 'destroyImage'
+                'index', 'show', 'store', 'update', 'updateEmail', 'getImage', 'updateImage', 'destroyImage',
             ],
             User::ROLE_WORKER => [
-                'index', 'show', 'getImage', 'updateEmail', 'updateImage', 'destroyImage'
+                'index', 'show', 'getImage', 'updateEmail', 'updateImage', 'destroyImage',
             ],
             User::ROLE_USER => [
-                'index', 'show', 'getImage', 'updateEmail', 'updateImage', 'destroyImage'
+                'index', 'show', 'getImage', 'updateEmail', 'updateImage', 'destroyImage',
             ],
         ]);
     }
@@ -38,7 +38,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $list = User::paginate(50);
+        $list = User::paginate(self::PAGINATE_DEFAULT);
 
         return response()->json($list);
     }

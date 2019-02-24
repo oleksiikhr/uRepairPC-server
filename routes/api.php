@@ -40,4 +40,11 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         Route::delete('{id}/image', 'UserController@destroyImage')->where('id', '[0-9]+');
     });
 
+    /*
+     * Section: Equipment
+     */
+    Route::group(['prefix' => 'equipments'], function () {
+        Route::apiResource('types', 'EquipmentTypeController');
+    });
+
 });

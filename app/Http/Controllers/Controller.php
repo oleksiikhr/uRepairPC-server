@@ -12,6 +12,9 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    /** @var int */
+    const PAGINATE_DEFAULT = 50;
+
     /**
      * Register middleware on depends key-value array.
      * Allow only accept routes on current role.
