@@ -15,7 +15,7 @@ class CreateEquipmentManufacturersTable extends Migration
     {
         Schema::create('equipment_manufacturers', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
+            $table->string('name')->unique();
             $table->text('description')->nullable();
             $table->timestamps();
         });

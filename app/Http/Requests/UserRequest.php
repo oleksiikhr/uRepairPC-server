@@ -37,7 +37,7 @@ class UserRequest extends FormRequest
         ];
 
         if ($request->method === 'POST') {
-            $rules['email'] = 'required|email|unique:users';
+            $rules['email'] = 'required|email|unique:users,email';
             $rules['first_name'] = 'required|' . $rules['first_name'];
             $rules['last_name'] = 'required|' . $rules['last_name'];
 

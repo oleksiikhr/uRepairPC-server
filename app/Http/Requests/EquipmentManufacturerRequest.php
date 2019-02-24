@@ -26,7 +26,7 @@ class EquipmentManufacturerRequest extends FormRequest
     public function rules(Request $request)
     {
         $rules = [
-            'name' => 'string|between:1,191',
+            'name' => 'string|between:1,191|unique:equipment_manufacturers,name',
             'description' => 'nullable|text|max:600',
         ];
 
