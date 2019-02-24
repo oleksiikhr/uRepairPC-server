@@ -33,7 +33,8 @@ Route::group(['middleware' => ['jwt.auth']], function () {
      */
     Route::group(['prefix' => 'users'], function () {
         Route::apiResource('/', 'UserController');
-        // TODO email, password
+        Route::post('{id}/email', 'UserController@updateEmail')->where('id', '[0-9]+');
+        Route::post('{id}/password', 'UserController@updatePassword')->where('id', '[0-9]+');
         Route::get('{id}/image', 'UserController@getImage')->where('id', '[0-9]+');
         Route::post('{id}/image', 'UserController@updateImage')->where('id', '[0-9]+');
         Route::delete('{id}/image', 'UserController@destroyImage')->where('id', '[0-9]+');

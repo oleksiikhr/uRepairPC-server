@@ -12,7 +12,7 @@ trait ImageTrait
      *
      * @param string $id
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return false|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|int
      */
     public function getImage($id)
     {
@@ -23,12 +23,11 @@ trait ImageTrait
         }
 
         $type = Storage::mimeType($path);
+        $file = Storage::path($path);
 
-        self::decodeImageToHtml($path);
-
-        die;
-
-        return response(file_get_contents($path))->header('Content-Type', $type);
+        header('Content-Type:' . $type);
+        header('Content-Length:' . filesize($file));
+        return readfile($file);
     }
 
     /**
@@ -41,7 +40,7 @@ trait ImageTrait
      */
     public function setImage(Request $request, $id)
     {
-        $this->validate($request, [
+        $request->validate([
             'image' => 'required|file|mimes:jpeg,jpg,png|max:8000'
         ]);
 

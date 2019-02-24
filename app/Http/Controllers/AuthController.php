@@ -16,11 +16,10 @@ class AuthController extends Controller
      *
      * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function login(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'email' => 'required|email|max:191',
             'password' => 'required|between:6,191'
         ]);

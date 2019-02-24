@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\traits\ImageTrait;
 use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -18,9 +19,15 @@ class UserController extends Controller
     public function __construct()
     {
         $this->allowRoles([
-            User::ROLE_MODERATOR => ['index2', 'show', 'store', 'update', 'getImage', 'updateImage', 'destroyImage'],
-            User::ROLE_WORKER => ['index', 'show', 'getImage', 'updateImage', 'destroyImage'],
-            User::ROLE_USER => ['index', 'show', 'getImage', 'updateImage', 'destroyImage'],
+            User::ROLE_MODERATOR => [
+                'index', 'show', 'store', 'update', 'updateEmail', 'getImage', 'updateImage', 'destroyImage'
+            ],
+            User::ROLE_WORKER => [
+                'index', 'show', 'getImage', 'updateEmail', 'updateImage', 'destroyImage'
+            ],
+            User::ROLE_USER => [
+                'index', 'show', 'getImage', 'updateEmail', 'updateImage', 'destroyImage'
+            ],
         ]);
     }
 
@@ -136,6 +143,37 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
+    public function updateEmail(Request $request, int $id)
+    {
+        $request->validate([
+            'email' => 'required|email|unique:users',
+        ]);
+
+        $me = Auth::user();
+
+        if (($me->isUserRole() || $me->isWorkerRole()) && $me->id !== $id) {
+            return response()->json(['message' => 'Немає прав'], 422);
+        }
+
+        $user = User::findOrFail($id);
+        $user->email = $request->email;
+
+        if (! $user->save()) {
+            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+        }
+
+//        TODO Send message to email
+
+        return response()->json(['message' => 'Збережено', 'user' => $user]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function updateImage(Request $request, int $id)
     {
         $me = Auth::user();
@@ -162,6 +200,54 @@ class UserController extends Controller
         }
 
         return $this->deleteImage($id);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param   Request  $request
+     * @param   int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updatePassword(Request $request, $id)
+    {
+        $request->validate([
+            'old_password' => 'required|string',
+            'new_password' => 'required|string',
+        ]);
+
+        $me = Auth::user();
+
+        if ($me->id !== $id && ($me->isUserRole() || $me->isWorkerRole())) {
+            return response()->json(['message' => 'Немає прав'], 422);
+        }
+
+        $user = User::findOrFail($id);
+        $password = str_random(10);
+
+        if ($me->id !== $id) {
+            $user->password = bcrypt($password);
+
+            if (! $user->save()) {
+                return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+            }
+
+            // TODO Send email with new password to the user
+
+            return response()->json(['message' => 'Пароль змінений та відправлений на почту']);
+        }
+
+        if (! Hash::check($request->old_password, $me->passowrd)) {
+            return response()->json(['Дані невірні'], 422);
+        }
+
+        $me->password = bcrypt($password);
+
+        if (! $user->save()) {
+            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+        }
+
+        return response()->json(['message' => 'Пароль змінений']);
     }
 
     /**
