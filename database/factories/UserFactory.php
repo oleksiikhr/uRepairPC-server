@@ -20,7 +20,6 @@ $factory->define(App\User::class, function (Faker $faker) {
         'last_name' => $faker->lastName,
         'email' => $faker->unique()->safeEmail,
         'password' => bcrypt('admin123'),
-        'is_blocked' => random_int(0, 5) === 5,
         'phone' => $faker->phoneNumber,
     ];
 });

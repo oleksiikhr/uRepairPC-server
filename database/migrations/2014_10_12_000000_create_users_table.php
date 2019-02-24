@@ -22,7 +22,6 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('image')->nullable();
             $table->string('role')->default('user');
-            $table->boolean('is_blocked')->default(false);
             $table->string('phone')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();

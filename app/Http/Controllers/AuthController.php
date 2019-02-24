@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use JWTAuth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 
@@ -28,7 +29,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'Дані невірні'], 401);
         }
 
-        return response()->json(['token' => $token]);
+        return response()->json([
+            'message' => 'Ви увійшли в систему',
+            'token' => $token,
+            'user' => Auth::user(),
+        ]);
     }
 
     /**
