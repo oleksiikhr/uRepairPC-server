@@ -32,6 +32,8 @@ class EquipmentManufacturerController extends Controller
     {
         $list = EquipmentManufacturer::paginate(self::PAGINATE_DEFAULT);
 
+//        TODO order, sort, count
+
         return response()->json($list);
     }
 

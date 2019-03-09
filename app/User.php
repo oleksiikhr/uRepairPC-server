@@ -24,6 +24,19 @@ class User extends Authenticatable implements JWTSubject
     /** @var array */
     const ROLES = [self::ROLE_ADMIN, self::ROLE_MODERATOR, self::ROLE_WORKER, self::ROLE_USER];
 
+    /** @var array */
+    const ALLOW_COLUMNS_SEARCH = [
+        'id',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'email',
+        'image',
+        'phone',
+        'updated_at',
+        'created_at',
+    ];
+
     use Notifiable;
 
     /**

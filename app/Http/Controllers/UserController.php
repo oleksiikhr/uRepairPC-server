@@ -34,11 +34,25 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        $list = User::paginate(self::PAGINATE_DEFAULT);
+        $request->validate([
+            'search' => 'string',
+            'columns.*' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SEARCH),
+        ]);
+
+        $query = User::query();
+
+        if ($request->has('search') && $request->has('columns') && count($request->columns)) {
+            foreach ($request->columns as $column) {
+                $query->orWhere($column, 'LIKE', '%' . $request->search . '%');
+            }
+        }
+
+        $list = $query->paginate(self::PAGINATE_DEFAULT);
 
         return response()->json($list);
     }
