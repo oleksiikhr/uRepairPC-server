@@ -37,6 +37,19 @@ class User extends Authenticatable implements JWTSubject
         'created_at',
     ];
 
+    /** @var array */
+    const ALLOW_COLUMNS_SORT = [
+        'id',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'email',
+        'role',
+        'phone',
+        'updated_at',
+        'created_at',
+    ];
+
     use Notifiable;
 
     /**

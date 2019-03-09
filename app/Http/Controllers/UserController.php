@@ -42,14 +42,22 @@ class UserController extends Controller
         $request->validate([
             'search' => 'string',
             'columns.*' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SEARCH),
+            'sortColumn' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SORT),
+            'sortOrder' => 'string|in:ascending,descending',
         ]);
 
         $query = User::query();
 
+        // Search
         if ($request->has('search') && $request->has('columns') && count($request->columns)) {
             foreach ($request->columns as $column) {
                 $query->orWhere($column, 'LIKE', '%' . $request->search . '%');
             }
+        }
+
+        // Order
+        if ($request->has('sortColumn')) {
+            $query->orderBy($request->sortColumn, $request->sortOrder === 'descending' ? 'desc' : 'asc');
         }
 
         $list = $query->paginate(self::PAGINATE_DEFAULT);
