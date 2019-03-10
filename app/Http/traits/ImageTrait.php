@@ -50,7 +50,7 @@ trait ImageTrait
     public function setImage(Request $request, $id)
     {
         $request->validate([
-            'image' => 'required|file|mimes:jpeg,jpg,png|max:8000'
+            'image' => 'required|file|mimes:jpeg,jpg,png|max:2000'
         ]);
 
         $file = $request->file('image');
