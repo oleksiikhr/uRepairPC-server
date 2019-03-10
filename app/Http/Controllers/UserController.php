@@ -259,7 +259,7 @@ class UserController extends Controller
             return response()->json(['message' => 'Пароль змінений та відправлений на почту']);
         }
 
-        if (! Hash::check($request->old_password, $me->passowrd)) {
+        if (! Hash::check($request->old_password, $me->password)) {
             return response()->json(['Дані невірні'], 422);
         }
 

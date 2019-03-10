@@ -2,6 +2,7 @@
 
 namespace App\Http\traits;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -10,20 +11,28 @@ trait ImageTrait
     /**
      * Get image by model.
      *
-     * @param string $id
+     * @param  Request  $request
      *
      * @return false|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|int
      */
-    public function getImage($id)
+    public function getImage(Request $request)
     {
-        $path = $this->_model::findOrFail($id)->image;
+        $request->validate([
+            'path' => 'required|string'
+        ]);
 
-        if (! Storage::exists($path)) {
+        $tableName = (new $this->_model)->getTable();
+
+        if (! Str::startsWith($request->path, $tableName . '/avatars/')) {
             return response(null);
         }
 
-        $type = Storage::mimeType($path);
-        $file = Storage::path($path);
+        if (! Storage::exists($request->path)) {
+            return response(null);
+        }
+
+        $type = Storage::mimeType($request->path);
+        $file = Storage::path($request->path);
 
         header('Content-Type:' . $type);
         header('Content-Length:' . filesize($file));
