@@ -49,7 +49,7 @@ class EquipmentModelController extends Controller
         $model->manufacturer_id = $request->manufacturer_id;
 
         if (! $model->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+            return response()->json(['message' => 'Виникла помилка при збереженні'], 409);
         }
 
         return response()->json([
@@ -89,7 +89,7 @@ class EquipmentModelController extends Controller
             : $model->manufacturer_id;
 
         if (! $model->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+            return response()->json(['message' => 'Виникла помилка при збереженні'], 409);
         }
 
         return response()->json([
@@ -110,7 +110,7 @@ class EquipmentModelController extends Controller
             return response()->json(['message' => 'Модель обладнання видалений']);
         }
 
-        return response()->json(['message' => 'Виникла помилка при видаленні'], 422);
+        return response()->json(['message' => 'Виникла помилка при видаленні'], 409);
     }
 
     /**

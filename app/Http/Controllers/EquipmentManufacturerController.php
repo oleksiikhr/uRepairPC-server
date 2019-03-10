@@ -47,7 +47,7 @@ class EquipmentManufacturerController extends Controller
         $model->description = $request->description;
 
         if (! $model->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+            return response()->json(['message' => 'Виникла помилка при збереженні'], 409);
         }
 
         return response()->json(['message' => 'Збережено', 'model' => $model]);
@@ -83,7 +83,7 @@ class EquipmentManufacturerController extends Controller
         $model->description = $request->has('description') ? $request->description : $model->description;
 
         if (! $model->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+            return response()->json(['message' => 'Виникла помилка при збереженні'], 409);
         }
 
         return response()->json(['message' => 'Збережено', 'model' => $model]);
@@ -101,6 +101,6 @@ class EquipmentManufacturerController extends Controller
             return response()->json(['message' => 'Виробник обладнання видалений']);
         }
 
-        return response()->json(['message' => 'Виникла помилка при видаленні'], 422);
+        return response()->json(['message' => 'Виникла помилка при видаленні'], 409);
     }
 }

@@ -72,14 +72,14 @@ trait ImageTrait
         );
 
         if (! $uploadedUri) {
-            return response()->json(['message' => 'Файл не зберігся'], 422);
+            return response()->json(['message' => 'Файл не зберігся'], 409);
         }
 
         $model->image = $uploadedUri;
 
         if (! $model->save()) {
             Storage::delete($uploadedUri);
-            return response()->json(['message' => 'Помилка створення запису в БД'], 422);
+            return response()->json(['message' => 'Помилка створення запису в БД'], 409);
         }
 
         self::decodeImageToHtml($model);
@@ -104,13 +104,13 @@ trait ImageTrait
         }
 
         if (! $deleted) {
-            return response()->json(['message' => 'Зображення не вилучено'], 422);
+            return response()->json(['message' => 'Зображення не вилучено'], 409);
         }
 
         $model->image = null;
 
         if (! $model->save()) {
-            return response()->json(['message' => 'Помилка видалення зображення з БД'], 422);
+            return response()->json(['message' => 'Помилка видалення зображення з БД'], 409);
         }
 
         return response()->json(['message' => 'Видалено зображення', 'deleted' => $deleted]);
