@@ -13,16 +13,13 @@ class User extends Authenticatable implements JWTSubject
     const ROLE_ADMIN = 'admin';
 
     /** @var string - DB */
-    const ROLE_MODERATOR = 'moderator';
-
-    /** @var string - DB */
     const ROLE_WORKER = 'worker';
 
     /** @var string - DB */
     const ROLE_USER = 'user';
 
     /** @var array */
-    const ROLES = [self::ROLE_ADMIN, self::ROLE_MODERATOR, self::ROLE_WORKER, self::ROLE_USER];
+    const ROLES = [self::ROLE_ADMIN, self::ROLE_WORKER, self::ROLE_USER];
 
     /** @var array */
     const ALLOW_COLUMNS_SEARCH = [
@@ -95,19 +92,9 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return bool
      */
-    public function isAdminRole()
+    public function admin()
     {
         return $this->role === self::ROLE_ADMIN;
-    }
-
-    /**
-     * Role of the user is Moderator.
-     *
-     * @return bool
-     */
-    public function isModeratorRole()
-    {
-        return $this->role === self::ROLE_MODERATOR;
     }
 
     /**
@@ -115,7 +102,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return bool
      */
-    public function isWorkerRole()
+    public function worker()
     {
         return $this->role === self::ROLE_WORKER;
     }
@@ -125,7 +112,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return bool
      */
-    public function isUserRole()
+    public function user()
     {
         return $this->role === self::ROLE_USER;
     }

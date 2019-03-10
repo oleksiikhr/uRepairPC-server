@@ -41,7 +41,7 @@ class UserRequest extends FormRequest
             $rules['first_name'] = 'required|' . $rules['first_name'];
             $rules['last_name'] = 'required|' . $rules['last_name'];
 
-            if (Auth::user()->isAdminRole()) {
+            if (Auth::user()->admin()) {
                 $rules['role'] = 'required|' . $rules['role'];
             }
         }

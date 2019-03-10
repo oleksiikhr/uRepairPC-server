@@ -19,14 +19,11 @@ class UserController extends Controller
     public function __construct()
     {
         $this->allowRoles([
-            User::ROLE_MODERATOR => [
-                'index', 'show', 'store', 'update', 'updateEmail', 'getImage', 'updateImage', 'destroyImage',
-            ],
             User::ROLE_WORKER => [
-                'index', 'show', 'getImage', 'updateEmail', 'updateImage', 'destroyImage',
+                'index', 'show', 'update', 'updatePassword', 'updateEmail', 'getImage', 'updateImage', 'destroyImage',
             ],
             User::ROLE_USER => [
-                'index', 'show', 'getImage', 'updateEmail', 'updateImage', 'destroyImage',
+                'index', 'show', 'update', 'updatePassword', 'updateEmail', 'getImage', 'updateImage', 'destroyImage',
             ],
         ]);
     }
@@ -82,7 +79,7 @@ class UserController extends Controller
         $user->last_name = $request->last_name;
         $user->phone = $request->phone;
         $user->description = $request->description;
-        $user->role = $this->setRole($user, $request->role);
+        $this->setRole($user, $request->role);
         $user->password = bcrypt($password);
 
         if (! $user->save()) {
@@ -118,7 +115,7 @@ class UserController extends Controller
     {
         $me = Auth::user();
 
-        if (($me->isUserRole() || $me->isWorkerRole()) && $me->id !== $id) {
+        if (! $me->admin() && $me->id !== $id) {
             return response()->json(['Немає прав'], 422);
         }
 
@@ -128,7 +125,10 @@ class UserController extends Controller
         $user->last_name = $request->has('last_name') ? $request->last_name : $user->last_name;
         $user->phone = $request->has('phone') ? $request->phone : $user->phone;
         $user->description = $request->has('description') ? $request->description : $user->description;
-        $user->role = $request->has('role') ? $this->setRole($user, $request->role) : $user->role;
+
+        if ($request->has('role')) {
+            $this->setRole($user, $request->role);
+        }
 
         if (! $user->save()) {
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
@@ -173,7 +173,7 @@ class UserController extends Controller
 
         $me = Auth::user();
 
-        if (($me->isUserRole() || $me->isWorkerRole()) && $me->id !== $id) {
+        if (! $me->admin() && $me->id !== $id) {
             return response()->json(['message' => 'Немає прав'], 422);
         }
 
@@ -200,7 +200,7 @@ class UserController extends Controller
     {
         $me = Auth::user();
 
-        if (($me->isUserRole() || $me->isWorkerRole()) && $me->id !== $id) {
+        if (! $me->admin() && $me->id !== $id) {
             return response()->json(['message' => 'Немає прав'], 422);
         }
 
@@ -217,7 +217,7 @@ class UserController extends Controller
     {
         $me = Auth::user();
 
-        if (($me->isUserRole() || $me->isWorkerRole()) && $me->id !== $id) {
+        if (! $me->admin() && $me->id !== $id) {
             return response()->json(['message' => 'Немає прав'], 422);
         }
 
@@ -226,6 +226,9 @@ class UserController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * If the user edit the same, need password
+     * Another - send email to the user with
+     * new random password.
      *
      * @param   Request  $request
      * @param   int  $id
@@ -233,20 +236,22 @@ class UserController extends Controller
      */
     public function updatePassword(Request $request, $id)
     {
-        $request->validate([
-            'old_password' => 'required|string',
-            'new_password' => 'required|string',
-        ]);
-
         $me = Auth::user();
 
-        if ($me->id !== $id && ($me->isUserRole() || $me->isWorkerRole())) {
+        if ($me->id === $id) {
+            $request->validate([
+                'password' => 'required|string',
+            ]);
+        }
+
+        if (! $me->admin() && $me->id !== $id) {
             return response()->json(['message' => 'Немає прав'], 422);
         }
 
         $user = User::findOrFail($id);
         $password = str_random(10);
 
+        // Send email with new password
         if ($me->id !== $id) {
             $user->password = bcrypt($password);
 
@@ -257,10 +262,6 @@ class UserController extends Controller
             // TODO Send email with new password to the user
 
             return response()->json(['message' => 'Пароль змінений та відправлений на почту']);
-        }
-
-        if (! Hash::check($request->old_password, $me->password)) {
-            return response()->json(['Дані невірні'], 422);
         }
 
         $me->password = bcrypt($password);
@@ -280,24 +281,18 @@ class UserController extends Controller
     private function setRole(&$user, $role)
     {
         $me = Auth::user();
-        $user->role = User::ROLE_USER;
 
         if (empty($role)) {
             return false;
         }
 
-        // User and Worker can't set a role
-        if ($me->isUserRole() || $me->isWorkerRole()) {
+        // No admin can't set a role
+        if (! $me->admin()) {
             return false;
         }
 
         // Block change myself a role
         if ($me->id === $user->id) {
-            return false;
-        }
-
-        // Moderator can't set admin a role
-        if ($me->isModeratorRole() && $role === User::ROLE_ADMIN) {
             return false;
         }
 

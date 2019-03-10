@@ -23,7 +23,7 @@ class Role
 
         $user = Auth::user();
 
-        if ($user->isAdminRole()) {
+        if ($user->admin()) {
             return $next($request);
         }
 
