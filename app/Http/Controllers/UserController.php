@@ -83,7 +83,7 @@ class UserController extends Controller
         $user->password = bcrypt($password);
 
         if (! $user->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 409);
+            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
         }
 
 //        TODO Send email with password
@@ -116,7 +116,7 @@ class UserController extends Controller
         $me = Auth::user();
 
         if (! $me->admin() && $me->id !== $id) {
-            return response()->json(['message' => 'Немає прав'], 422);
+            return response()->json(['message' => 'Немає прав'], 403);
         }
 
         $user = User::findOrFail($id);
@@ -131,7 +131,7 @@ class UserController extends Controller
         }
 
         if (! $user->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 409);
+            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
         }
 
         return response()->json(['message' => 'Збережено', 'user' => $user]);
@@ -148,14 +148,14 @@ class UserController extends Controller
         $me = Auth::user();
 
         if ($me->id === $id) {
-            return response()->json(['message' => 'Неможливо видалити самого себе'], 422);
+            return response()->json(['message' => 'Неможливо видалити самого себе'], 403);
         }
 
         if (User::destroy($id)) {
             return response()->json(['message' => 'Користувач видалений']);
         }
 
-        return response()->json(['message' => 'Виникла помилка при видаленні'], 409);
+        return response()->json(['message' => 'Виникла помилка при видаленні'], 422);
     }
 
     /**
@@ -174,14 +174,14 @@ class UserController extends Controller
         $me = Auth::user();
 
         if (! $me->admin() && $me->id !== $id) {
-            return response()->json(['message' => 'Немає прав'], 422);
+            return response()->json(['message' => 'Немає прав'], 403);
         }
 
         $user = User::findOrFail($id);
         $user->email = $request->email;
 
         if (! $user->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 409);
+            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
         }
 
 //        TODO Send message to email
@@ -201,7 +201,7 @@ class UserController extends Controller
         $me = Auth::user();
 
         if (! $me->admin() && $me->id !== $id) {
-            return response()->json(['message' => 'Немає прав'], 422);
+            return response()->json(['message' => 'Немає прав'], 403);
         }
 
         return $this->setImage($request, $id);
@@ -218,7 +218,7 @@ class UserController extends Controller
         $me = Auth::user();
 
         if (! $me->admin() && $me->id !== $id) {
-            return response()->json(['message' => 'Немає прав'], 422);
+            return response()->json(['message' => 'Немає прав'], 403);
         }
 
         return $this->deleteImage($id);
@@ -245,7 +245,7 @@ class UserController extends Controller
         }
 
         if (! $me->admin() && $me->id !== $id) {
-            return response()->json(['message' => 'Немає прав'], 422);
+            return response()->json(['message' => 'Немає прав'], 403);
         }
 
         $user = User::findOrFail($id);
@@ -256,7 +256,7 @@ class UserController extends Controller
             $user->password = bcrypt($password);
 
             if (! $user->save()) {
-                return response()->json(['message' => 'Виникла помилка при збереженні'], 409);
+                return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
             }
 
             // TODO Send email with new password to the user
@@ -267,7 +267,7 @@ class UserController extends Controller
         $me->password = bcrypt($password);
 
         if (! $user->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 409);
+            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
         }
 
         return response()->json(['message' => 'Пароль змінений']);

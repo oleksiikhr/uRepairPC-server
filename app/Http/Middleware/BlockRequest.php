@@ -15,6 +15,6 @@ class BlockRequest
      */
     public function handle($request, Closure $next)
     {
-        return response()->json(['message' => 'Немає прав'], 422);
+        return response()->json(['message' => 'Немає прав'], 403);
     }
 }
