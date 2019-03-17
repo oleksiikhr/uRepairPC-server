@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -85,6 +86,21 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    /**
+     * Convert the model instance to an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        // Hide role
+        if (Auth::user()->role !== self::ROLE_ADMIN && Auth::user()->id !== $this->id) {
+            $this->makeHidden('role');
+        }
+
+        return parent::toArray();
     }
 
     /**
