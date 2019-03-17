@@ -16,7 +16,7 @@ class UsersTableSeeder extends Seeder
             'first_name' => 'Admin',
             'last_name' => 'Admin',
             'email' => 'admin@example.com',
-            'password' => bcrypt('admin123'),
+            'password' => '$2y$10$wUVz4ckveO.3O4Qvbuik/.fleI13a/VxQmeSEbPwaqZ8GbdLedmNC', // admin123
             'role' => 'admin',
         ]);
 

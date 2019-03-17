@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Http\traits\ImageTrait;
 use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -15,6 +14,9 @@ class UserController extends Controller
 
     /** @var string */
     private $_model = User::class;
+
+    /** @var int */
+    private const RANDOM_PASSWORD_LEN = 10;
 
     public function __construct()
     {
@@ -70,7 +72,7 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
-        $password = str_random(10);
+        $password = str_random(self::RANDOM_PASSWORD_LEN);
 
         $user = new User;
         $user->email = $request->email;
@@ -97,7 +99,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function show(int $id)
     {
         $user = User::findOrFail($id);
 
@@ -111,7 +113,7 @@ class UserController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UserRequest $request, $id)
+    public function update(UserRequest $request, int $id)
     {
         $me = Auth::user();
 
@@ -143,7 +145,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $me = Auth::user();
 
@@ -234,7 +236,7 @@ class UserController extends Controller
      * @param   int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updatePassword(Request $request, $id)
+    public function updatePassword(Request $request, int $id)
     {
         $me = Auth::user();
 
@@ -249,9 +251,9 @@ class UserController extends Controller
         }
 
         $user = User::findOrFail($id);
-        $password = str_random(10);
+        $password = str_random(self::RANDOM_PASSWORD_LEN);
 
-        // Send email with new password
+        // Edit another user => send email with a new random password
         if ($me->id !== $id) {
             $user->password = bcrypt($password);
 
@@ -264,7 +266,7 @@ class UserController extends Controller
             return response()->json(['message' => 'Пароль змінений та відправлений на почту']);
         }
 
-        $me->password = bcrypt($password);
+        $user->password = bcrypt($request->password);
 
         if (! $user->save()) {
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
@@ -278,7 +280,7 @@ class UserController extends Controller
      * @param  String  $role
      * @return bool
      */
-    private function setRole(&$user, $role)
+    private function setRole(User &$user, string $role)
     {
         $me = Auth::user();
 
