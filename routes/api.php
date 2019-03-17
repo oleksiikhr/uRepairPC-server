@@ -41,6 +41,13 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     });
 
     /*
+     * Section: Workers (users*)
+     */
+    Route::group(['prefix' => 'workers'], function () {
+        Route::get('/', 'WorkerController@index');
+    });
+
+    /*
      * Section: Equipments
      */
     Route::apiResource('equipments', 'EquipmentController');
