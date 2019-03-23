@@ -33,11 +33,18 @@ Route::group(['middleware' => ['jwt.auth']], function () {
      */
     Route::apiResource('users', 'UserController');
     Route::group(['prefix' => 'users'], function () {
+        Route::get('get/image', 'UserController@getImage');
         Route::post('{id}/email', 'UserController@updateEmail')->where('id', '[0-9]+');
         Route::post('{id}/password', 'UserController@updatePassword')->where('id', '[0-9]+');
-        Route::get('{id}/image', 'UserController@getImage')->where('id', '[0-9]+');
         Route::post('{id}/image', 'UserController@updateImage')->where('id', '[0-9]+');
         Route::delete('{id}/image', 'UserController@destroyImage')->where('id', '[0-9]+');
+    });
+
+    /*
+     * Section: Workers (users*)
+     */
+    Route::group(['prefix' => 'workers'], function () {
+        Route::get('/', 'WorkerController@index');
     });
 
     /*

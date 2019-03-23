@@ -11,9 +11,6 @@ class EquipmentTypeController extends Controller
     public function __construct()
     {
         $this->allowRoles([
-            User::ROLE_MODERATOR => [
-                'index', 'store', 'show', 'update', 'destroy',
-            ],
             User::ROLE_WORKER => [
                 'index', 'store', 'show', 'update', 'destroy',
             ],
@@ -31,6 +28,8 @@ class EquipmentTypeController extends Controller
     public function index()
     {
         $list = EquipmentType::paginate(self::PAGINATE_DEFAULT);
+
+//        TODO order, sort, count
 
         return response()->json($list);
     }

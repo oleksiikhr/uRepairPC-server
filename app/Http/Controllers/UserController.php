@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Http\traits\ImageTrait;
 use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -16,17 +15,17 @@ class UserController extends Controller
     /** @var string */
     private $_model = User::class;
 
+    /** @var int */
+    private const RANDOM_PASSWORD_LEN = 10;
+
     public function __construct()
     {
         $this->allowRoles([
-            User::ROLE_MODERATOR => [
-                'index', 'show', 'store', 'update', 'updateEmail', 'getImage', 'updateImage', 'destroyImage',
-            ],
             User::ROLE_WORKER => [
-                'index', 'show', 'getImage', 'updateEmail', 'updateImage', 'destroyImage',
+                'index', 'show', 'update', 'updatePassword', 'updateEmail', 'getImage', 'updateImage', 'destroyImage',
             ],
             User::ROLE_USER => [
-                'index', 'show', 'getImage', 'updateEmail', 'updateImage', 'destroyImage',
+                'index', 'show', 'update', 'updatePassword', 'updateEmail', 'getImage', 'updateImage', 'destroyImage',
             ],
         ]);
     }
@@ -34,11 +33,33 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        $list = User::paginate(self::PAGINATE_DEFAULT);
+        $request->validate([
+            'search' => 'string',
+            'columns.*' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SEARCH),
+            'sortColumn' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SORT),
+            'sortOrder' => 'string|in:ascending,descending',
+        ]);
+
+        $query = User::query();
+
+        // Search
+        if ($request->has('search') && $request->has('columns') && count($request->columns)) {
+            foreach ($request->columns as $column) {
+                $query->orWhere($column, 'LIKE', '%' . $request->search . '%');
+            }
+        }
+
+        // Order
+        if ($request->has('sortColumn')) {
+            $query->orderBy($request->sortColumn, $request->sortOrder === 'descending' ? 'desc' : 'asc');
+        }
+
+        $list = $query->paginate(self::PAGINATE_DEFAULT);
 
         return response()->json($list);
     }
@@ -51,7 +72,7 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
-        $password = str_random(10);
+        $password = str_random(self::RANDOM_PASSWORD_LEN);
 
         $user = new User;
         $user->email = $request->email;
@@ -60,7 +81,7 @@ class UserController extends Controller
         $user->last_name = $request->last_name;
         $user->phone = $request->phone;
         $user->description = $request->description;
-        $user->role = $this->setRole($user, $request->role);
+        $this->setRole($user, $request->role);
         $user->password = bcrypt($password);
 
         if (! $user->save()) {
@@ -78,7 +99,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function show(int $id)
     {
         $user = User::findOrFail($id);
 
@@ -92,12 +113,12 @@ class UserController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UserRequest $request, $id)
+    public function update(UserRequest $request, int $id)
     {
         $me = Auth::user();
 
-        if (($me->isUserRole() || $me->isWorkerRole()) && $me->id !== $id) {
-            return response()->json(['Немає прав'], 422);
+        if (! $me->admin() && $me->id !== $id) {
+            return response()->json(['message' => 'Немає прав'], 403);
         }
 
         $user = User::findOrFail($id);
@@ -106,7 +127,10 @@ class UserController extends Controller
         $user->last_name = $request->has('last_name') ? $request->last_name : $user->last_name;
         $user->phone = $request->has('phone') ? $request->phone : $user->phone;
         $user->description = $request->has('description') ? $request->description : $user->description;
-        $user->role = $request->has('role') ? $this->setRole($user, $request->role) : $user->role;
+
+        if ($request->has('role')) {
+            $this->setRole($user, $request->role);
+        }
 
         if (! $user->save()) {
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
@@ -121,12 +145,12 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $me = Auth::user();
 
         if ($me->id === $id) {
-            return response()->json(['message' => 'Неможливо видалити самого себе'], 422);
+            return response()->json(['message' => 'Неможливо видалити самого себе'], 403);
         }
 
         if (User::destroy($id)) {
@@ -151,8 +175,8 @@ class UserController extends Controller
 
         $me = Auth::user();
 
-        if (($me->isUserRole() || $me->isWorkerRole()) && $me->id !== $id) {
-            return response()->json(['message' => 'Немає прав'], 422);
+        if (! $me->admin() && $me->id !== $id) {
+            return response()->json(['message' => 'Немає прав'], 403);
         }
 
         $user = User::findOrFail($id);
@@ -178,8 +202,8 @@ class UserController extends Controller
     {
         $me = Auth::user();
 
-        if (($me->isUserRole() || $me->isWorkerRole()) && $me->id !== $id) {
-            return response()->json(['message' => 'Немає прав'], 422);
+        if (! $me->admin() && $me->id !== $id) {
+            return response()->json(['message' => 'Немає прав'], 403);
         }
 
         return $this->setImage($request, $id);
@@ -195,8 +219,8 @@ class UserController extends Controller
     {
         $me = Auth::user();
 
-        if (($me->isUserRole() || $me->isWorkerRole()) && $me->id !== $id) {
-            return response()->json(['message' => 'Немає прав'], 422);
+        if (! $me->admin() && $me->id !== $id) {
+            return response()->json(['message' => 'Немає прав'], 403);
         }
 
         return $this->deleteImage($id);
@@ -204,27 +228,32 @@ class UserController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * If the user edit the same, need password
+     * Another - send email to the user with
+     * new random password.
      *
      * @param   Request  $request
      * @param   int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updatePassword(Request $request, $id)
+    public function updatePassword(Request $request, int $id)
     {
-        $request->validate([
-            'old_password' => 'required|string',
-            'new_password' => 'required|string',
-        ]);
-
         $me = Auth::user();
 
-        if ($me->id !== $id && ($me->isUserRole() || $me->isWorkerRole())) {
-            return response()->json(['message' => 'Немає прав'], 422);
+        if ($me->id === $id) {
+            $request->validate([
+                'password' => 'required|string',
+            ]);
+        }
+
+        if (! $me->admin() && $me->id !== $id) {
+            return response()->json(['message' => 'Немає прав'], 403);
         }
 
         $user = User::findOrFail($id);
-        $password = str_random(10);
+        $password = str_random(self::RANDOM_PASSWORD_LEN);
 
+        // Edit another user => send email with a new random password
         if ($me->id !== $id) {
             $user->password = bcrypt($password);
 
@@ -237,11 +266,7 @@ class UserController extends Controller
             return response()->json(['message' => 'Пароль змінений та відправлений на почту']);
         }
 
-        if (! Hash::check($request->old_password, $me->passowrd)) {
-            return response()->json(['Дані невірні'], 422);
-        }
-
-        $me->password = bcrypt($password);
+        $user->password = bcrypt($request->password);
 
         if (! $user->save()) {
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
@@ -255,27 +280,21 @@ class UserController extends Controller
      * @param  String  $role
      * @return bool
      */
-    private function setRole(&$user, $role)
+    private function setRole(User &$user, string $role)
     {
         $me = Auth::user();
-        $user->role = User::ROLE_USER;
 
         if (empty($role)) {
             return false;
         }
 
-        // User and Worker can't set a role
-        if ($me->isUserRole() || $me->isWorkerRole()) {
+        // No admin can't set a role
+        if (! $me->admin()) {
             return false;
         }
 
         // Block change myself a role
         if ($me->id === $user->id) {
-            return false;
-        }
-
-        // Moderator can't set admin a role
-        if ($me->isModeratorRole() && $role === User::ROLE_ADMIN) {
             return false;
         }
 

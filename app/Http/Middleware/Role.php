@@ -23,7 +23,7 @@ class Role
 
         $user = Auth::user();
 
-        if ($user->isAdminRole()) {
+        if ($user->admin()) {
             return $next($request);
         }
 
@@ -33,6 +33,6 @@ class Role
             }
         }
 
-        return response()->json(['message' => 'Немає прав'], 422);
+        return response()->json(['message' => 'Немає прав'], 403);
     }
 }
