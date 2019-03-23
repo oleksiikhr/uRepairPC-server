@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Mail\UserCreated;
+use App\Mail\EmailChange;
 use Illuminate\Http\Request;
 use App\Http\traits\ImageTrait;
 use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -88,7 +91,7 @@ class UserController extends Controller
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
         }
 
-//        TODO Send email with password
+        Mail::to($user)->send(new UserCreated($password));
 
         return response()->json(['message' => 'Збережено', 'user' => $user]);
     }
@@ -180,13 +183,14 @@ class UserController extends Controller
         }
 
         $user = User::findOrFail($id);
+        $oldEmail = $user->email;
         $user->email = $request->email;
 
         if (! $user->save()) {
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
         }
 
-//        TODO Send message to email
+        Mail::to($user)->send(new EmailChange($oldEmail, $user->email));
 
         return response()->json(['message' => 'Збережено', 'user' => $user]);
     }
@@ -261,7 +265,7 @@ class UserController extends Controller
                 return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
             }
 
-            // TODO Send email with new password to the user
+            Mail::to($user)->send(new UserCreated($password));
 
             return response()->json(['message' => 'Пароль змінений та відправлений на почту']);
         }
