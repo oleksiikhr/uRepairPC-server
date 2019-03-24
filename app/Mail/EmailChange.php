@@ -14,23 +14,16 @@ class EmailChange extends Mailable
     /**
      * @var string
      */
-    private $_oldEmail;
-
-    /**
-     * @var string
-     */
-    private $_newEmail;
+    private $_email;
 
     /**
      * Create a new message instance.
      *
-     * @param string $oldEmail
-     * @param string $newEmail
+     * @param string $email
      */
-    public function __construct(string $oldEmail, string $newEmail)
+    public function __construct(string $email)
     {
-        $this->_oldEmail = $oldEmail;
-        $this->_newEmail = $newEmail;
+        $this->_email = $email;
     }
 
     /**
@@ -42,9 +35,8 @@ class EmailChange extends Mailable
     {
         return $this->markdown('emails.users.email')
             ->subject(config('app.name') . " - змінився email")
-            ->to($this->_oldEmail)
             ->with([
-                'email' => $this->_newEmail,
+                'email' => $this->_email,
             ]);
     }
 }

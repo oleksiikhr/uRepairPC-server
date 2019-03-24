@@ -50,9 +50,9 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     /*
      * Section: Equipments
      */
-    Route::apiResource('equipments', 'EquipmentController');
     Route::apiResource('equipments/types', 'EquipmentTypeController');
     Route::apiResource('equipments/manufacturers', 'EquipmentManufacturerController');
     Route::apiResource('equipments/models', 'EquipmentModelController');
+    Route::apiResource('equipments', 'EquipmentController');
 
 });

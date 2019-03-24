@@ -183,14 +183,12 @@ class UserController extends Controller
         }
 
         $user = User::findOrFail($id);
-        $oldEmail = $user->email;
+        Mail::to($user)->send(new EmailChange($request->email));
         $user->email = $request->email;
 
         if (! $user->save()) {
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
         }
-
-        Mail::to($user)->send(new EmailChange($oldEmail, $user->email));
 
         return response()->json(['message' => 'Збережено', 'user' => $user]);
     }

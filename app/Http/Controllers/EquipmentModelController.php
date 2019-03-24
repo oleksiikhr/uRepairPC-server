@@ -27,9 +27,7 @@ class EquipmentModelController extends Controller
      */
     public function index()
     {
-        $list = $this->getSelectModel()->paginate(self::PAGINATE_DEFAULT);
-
-//        TODO order, sort, count
+        $list = $this->getSelectModel()->all();
 
         return response()->json($list);
     }
