@@ -27,7 +27,7 @@ class EquipmentTypeRequest extends FormRequest
     {
         $rules = [
             'name' => 'string|between:1,191|unique:equipment_types,name',
-            'description' => 'nullable|text|max:600',
+            'description' => 'nullable|string|max:600',
         ];
 
         if ($request->method === 'POST') {

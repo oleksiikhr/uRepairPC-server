@@ -27,7 +27,7 @@ class EquipmentModelRequest extends FormRequest
     {
         $rules = [
             'name' => 'string|between:1,191',
-            'description' => 'nullable|text|max:600',
+            'description' => 'nullable|string|max:600',
             'type_id' => 'integer|exists:equipment_types,id',
             'manufacturer_id' => 'integer|exists:equipment_manufacturers,id',
         ];
