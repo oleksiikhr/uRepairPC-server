@@ -30,6 +30,10 @@ class EquipmentManufacturerRequest extends FormRequest
             'description' => 'nullable|string|max:600',
         ];
 
+        if ($request->manufacturer) {
+            $rules['name'] = $rules['name'] . ',' . $request->manufacturer;
+        }
+
         if ($request->method === 'POST') {
             $rules['name'] = 'required|' . $rules['name'];
         }

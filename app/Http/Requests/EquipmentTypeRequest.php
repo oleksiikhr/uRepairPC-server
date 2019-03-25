@@ -30,6 +30,10 @@ class EquipmentTypeRequest extends FormRequest
             'description' => 'nullable|string|max:600',
         ];
 
+        if ($request->type) {
+            $rules['name'] = $rules['name'] . ',' . $request->type;
+        }
+
         if ($request->method === 'POST') {
             $rules['name'] = 'required|' . $rules['name'];
         }
