@@ -40,15 +40,15 @@ class EquipmentManufacturerController extends Controller
      */
     public function store(EquipmentManufacturerRequest $request)
     {
-        $model = new EquipmentManufacturer;
-        $model->name = $request->name;
-        $model->description = $request->description;
+        $manufacturer = new EquipmentManufacturer;
+        $manufacturer->name = $request->name;
+        $manufacturer->description = $request->description;
 
-        if (! $model->save()) {
+        if (! $manufacturer->save()) {
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
         }
 
-        return response()->json(['message' => 'Збережено', 'model' => $model]);
+        return response()->json(['message' => 'Збережено', 'model' => $manufacturer]);
     }
 
     /**
@@ -59,11 +59,11 @@ class EquipmentManufacturerController extends Controller
      */
     public function show($id)
     {
-        $model = EquipmentManufacturer::findOrFail($id);
+        $manufacturer = EquipmentManufacturer::findOrFail($id);
 
         return response()->json([
             'message' => 'Виробник обладнання отриман',
-            'model' => $model,
+            'manufacturer' => $manufacturer,
         ]);
     }
 
@@ -76,15 +76,15 @@ class EquipmentManufacturerController extends Controller
      */
     public function update(EquipmentManufacturerRequest $request, $id)
     {
-        $model = EquipmentManufacturer::findOrFail($id);
-        $model->name = $request->has('name') ? $request->name : $model->name;
-        $model->description = $request->has('description') ? $request->description : $model->description;
+        $manufacturer = EquipmentManufacturer::findOrFail($id);
+        $manufacturer->name = $request->has('name') ? $request->name : $manufacturer->name;
+        $manufacturer->description = $request->has('description') ? $request->description : $manufacturer->description;
 
-        if (! $model->save()) {
+        if (! $manufacturer->save()) {
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
         }
 
-        return response()->json(['message' => 'Збережено', 'model' => $model]);
+        return response()->json(['message' => 'Збережено', 'manufacturer' => $manufacturer]);
     }
 
     /**

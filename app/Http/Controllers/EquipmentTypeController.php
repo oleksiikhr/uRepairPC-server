@@ -40,15 +40,15 @@ class EquipmentTypeController extends Controller
      */
     public function store(EquipmentTypeRequest $request)
     {
-        $model = new EquipmentType;
-        $model->name = $request->name;
-        $model->description = $request->description;
+        $type = new EquipmentType;
+        $type->name = $request->name;
+        $type->description = $request->description;
 
-        if (! $model->save()) {
+        if (! $type->save()) {
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
         }
 
-        return response()->json(['message' => 'Збережено', 'model' => $model]);
+        return response()->json(['message' => 'Збережено', 'model' => $type]);
     }
 
     /**
@@ -59,9 +59,9 @@ class EquipmentTypeController extends Controller
      */
     public function show($id)
     {
-        $model = EquipmentType::findOrFail($id);
+        $type = EquipmentType::findOrFail($id);
 
-        return response()->json(['message' => 'Тип обладнання отриман', 'model' => $model]);
+        return response()->json(['message' => 'Тип обладнання отриман', 'type' => $type]);
     }
 
     /**
@@ -73,15 +73,15 @@ class EquipmentTypeController extends Controller
      */
     public function update(EquipmentTypeRequest $request, $id)
     {
-        $model = EquipmentType::findOrFail($id);
-        $model->name = $request->has('name') ? $request->name : $model->name;
-        $model->description = $request->has('description') ? $request->description : $model->description;
+        $type = EquipmentType::findOrFail($id);
+        $type->name = $request->has('name') ? $request->name : $type->name;
+        $type->description = $request->has('description') ? $request->description : $type->description;
 
-        if (! $model->save()) {
+        if (! $type->save()) {
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
         }
 
-        return response()->json(['message' => 'Збережено', 'model' => $model]);
+        return response()->json(['message' => 'Збережено', 'type' => $type]);
     }
 
     /**
