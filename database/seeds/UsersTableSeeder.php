@@ -18,6 +18,8 @@ class UsersTableSeeder extends Seeder
             'email' => 'admin@example.com',
             'password' => '$2y$10$wUVz4ckveO.3O4Qvbuik/.fleI13a/VxQmeSEbPwaqZ8GbdLedmNC', // admin123
             'role' => 'admin',
+            'updated_at' => \Carbon\Carbon::now(),
+            'created_at' => \Carbon\Carbon::now(),
         ]);
 
         factory(App\User::class, 220)->create();

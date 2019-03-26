@@ -27,9 +27,7 @@ class EquipmentManufacturerController extends Controller
      */
     public function index()
     {
-        $list = EquipmentManufacturer::paginate(self::PAGINATE_DEFAULT);
-
-//        TODO order, sort, count
+        $list = EquipmentManufacturer::all();
 
         return response()->json($list);
     }

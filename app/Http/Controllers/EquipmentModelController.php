@@ -27,9 +27,7 @@ class EquipmentModelController extends Controller
      */
     public function index()
     {
-        $list = $this->getSelectModel()->paginate(self::PAGINATE_DEFAULT);
-
-//        TODO order, sort, count
+        $list = $this->getSelectModel()->get();
 
         return response()->json($list);
     }
@@ -120,7 +118,7 @@ class EquipmentModelController extends Controller
     {
         return EquipmentModel::select(
             'equipment_models.*',
-            'equipment_types.name as equipment_name',
+            'equipment_types.name as type_name',
             'equipment_manufacturers.name as manufacturer_name'
         )
             ->join('equipment_types', 'equipment_models.type_id', '=', 'equipment_types.id')

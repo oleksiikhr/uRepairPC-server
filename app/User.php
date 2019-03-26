@@ -5,7 +5,6 @@ namespace App;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
@@ -29,7 +28,7 @@ class User extends Authenticatable implements JWTSubject
         'middle_name',
         'last_name',
         'email',
-        'image',
+        'role',
         'phone',
         'updated_at',
         'created_at',
@@ -142,22 +141,5 @@ class User extends Authenticatable implements JWTSubject
     public function hasRole($role)
     {
         return $this->role === $role;
-    }
-
-    /**
-     * Send the password reset notification.
-     *
-     * @param  string  $token
-     * @return MailMessage
-     */
-    public function sendPasswordResetNotification($token)
-    {
-//        TODO
-        return (new MailMessage)
-            ->subject('Скинути сповіщення про пароль')
-            ->line('Ви отримуєте це повідомлення, оскільки ми отримали запит на зміну пароля для вашого облікового запису.')
-            ->action(Lang::getFromJson('Reset Password'), url(config('app.url').route('password.reset', $this->token, false)))
-            ->line('Ця посилання для скидання пароля закінчується: ' . config('auth.passwords.users.expire') . ' хвилин(а)')
-            ->line('Якщо ви не подали запит на скидання пароля, додаткові дії не потрібно');
     }
 }

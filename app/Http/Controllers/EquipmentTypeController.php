@@ -27,9 +27,7 @@ class EquipmentTypeController extends Controller
      */
     public function index()
     {
-        $list = EquipmentType::paginate(self::PAGINATE_DEFAULT);
-
-//        TODO order, sort, count
+        $list = EquipmentType::all();
 
         return response()->json($list);
     }

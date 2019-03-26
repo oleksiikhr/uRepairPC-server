@@ -20,6 +20,8 @@ class EquipmentModelsTableSeeder extends Seeder
                 'name' => $item['name'],
                 'type_id' => $item['type_id'],
                 'manufacturer_id' => $item['manufacturer_id'],
+                'updated_at' => \Carbon\Carbon::now(),
+                'created_at' => \Carbon\Carbon::now(),
             ]);
         }
     }

@@ -16,6 +16,8 @@ class EquipmentTypesTableSeeder extends Seeder
         foreach ($names as $name) {
             DB::table('equipment_types')->insert([
                 'name' => $name,
+                'updated_at' => \Carbon\Carbon::now(),
+                'created_at' => \Carbon\Carbon::now(),
             ]);
         }
     }
