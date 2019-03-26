@@ -34,7 +34,7 @@ class EquipmentRequest extends FormRequest
         ];
 
         if ($request->method === 'POST') {
-            $rules['manufacturer_id'] = 'required|' . $rules['manufacturer_id'];
+            $rules['type_id'] = 'required|' . $rules['type_id'];
         }
 
         return $rules;

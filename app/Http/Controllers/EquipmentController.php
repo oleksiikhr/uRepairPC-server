@@ -72,20 +72,20 @@ class EquipmentController extends Controller
      */
     public function store(EquipmentRequest $request)
     {
-        $model = new Equipment;
-        $model->serial_number = $request->serial_number;
-        $model->inventory_number = $request->inventory_number;
-        $model->type_id = $request->type_id;
-        $model->manufacturer_id = $request->manufacturer_id;
-        $model->model_id = $request->model_id;
+        $equipment = new Equipment;
+        $equipment->serial_number = $request->serial_number;
+        $equipment->inventory_number = $request->inventory_number;
+        $equipment->type_id = $request->type_id;
+        $equipment->manufacturer_id = $request->manufacturer_id;
+        $equipment->model_id = $request->model_id;
 
-        if (! $model->save()) {
+        if (! $equipment->save()) {
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
         }
 
         return response()->json([
             'message' => 'Збережено',
-            'model' => $this->getSelectModel()->find($model->id),
+            'equipment' => $this->getSelectModel()->find($equipment->id),
         ]);
     }
 
@@ -97,9 +97,9 @@ class EquipmentController extends Controller
      */
     public function show($id)
     {
-        $model = $this->getSelectModel()->findOrFail($id);
+        $equipment = $this->getSelectModel()->findOrFail($id);
 
-        return response()->json(['message' => 'Обладнання отримано', 'model' => $model]);
+        return response()->json(['message' => 'Обладнання отримано', 'equipment' => $equipment]);
     }
 
     /**
@@ -111,20 +111,20 @@ class EquipmentController extends Controller
      */
     public function update(EquipmentRequest $request, $id)
     {
-        $model = Equipment::findOrFail($id);
-        $model->serial_number = $request->has('serial_number') ? $request->serial_number : $model->serial_number;
-        $model->inventory_number = $request->has('inventory_number') ? $request->inventory_number : $model->inventory_number;
-        $model->manufacturer_id = $request->has('manufacturer_id') ? $request->manufacturer_id : $model->manufacturer_id;
-        $model->type_id = $request->has('type_id') ? $request->type_id : $model->type_id;
-        $model->model_id = $request->has('model_id') ? $request->model_id : $model->model_id;
+        $equipment = Equipment::findOrFail($id);
+        $equipment->serial_number = $request->has('serial_number') ? $request->serial_number : $equipment->serial_number;
+        $equipment->inventory_number = $request->has('inventory_number') ? $request->inventory_number : $equipment->inventory_number;
+        $equipment->manufacturer_id = $request->has('manufacturer_id') ? $request->manufacturer_id : $equipment->manufacturer_id;
+        $equipment->type_id = $request->has('type_id') ? $request->type_id : $equipment->type_id;
+        $equipment->model_id = $request->has('model_id') ? $request->model_id : $equipment->model_id;
 
-        if (! $model->save()) {
+        if (! $equipment->save()) {
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
         }
 
         return response()->json([
             'message' => 'Збережено',
-            'model' => $this->getSelectModel()->find($model->id),
+            'equipment' => $this->getSelectModel()->find($equipment->id),
         ]);
     }
 
@@ -154,8 +154,8 @@ class EquipmentController extends Controller
             'equipment_manufacturers.name as manufacturer_name',
             'equipment_models.name as model_name'
         )
-            ->join('equipment_types', 'equipments.type_id', '=', 'equipment_types.id')
-            ->join('equipment_manufacturers', 'equipments.manufacturer_id', '=', 'equipment_manufacturers.id')
-            ->join('equipment_models', 'equipments.model_id', '=', 'equipment_models.id');
+            ->leftJoin('equipment_types', 'equipments.type_id', '=', 'equipment_types.id')
+            ->leftJoin('equipment_manufacturers', 'equipments.manufacturer_id', '=', 'equipment_manufacturers.id')
+            ->leftJoin('equipment_models', 'equipments.model_id', '=', 'equipment_models.id');
     }
 }

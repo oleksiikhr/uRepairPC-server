@@ -17,14 +17,14 @@ class CreateEquipmentsTable extends Migration
             $table->increments('id');
             $table->string('serial_number')->nullable();
             $table->string('inventory_number')->nullable();
-            $table->unsignedInteger('manufacturer_id');
-            $table->unsignedInteger('type_id')->nullable();
+            $table->unsignedInteger('type_id');
+            $table->unsignedInteger('manufacturer_id')->nullable();
             $table->unsignedInteger('model_id')->nullable();
             $table->timestamps();
 
-            $table->foreign('manufacturer_id')->references('id')->on('equipment_manufacturers')
-                ->onDelete('cascade');
             $table->foreign('type_id')->references('id')->on('equipment_types')
+                ->onDelete('cascade');
+            $table->foreign('manufacturer_id')->references('id')->on('equipment_manufacturers')
                 ->onDelete('set null');
             $table->foreign('model_id')->references('id')->on('equipment_models')
                 ->onDelete('set null');
