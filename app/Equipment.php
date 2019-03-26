@@ -13,6 +13,30 @@ class Equipment extends Model
      */
     protected $table = 'equipments';
 
+    /** @var array */
+    const ALLOW_COLUMNS_SEARCH = [
+        'id',
+        'serial_number',
+        'inventory_number',
+        'type_name',
+        'manufacturer_name',
+        'model_name',
+        'updated_at',
+        'created_at',
+    ];
+
+    /** @var array */
+    const ALLOW_COLUMNS_SORT = [
+        'id',
+        'serial_number',
+        'inventory_number',
+        'type_name',
+        'manufacturer_name',
+        'model_name',
+        'updated_at',
+        'created_at',
+    ];
+
     /* | ---------------------------------------------------------------
      * | Relationships
      * | ---------------------------------------------------------------

@@ -9,6 +9,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
+    use Notifiable;
+
     /** @var string - DB */
     const ROLE_ADMIN = 'admin';
 
@@ -46,8 +48,6 @@ class User extends Authenticatable implements JWTSubject
         'updated_at',
         'created_at',
     ];
-
-    use Notifiable;
 
     /**
      * The attributes that are mass assignable.

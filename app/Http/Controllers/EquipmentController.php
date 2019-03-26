@@ -4,10 +4,20 @@ namespace App\Http\Controllers;
 
 use App\User;
 use App\Equipment;
+use Illuminate\Http\Request;
 use App\Http\Requests\EquipmentRequest;
 
 class EquipmentController extends Controller
 {
+    /**
+     * Uses in search.
+     */
+    private const SEARCH_RELATIONSHIP = [
+        'manufacturer_name' => 'equipment_manufacturers.name',
+        'model_name' => 'equipment_models.name',
+        'type_name' => 'equipment_types.name',
+    ];
+
     public function __construct()
     {
         $this->allowRoles([
@@ -23,13 +33,33 @@ class EquipmentController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $list = $this->getSelectModel()->paginate(self::PAGINATE_DEFAULT);
+        $request->validate([
+            'search' => 'string',
+            'columns.*' => 'string|in:' . join(',', Equipment::ALLOW_COLUMNS_SEARCH),
+            'sortColumn' => 'string|in:' . join(',', Equipment::ALLOW_COLUMNS_SORT),
+            'sortOrder' => 'string|in:ascending,descending',
+        ]);
 
-//        TODO order, sort, count
+        $query = $this->getSelectModel();
+
+        // Search
+        if ($request->has('search') && $request->has('columns') && count($request->columns)) {
+            foreach ($request->columns as $column) {
+                $query->orWhere(self::SEARCH_RELATIONSHIP[$column] ?? $column, 'LIKE', '%' . $request->search . '%');
+            }
+        }
+
+        // Order
+        if ($request->has('sortColumn')) {
+            $query->orderBy($request->sortColumn, $request->sortOrder === 'descending' ? 'desc' : 'asc');
+        }
+
+        $list = $query->paginate(self::PAGINATE_DEFAULT);
 
         return response()->json($list);
     }
@@ -120,7 +150,7 @@ class EquipmentController extends Controller
     {
         return Equipment::select(
             'equipments.*',
-            'equipment_types.name as equipment_name',
+            'equipment_types.name as type_name',
             'equipment_manufacturers.name as manufacturer_name',
             'equipment_models.name as model_name'
         )
