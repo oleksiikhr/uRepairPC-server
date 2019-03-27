@@ -31,6 +31,7 @@ class EquipmentRequest extends FormRequest
             'manufacturer_id' => 'integer|exists:equipment_manufacturers,id',
             'type_id' => 'nullable|integer|exists:equipment_types,id',
             'model_id' => 'nullable|integer|exists:equipment_models,id',
+            'description' => 'nullable|string|max:600',
         ];
 
         if ($request->method === 'POST') {

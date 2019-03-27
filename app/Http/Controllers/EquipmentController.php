@@ -78,6 +78,7 @@ class EquipmentController extends Controller
         $equipment->type_id = $request->type_id;
         $equipment->manufacturer_id = $request->manufacturer_id;
         $equipment->model_id = $request->model_id;
+        $equipment->description = $request->description;
 
         if (! $equipment->save()) {
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
@@ -117,6 +118,7 @@ class EquipmentController extends Controller
         $equipment->manufacturer_id = $request->has('manufacturer_id') ? $request->manufacturer_id : $equipment->manufacturer_id;
         $equipment->type_id = $request->has('type_id') ? $request->type_id : $equipment->type_id;
         $equipment->model_id = $request->has('model_id') ? $request->model_id : $equipment->model_id;
+        $equipment->description = $request->has('description') ? $request->description : $equipment->description;
 
         if (! $equipment->save()) {
             return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
