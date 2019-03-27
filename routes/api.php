@@ -34,10 +34,10 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::apiResource('users', 'UserController');
     Route::group(['prefix' => 'users'], function () {
         Route::get('get/image', 'UserController@getImage');
-        Route::post('{id}/email', 'UserController@updateEmail')->where('id', '[0-9]+');
-        Route::post('{id}/password', 'UserController@updatePassword')->where('id', '[0-9]+');
-        Route::post('{id}/image', 'UserController@updateImage')->where('id', '[0-9]+');
-        Route::delete('{id}/image', 'UserController@destroyImage')->where('id', '[0-9]+');
+        Route::post('{id}/email', 'UserController@updateEmail');
+        Route::post('{id}/password', 'UserController@updatePassword');
+        Route::post('{id}/image', 'UserController@updateImage');
+        Route::delete('{id}/image', 'UserController@destroyImage');
     });
 
     /*
@@ -54,5 +54,6 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::apiResource('equipments/manufacturers', 'EquipmentManufacturerController');
     Route::apiResource('equipments/models', 'EquipmentModelController');
     Route::apiResource('equipments', 'EquipmentController');
+    Route::apiResource('equipments/{id}/file', 'EquipmentFileController');
 
 });
