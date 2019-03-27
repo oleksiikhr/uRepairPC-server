@@ -67,8 +67,7 @@ trait ImageTrait
 
         $uploadedUri = $file->storeAs(
             $tableName . '/avatars/' . $f . '/' . $s,
-            str_replace('.', '_', uniqid('', true))
-                . '.' . $file->getClientOriginalExtension()
+            str_replace('.', '_', uniqid('', true)) . '.' . $file->extension()
         );
 
         if (! $uploadedUri) {

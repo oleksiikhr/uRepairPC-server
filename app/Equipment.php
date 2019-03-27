@@ -56,4 +56,9 @@ class Equipment extends Model
     {
         return $this->belongsTo(EquipmentModel::class);
     }
+
+    public function files()
+    {
+        return $this->belongsToMany(File::class);
+    }
 }
