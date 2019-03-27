@@ -28,8 +28,8 @@ class EquipmentRequest extends FormRequest
         $rules = [
             'serial_number' => 'nullable|string|between:1,191',
             'inventory_number' => 'nullable|string|max:600',
-            'manufacturer_id' => 'integer|exists:equipment_manufacturers,id',
-            'type_id' => 'nullable|integer|exists:equipment_types,id',
+            'type_id' => 'integer|exists:equipment_types,id',
+            'manufacturer_id' => 'nullable|integer|exists:equipment_manufacturers,id',
             'model_id' => 'nullable|integer|exists:equipment_models,id',
             'description' => 'nullable|string|max:600',
         ];
