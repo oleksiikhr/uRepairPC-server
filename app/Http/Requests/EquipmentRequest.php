@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Equipment;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -25,6 +26,18 @@ class EquipmentRequest extends FormRequest
      */
     public function rules(Request $request)
     {
+        $method = $request->method;
+
+        // List of all equipments
+        if ($method === Request::METHOD_GET && $request->route()->getName() === 'equipments.index') {
+            return [
+                'search' => 'string',
+                'columns.*' => 'string|in:' . join(',', Equipment::ALLOW_COLUMNS_SEARCH),
+                'sortColumn' => 'string|in:' . join(',', Equipment::ALLOW_COLUMNS_SORT),
+                'sortOrder' => 'string|in:ascending,descending',
+            ];
+        }
+
         $rules = [
             'serial_number' => 'nullable|string|between:1,191',
             'inventory_number' => 'nullable|string|max:600',
@@ -34,7 +47,8 @@ class EquipmentRequest extends FormRequest
             'description' => 'nullable|string|max:600',
         ];
 
-        if ($request->method === 'POST') {
+        // Store
+        if ($method === Request::METHOD_POST) {
             $rules['type_id'] = 'required|' . $rules['type_id'];
         }
 

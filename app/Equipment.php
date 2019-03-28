@@ -7,13 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Equipment extends Model
 {
     /**
-     * The table associated with the model.
-     *
-     * @var string
+     * @var array
      */
-    protected $table = 'equipments';
-
-    /** @var array */
     const ALLOW_COLUMNS_SEARCH = [
         'id',
         'serial_number',
@@ -25,7 +20,9 @@ class Equipment extends Model
         'created_at',
     ];
 
-    /** @var array */
+    /**
+     * @var array
+     */
     const ALLOW_COLUMNS_SORT = [
         'id',
         'serial_number',
@@ -37,9 +34,54 @@ class Equipment extends Model
         'created_at',
     ];
 
-    /* | ---------------------------------------------------------------
+    /**
+     * Correctly display ORM request.
+     *
+     * @var array
+     */
+    const SEARCH_RELATIONSHIP = [
+        'manufacturer_name' => 'equipment_manufacturers.name',
+        'model_name' => 'equipment_models.name',
+        'type_name' => 'equipment_types.name',
+    ];
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'equipments';
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
+    protected $guarded = [
+        'id',
+        'updated_at',
+        'created_at',
+    ];
+
+    /**
+     * @return mixed
+     */
+    public static function querySelectJoins()
+    {
+        return self::select(
+            'equipments.*',
+            'equipment_types.name as type_name',
+            'equipment_manufacturers.name as manufacturer_name',
+            'equipment_models.name as model_name'
+        )
+            ->leftJoin('equipment_types', 'equipments.type_id', '=', 'equipment_types.id')
+            ->leftJoin('equipment_manufacturers', 'equipments.manufacturer_id', '=', 'equipment_manufacturers.id')
+            ->leftJoin('equipment_models', 'equipments.model_id', '=', 'equipment_models.id');
+    }
+
+    /* | -----------------------------------------------------------------------------------
      * | Relationships
-     * | ---------------------------------------------------------------
+     * | -----------------------------------------------------------------------------------
      */
 
     public function manufacturer()

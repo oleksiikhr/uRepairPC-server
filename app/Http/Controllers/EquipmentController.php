@@ -4,20 +4,10 @@ namespace App\Http\Controllers;
 
 use App\User;
 use App\Equipment;
-use Illuminate\Http\Request;
 use App\Http\Requests\EquipmentRequest;
 
 class EquipmentController extends Controller
 {
-    /**
-     * Uses in search.
-     */
-    private const SEARCH_RELATIONSHIP = [
-        'manufacturer_name' => 'equipment_manufacturers.name',
-        'model_name' => 'equipment_models.name',
-        'type_name' => 'equipment_types.name',
-    ];
-
     public function __construct()
     {
         $this->allowRoles([
@@ -33,24 +23,17 @@ class EquipmentController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param  Request  $request
+     * @param  EquipmentRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(EquipmentRequest $request)
     {
-        $request->validate([
-            'search' => 'string',
-            'columns.*' => 'string|in:' . join(',', Equipment::ALLOW_COLUMNS_SEARCH),
-            'sortColumn' => 'string|in:' . join(',', Equipment::ALLOW_COLUMNS_SORT),
-            'sortOrder' => 'string|in:ascending,descending',
-        ]);
-
-        $query = $this->getSelectModel();
+        $query = Equipment::querySelectJoins();
 
         // Search
         if ($request->has('search') && $request->has('columns') && count($request->columns)) {
             foreach ($request->columns as $column) {
-                $query->orWhere(self::SEARCH_RELATIONSHIP[$column] ?? $column, 'LIKE', '%' . $request->search . '%');
+                $query->orWhere(Equipment::SEARCH_RELATIONSHIP[$column] ?? $column, 'LIKE', '%' . $request->search . '%');
             }
         }
 
@@ -73,20 +56,15 @@ class EquipmentController extends Controller
     public function store(EquipmentRequest $request)
     {
         $equipment = new Equipment;
-        $equipment->serial_number = $request->serial_number;
-        $equipment->inventory_number = $request->inventory_number;
-        $equipment->type_id = $request->type_id;
-        $equipment->manufacturer_id = $request->manufacturer_id;
-        $equipment->model_id = $request->model_id;
-        $equipment->description = $request->description;
+        $equipment->fill($request->all());
 
         if (! $equipment->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+            return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
         return response()->json([
-            'message' => 'Збережено',
-            'equipment' => $this->getSelectModel()->find($equipment->id),
+            'message' => __('app.equipments.store'),
+            'equipment' => Equipment::querySelectJoins()->find($equipment->id),
         ]);
     }
 
@@ -98,9 +76,12 @@ class EquipmentController extends Controller
      */
     public function show($id)
     {
-        $equipment = $this->getSelectModel()->findOrFail($id);
+        $equipment = Equipment::querySelectJoins()->findOrFail($id);
 
-        return response()->json(['message' => 'Обладнання отримано', 'equipment' => $equipment]);
+        return response()->json([
+            'message' => __('app.equipments.show'),
+            'equipment' => $equipment
+        ]);
     }
 
     /**
@@ -113,20 +94,15 @@ class EquipmentController extends Controller
     public function update(EquipmentRequest $request, $id)
     {
         $equipment = Equipment::findOrFail($id);
-        $equipment->serial_number = $request->has('serial_number') ? $request->serial_number : $equipment->serial_number;
-        $equipment->inventory_number = $request->has('inventory_number') ? $request->inventory_number : $equipment->inventory_number;
-        $equipment->manufacturer_id = $request->has('manufacturer_id') ? $request->manufacturer_id : $equipment->manufacturer_id;
-        $equipment->type_id = $request->has('type_id') ? $request->type_id : $equipment->type_id;
-        $equipment->model_id = $request->has('model_id') ? $request->model_id : $equipment->model_id;
-        $equipment->description = $request->has('description') ? $request->description : $equipment->description;
+        $equipment->fill($request->all());
 
         if (! $equipment->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+            return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
         return response()->json([
-            'message' => 'Збережено',
-            'equipment' => $this->getSelectModel()->find($equipment->id),
+            'message' => __('app.equipments.update'),
+            'equipment' => Equipment::querySelectJoins()->find($equipment->id),
         ]);
     }
 
@@ -138,26 +114,12 @@ class EquipmentController extends Controller
      */
     public function destroy($id)
     {
-        if (Equipment::destroy($id)) {
-            return response()->json(['message' => 'Обладнання видалено']);
+        if (! Equipment::destroy($id)) {
+            return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
 
-        return response()->json(['message' => 'Виникла помилка при видаленні'], 422);
-    }
-
-    /**
-     * @return mixed
-     */
-    private function getSelectModel()
-    {
-        return Equipment::select(
-            'equipments.*',
-            'equipment_types.name as type_name',
-            'equipment_manufacturers.name as manufacturer_name',
-            'equipment_models.name as model_name'
-        )
-            ->leftJoin('equipment_types', 'equipments.type_id', '=', 'equipment_types.id')
-            ->leftJoin('equipment_manufacturers', 'equipments.manufacturer_id', '=', 'equipment_manufacturers.id')
-            ->leftJoin('equipment_models', 'equipments.model_id', '=', 'equipment_models.id');
+        return response()->json([
+            'message' => __('app.equipments.destroy'),
+        ]);
     }
 }
