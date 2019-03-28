@@ -57,10 +57,13 @@ class Equipment extends Model
      *
      * @var array
      */
-    protected $guarded = [
-        'id',
-        'updated_at',
-        'created_at',
+    protected $fillable = [
+        'serial_number',
+        'inventory_number',
+        'type_id',
+        'manufacturer_id',
+        'model_id',
+        'description',
     ];
 
     /**

@@ -11,10 +11,9 @@ class EquipmentManufacturer extends Model
      *
      * @var array
      */
-    protected $guarded = [
-        'id',
-        'updated_at',
-        'created_at',
+    protected $fillable = [
+        'name',
+        'description',
     ];
 
     /* | ---------------------------------------------------------------
