@@ -27,7 +27,7 @@ class EquipmentModelController extends Controller
      */
     public function index()
     {
-        $list = $this->getSelectModel()->get();
+        $list = EquipmentModel::querySelectJoins()->get();
 
         return response()->json($list);
     }
@@ -40,19 +40,16 @@ class EquipmentModelController extends Controller
      */
     public function store(EquipmentModelRequest $request)
     {
-        $model = new EquipmentModel;
-        $model->name = $request->name;
-        $model->description = $request->description;
-        $model->type_id = $request->type_id;
-        $model->manufacturer_id = $request->manufacturer_id;
+        $equipmentModel = new EquipmentModel;
+        $equipmentModel->fill($request->all());
 
-        if (! $model->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+        if (! $equipmentModel->save()) {
+            return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
         return response()->json([
-            'message' => 'Збережено',
-            'model' => $this->getSelectModel()->find($model->id),
+            'message' => __('app.equipment_model.store.store'),
+            'equipment_model' => EquipmentModel::querySelectJoins()->find($equipmentModel->id),
         ]);
     }
 
@@ -64,9 +61,12 @@ class EquipmentModelController extends Controller
      */
     public function show($id)
     {
-        $model = $this->getSelectModel()->findOrFail($id);
+        $equipmentModel = EquipmentModel::querySelectJoins()->findOrFail($id);
 
-        return response()->json(['message' => 'Модель обладнання отриман', 'model' => $model]);
+        return response()->json([
+            'message' => __('app.equipment_model.show'),
+            'equipment_model' => $equipmentModel,
+        ]);
     }
 
     /**
@@ -78,21 +78,16 @@ class EquipmentModelController extends Controller
      */
     public function update(EquipmentModelRequest $request, $id)
     {
-        $model = EquipmentModel::findOrFail($id);
-        $model->name = $request->has('name') ? $request->name : $model->name;
-        $model->description = $request->has('description') ? $request->description : $model->description;
-        $model->type_id = $request->has('type_id') ? $request->type_id : $model->type_id;
-        $model->manufacturer_id = $request->has('manufacturer_id')
-            ? $request->manufacturer_id
-            : $model->manufacturer_id;
+        $equipmentModel = EquipmentModel::findOrFail($id);
+        $equipmentModel->fill($request->all());
 
-        if (! $model->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+        if (! $equipmentModel->save()) {
+            return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
         return response()->json([
-            'message' => 'Збережено',
-            'model' => $this->getSelectModel()->find($model->id),
+            'message' => __('app.equipment_model.update'),
+            'equipment_model' => EquipmentModel::querySelectJoins()->find($equipmentModel->id),
         ]);
     }
 
@@ -104,24 +99,12 @@ class EquipmentModelController extends Controller
      */
     public function destroy($id)
     {
-        if (EquipmentModel::destroy($id)) {
-            return response()->json(['message' => 'Модель обладнання видалений']);
+        if (! EquipmentModel::destroy($id)) {
+            return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
 
-        return response()->json(['message' => 'Виникла помилка при видаленні'], 422);
-    }
-
-    /**
-     * @return mixed
-     */
-    private function getSelectModel()
-    {
-        return EquipmentModel::select(
-            'equipment_models.*',
-            'equipment_types.name as type_name',
-            'equipment_manufacturers.name as manufacturer_name'
-        )
-            ->join('equipment_types', 'equipment_models.type_id', '=', 'equipment_types.id')
-            ->join('equipment_manufacturers', 'equipment_models.manufacturer_id', '=', 'equipment_manufacturers.id');
+        return response()->json([
+            'message' => __('app.equipment_model.destroy'),
+        ]);
     }
 }
