@@ -15,6 +15,6 @@ class BlockRequest
      */
     public function handle($request, Closure $next)
     {
-        return response()->json(['message' => 'Немає прав'], 403);
+        return response()->json(['message' => __('app.middleware.no_permission')], 403);
     }
 }

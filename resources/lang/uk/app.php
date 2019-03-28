@@ -2,6 +2,10 @@
 
 return [
 
+    'middleware' => [
+        'no_permission' => 'Немає прав',
+    ],
+
     /**
      * AuthController.
      */
