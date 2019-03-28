@@ -6,7 +6,7 @@ use App\User;
 use App\Mail\UserCreated;
 use App\Mail\EmailChange;
 use Illuminate\Http\Request;
-use App\Http\traits\ImageTrait;
+use App\Http\Traits\ImageTrait;
 use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;

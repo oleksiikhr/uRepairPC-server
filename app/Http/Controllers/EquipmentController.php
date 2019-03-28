@@ -80,7 +80,7 @@ class EquipmentController extends Controller
 
         return response()->json([
             'message' => __('app.equipments.show'),
-            'equipment' => $equipment
+            'equipment' => $equipment,
         ]);
     }
 
