@@ -40,15 +40,17 @@ class EquipmentManufacturerController extends Controller
      */
     public function store(EquipmentManufacturerRequest $request)
     {
-        $manufacturer = new EquipmentManufacturer;
-        $manufacturer->name = $request->name;
-        $manufacturer->description = $request->description;
+        $equipmentManufacturer = new EquipmentManufacturer;
+        $equipmentManufacturer->fill($request->all());
 
-        if (! $manufacturer->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+        if (! $equipmentManufacturer->save()) {
+            return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        return response()->json(['message' => 'Збережено', 'model' => $manufacturer]);
+        return response()->json([
+            'message' => __('app.equipment_manufacturers.store'),
+            'equipment_manufacturer' => $equipmentManufacturer,
+        ]);
     }
 
     /**
@@ -59,11 +61,11 @@ class EquipmentManufacturerController extends Controller
      */
     public function show($id)
     {
-        $manufacturer = EquipmentManufacturer::findOrFail($id);
+        $equipmentManufacturer = EquipmentManufacturer::findOrFail($id);
 
         return response()->json([
-            'message' => 'Виробник обладнання отриман',
-            'manufacturer' => $manufacturer,
+            'message' => __('app.equipment_manufacturers.show'),
+            'equipment_manufacturer' => $equipmentManufacturer,
         ]);
     }
 
@@ -76,15 +78,17 @@ class EquipmentManufacturerController extends Controller
      */
     public function update(EquipmentManufacturerRequest $request, $id)
     {
-        $manufacturer = EquipmentManufacturer::findOrFail($id);
-        $manufacturer->name = $request->has('name') ? $request->name : $manufacturer->name;
-        $manufacturer->description = $request->has('description') ? $request->description : $manufacturer->description;
+        $equipmentManufacturer = EquipmentManufacturer::findOrFail($id);
+        $equipmentManufacturer->fill($request->all());
 
-        if (! $manufacturer->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+        if (! $equipmentManufacturer->save()) {
+            return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        return response()->json(['message' => 'Збережено', 'manufacturer' => $manufacturer]);
+        return response()->json([
+            'message' => __('app.equipment_manufacturers.update'),
+            'equipment_manufacturer' => $equipmentManufacturer,
+        ]);
     }
 
     /**
@@ -95,10 +99,12 @@ class EquipmentManufacturerController extends Controller
      */
     public function destroy($id)
     {
-        if (EquipmentManufacturer::destroy($id)) {
-            return response()->json(['message' => 'Виробник обладнання видалений']);
+        if (! EquipmentManufacturer::destroy($id)) {
+            return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
 
-        return response()->json(['message' => 'Виникла помилка при видаленні'], 422);
+        return response()->json([
+            'message' => __('app.equipment_manufacturers.destroy'),
+        ]);
     }
 }
