@@ -43,6 +43,16 @@ return [
         'destroy' => 'Модель обладнання видалено',
     ],
 
+    /*
+     * EquipmentTypeController.
+     */
+    'equipment_type' => [
+        'show' => 'Тип обладнання отримано',
+        'store' => 'Тип обладнання створено',
+        'update' => 'Тип обладнання оновлено',
+        'destroy' => 'Тип обладнання видалено',
+    ],
+
     /**
      * Database operations.
      */
