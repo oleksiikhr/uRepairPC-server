@@ -2,6 +2,17 @@
 
 return [
 
+    /**
+     * AuthController.
+     */
+    'auth' => [
+        'login_error' => 'Дані невірні',
+        'login_success' => 'Ви увійшли в систему',
+        'token_invalid' => 'Токен не дійсний',
+        'token_refresh' => 'Токен оновлено',
+        'logout' => 'Ви вийшли з системи',
+    ],
+
     /*
      * EquipmentController.
      */
