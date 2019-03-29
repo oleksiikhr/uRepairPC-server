@@ -18,17 +18,18 @@ class UserController extends Controller
     /** @var string */
     private $_model = User::class;
 
-    /** @var int */
-    private const RANDOM_PASSWORD_LEN = 10;
-
     public function __construct()
     {
+        $this->middleware('admin.or.current')->only([
+            'update', 'updateEmail', 'setImage', 'deleteImage', 'updatePassword',
+        ]);
+
         $this->allowRoles([
             User::ROLE_WORKER => [
-                'index', 'show', 'update', 'updatePassword', 'updateEmail', 'getImage', 'updateImage', 'destroyImage',
+                'index', 'show', 'update', 'updatePassword', 'updateEmail', 'getImage', 'setImage', 'deleteImage',
             ],
             User::ROLE_USER => [
-                'index', 'show', 'update', 'updatePassword', 'updateEmail', 'getImage', 'updateImage', 'destroyImage',
+                'index', 'show', 'update', 'updatePassword', 'updateEmail', 'getImage', 'setImage', 'deleteImage',
             ],
         ]);
     }
@@ -36,18 +37,11 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param  Request  $request
+     * @param  UserRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request)
+    public function index(UserRequest $request)
     {
-        $request->validate([
-            'search' => 'string',
-            'columns.*' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SEARCH),
-            'sortColumn' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SORT),
-            'sortOrder' => 'string|in:ascending,descending',
-        ]);
-
         $query = User::query();
 
         // Search
@@ -75,25 +69,24 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
-        $password = str_random(self::RANDOM_PASSWORD_LEN);
+        $password = User::generateRandomStrPassword();
 
         $user = new User;
+        $user->fill($request->all());
         $user->email = $request->email;
-        $user->first_name = $request->first_name;
-        $user->middle_name = $request->middle_name;
-        $user->last_name = $request->last_name;
-        $user->phone = $request->phone;
-        $user->description = $request->description;
-        $this->setRole($user, $request->role);
         $user->password = bcrypt($password);
+        User::setRole($user, $request->role);
 
         if (! $user->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+            return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
         Mail::to($user)->send(new UserCreated($password));
 
-        return response()->json(['message' => 'Збережено', 'user' => $user]);
+        return response()->json([
+            'message' => __('app.users.store'),
+            'user' => $user,
+        ]);
     }
 
     /**
@@ -106,7 +99,10 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        return response()->json(['message' => 'Користувач отриман', 'user' => $user]);
+        return response()->json([
+            'message' => __('app.users.show'),
+            'user' => $user,
+        ]);
     }
 
     /**
@@ -118,28 +114,18 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, int $id)
     {
-        $me = Auth::user();
-
-        if (! $me->admin() && $me->id !== $id) {
-            return response()->json(['message' => 'Немає прав'], 403);
-        }
-
         $user = User::findOrFail($id);
-        $user->first_name = $request->has('first_name') ? $request->first_name : $user->first_name;
-        $user->middle_name = $request->has('middle_name') ? $request->middle_name : $user->middle_name;
-        $user->last_name = $request->has('last_name') ? $request->last_name : $user->last_name;
-        $user->phone = $request->has('phone') ? $request->phone : $user->phone;
-        $user->description = $request->has('description') ? $request->description : $user->description;
-
-        if ($request->has('role')) {
-            $this->setRole($user, $request->role);
-        }
+        $user->fill($request->all());
+        User::setRole($user, $request->role);
 
         if (! $user->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+            return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        return response()->json(['message' => 'Збережено', 'user' => $user]);
+        return response()->json([
+            'message' => __('app.users.update'),
+            'user' => $user,
+        ]);
     }
 
     /**
@@ -153,14 +139,16 @@ class UserController extends Controller
         $me = Auth::user();
 
         if ($me->id === $id) {
-            return response()->json(['message' => 'Неможливо видалити самого себе'], 403);
+            return response()->json(['message' => __('app.users.self_destroy_error')], 403);
         }
 
-        if (User::destroy($id)) {
-            return response()->json(['message' => 'Користувач видалений']);
+        if (! User::destroy($id)) {
+            return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
 
-        return response()->json(['message' => 'Виникла помилка при видаленні'], 422);
+        return response()->json([
+            'message' => __('app.users.destroy'),
+        ]);
     }
 
     /**
@@ -176,56 +164,18 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
         ]);
 
-        $me = Auth::user();
-
-        if (! $me->admin() && $me->id !== $id) {
-            return response()->json(['message' => 'Немає прав'], 403);
-        }
-
         $user = User::findOrFail($id);
         Mail::to($user)->send(new EmailChange($request->email));
         $user->email = $request->email;
 
         if (! $user->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+            return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        return response()->json(['message' => 'Збережено', 'user' => $user]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function updateImage(Request $request, int $id)
-    {
-        $me = Auth::user();
-
-        if (! $me->admin() && $me->id !== $id) {
-            return response()->json(['message' => 'Немає прав'], 403);
-        }
-
-        return $this->setImage($request, $id);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroyImage(int $id)
-    {
-        $me = Auth::user();
-
-        if (! $me->admin() && $me->id !== $id) {
-            return response()->json(['message' => 'Немає прав'], 403);
-        }
-
-        return $this->deleteImage($id);
+        return response()->json([
+            'message' => __('app.users.email_changed'),
+            'user' => $user,
+        ]);
     }
 
     /**
@@ -240,67 +190,55 @@ class UserController extends Controller
      */
     public function updatePassword(Request $request, int $id)
     {
-        $me = Auth::user();
-
-        if ($me->id === $id) {
-            $request->validate([
-                'password' => 'required|string',
-            ]);
-        }
-
-        if (! $me->admin() && $me->id !== $id) {
-            return response()->json(['message' => 'Немає прав'], 403);
-        }
-
         $user = User::findOrFail($id);
-        $password = str_random(self::RANDOM_PASSWORD_LEN);
 
-        // Edit another user => send email with a new random password
-        if ($me->id !== $id) {
-            $user->password = bcrypt($password);
-
-            if (! $user->save()) {
-                return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
-            }
-
-            Mail::to($user)->send(new UserCreated($password));
-
-            return response()->json(['message' => 'Пароль змінений та відправлений на почту']);
+        // We can change only for own profile.
+        if (Auth::user()->id === $id) {
+            return $this->setPasswordProfile($request, $user);
         }
+
+        return $this->setPasswordEmail($user);
+    }
+
+    /**
+     * Generate a new random password and send to email.
+     *
+     * @param  User  $user
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function setPasswordEmail(User $user)
+    {
+        $password = User::generateRandomStrPassword();
+
+        // Change password for another users - send generate random password to email.
+        $user->password = bcrypt($password);
+
+        if (! $user->save()) {
+            return response()->json(['message' => __('app.database.save_error')], 422);
+        }
+
+        Mail::to($user)->send(new UserCreated($password));
+
+        return response()->json(['message' => __('app.users.password_email_changed')]);
+    }
+
+    /**
+     * Set a new password to profile of the current user.
+     *
+     * @param  Request  $request
+     * @param  User  $user
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function setPasswordProfile(Request $request, User $user)
+    {
+        $request->validate(['password' => 'required|string']);
 
         $user->password = bcrypt($request->password);
 
         if (! $user->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+            return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        return response()->json(['message' => 'Пароль змінений']);
-    }
-
-    /**
-     * @param  User  $user
-     * @param  String  $role
-     * @return bool
-     */
-    private function setRole(User &$user, string $role)
-    {
-        $me = Auth::user();
-
-        if (empty($role)) {
-            return false;
-        }
-
-        // No admin can't set a role
-        if (! $me->admin()) {
-            return false;
-        }
-
-        // Block change myself a role
-        if ($me->id === $user->id) {
-            return false;
-        }
-
-        $user->role = $role;
-        return true;
+        return response()->json(['message' => __('app.users.password_changed')]);
     }
 }

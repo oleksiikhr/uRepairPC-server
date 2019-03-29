@@ -18,6 +18,20 @@ return [
     ],
 
     /*
+     * UserController.
+     */
+    'users' => [
+        'show' => 'Користувач отриман',
+        'store' => 'Користувач створений',
+        'update' => 'Користувач оновлений',
+        'destroy' => 'Користувач видалений',
+        'self_destroy_error' => 'Неможливо видалити самого себе',
+        'email_changed' => 'E-mail змінений',
+        'password_changed' => 'Пароль змінений',
+        'password_email_changed' => 'Пароль змінений та відправлений на почту',
+    ],
+
+    /*
      * EquipmentController.
      */
     'equipments' => [

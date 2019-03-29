@@ -27,6 +27,18 @@ class UserRequest extends FormRequest
      */
     public function rules(Request $request)
     {
+        $method = $request->method;
+
+        // List of all users
+        if ($method === Request::METHOD_GET && $request->route()->getName() === 'users.index') {
+            return [
+                'search' => 'string',
+                'columns.*' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SEARCH),
+                'sortColumn' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SORT),
+                'sortOrder' => 'string|in:ascending,descending',
+            ];
+        }
+
         $rules = [
             'first_name' => 'string|between:1,191',
             'middle_name' => 'nullable|string|max:191',
@@ -36,7 +48,8 @@ class UserRequest extends FormRequest
             'description' => 'nullable|string|max:600',
         ];
 
-        if ($request->method === 'POST') {
+        // Store
+        if ($method === 'POST') {
             $rules['email'] = 'required|email|unique:users,email';
             $rules['first_name'] = 'required|' . $rules['first_name'];
             $rules['last_name'] = 'required|' . $rules['last_name'];
