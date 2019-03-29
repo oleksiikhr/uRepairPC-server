@@ -71,7 +71,15 @@ return [
         'destroy' => 'Тип обладнання видалено',
     ],
 
-    /**
+    /*
+     * Working with files.
+     */
+    'files' => [
+        'file_not_saved' => 'Файл не зберігся',
+        'file_saved' => 'Файл збережено',
+    ],
+
+    /*
      * Database operations.
      */
     'database' => [
