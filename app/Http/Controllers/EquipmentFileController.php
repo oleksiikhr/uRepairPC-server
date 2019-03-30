@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Equipment;
-use App\Http\FileHelper;
 use Illuminate\Http\Request;
+use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\FileRequest;
-use Illuminate\Support\Facades\Storage;
 
 class EquipmentFileController extends Controller
 {
@@ -28,7 +27,6 @@ class EquipmentFileController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * TODO Increase time to upload files + docs.
      *
      * @param  FileRequest  $request
      * @param  int  $equipmentId
@@ -38,44 +36,23 @@ class EquipmentFileController extends Controller
     {
         $equipment = Equipment::findOrFail($equipmentId);
         $requestFiles = $request->file('files');
-        $filesUploaded = [];
-        $errors = [];
 
-        foreach ($requestFiles as $requestFile) {
-            $fileHelper = new FileHelper($requestFile);
-            $file = $fileHelper->fill();
-            $uploadedUri = $fileHelper->store('equipments/' . $equipmentId);
+        $filesHelper = new FilesHelper($requestFiles);
+        $filesHelper->upload('equipments/' . $equipmentId);
 
-            if (! $uploadedUri) {
-                $errors[$requestFile->getClientOriginalName()] = [__('app.files.file_not_saved')];
-                continue;
-            }
+        $equipment->files()->attach($filesHelper->getUploadedIds());
 
-            $file->file = $uploadedUri;
-
-            if (! $file->save()) {
-                $errors[$requestFile->getClientOriginalName()] = [__('app.database.save_error')];
-                Storage::delete($uploadedUri);
-                continue;
-            }
-
-            $filesUploaded[] = $file;
-        }
-
-        $ids = collect($filesUploaded)->pluck('id');
-        $equipment->files()->attach($ids);
-
-        if (count($errors)) {
+        if ($filesHelper->hasErrors()) {
             return response()->json([
                 'message' => __('app.files.upload_error'),
-                'errors' => $errors,
-                'files' => $filesUploaded,
+                'errors' => $filesHelper->getErrors(),
+                'files' => $filesHelper->getFilesUploaded(),
             ], 422);
         }
 
         return response()->json([
             'message' => __('app.files.upload_success'),
-            'files' => $filesUploaded,
+            'files' => $filesHelper->getFilesUploaded(),
         ]);
     }
 

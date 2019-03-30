@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http;
+namespace App\Http\Helpers;
 
-use App\File;
+use App\File as FileModel;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class FileHelper
 {
@@ -37,11 +38,11 @@ class FileHelper
     }
 
     /**
-     * @return File
+     * @return FileModel
      */
-    public function fill(): File
+    public function fill(): FileModel
     {
-        $file = new File;
+        $file = new FileModel;
         $file->user_id = Auth::user()->id;
         $file->name = $this->_name;
         $file->ext = $this->_ext;
@@ -51,7 +52,7 @@ class FileHelper
     }
 
     /**
-     * @param  string  $folder
+     * @param string $folder
      * @return false|string
      */
     public function store($folder)
@@ -64,5 +65,17 @@ class FileHelper
             $folder . '/' . $f . '/' . $s,
             str_replace('.', '_', uniqid('', true)) . '.' . $this->_ext
         );
+    }
+
+    /**
+     * @return bool
+     */
+    public function delete()
+    {
+        $isDeleted = Storage::destroy();
+
+        // TODO Delete file with notify on error
+
+        return $isDeleted;
     }
 }
