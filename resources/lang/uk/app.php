@@ -75,8 +75,8 @@ return [
      * Working with files.
      */
     'files' => [
-        'file_not_saved' => 'Файл не зберігся',
-        'file_saved' => 'Файл збережено',
+        'upload_success' => 'Файли збережені',
+        'upload_error' => 'З\'явилася помилка при завантаженні деяких файлів',
     ],
 
     /*

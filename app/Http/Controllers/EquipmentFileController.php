@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\File;
 use App\Equipment;
 use App\Http\FileHelper;
 use Illuminate\Http\Request;
@@ -14,15 +13,22 @@ class EquipmentFileController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  int  $equipmentId
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(int $equipmentId)
     {
-        //
+        $equipment = Equipment::findOrFail($equipmentId);
+
+        return response()->json([
+            'message' => 'Файли отримані',
+            'files' => $equipment->files,
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
+     * TODO Increase time to upload files + docs.
      *
      * @param  FileRequest  $request
      * @param  int  $equipmentId
@@ -31,27 +37,51 @@ class EquipmentFileController extends Controller
     public function store(FileRequest $request, int $equipmentId)
     {
         $equipment = Equipment::findOrFail($equipmentId);
+        $requestFiles = $request->file('files');
+        $filesUploaded = [];
+        $errors = [];
 
-        $fileHelper = new FileHelper($request->file('file'));
-        $file = $fileHelper->fill();
-        $uploadedUri = $fileHelper->store('equipments');
+        foreach ($requestFiles as $requestFile) {
+            $fileHelper = new FileHelper($requestFile);
+            $file = $fileHelper->fill();
+            $uploadedUri = $fileHelper->store('equipments/' . $equipmentId);
 
-        if (! $uploadedUri) {
-            return response()->json(['message' => __('app.files.file_not_saved')], 422);
+            if (! $uploadedUri) {
+                $errors[] = [
+                    'message' => __('app.files.file_not_saved'),
+                    'file' => $requestFile->getClientOriginalName(),
+                ];
+                continue;
+            }
+
+            $file->file = $uploadedUri;
+
+            if (! $file->save()) {
+                Storage::delete($uploadedUri);
+                $errors[] = [
+                    'message' => __('app.database.save_error'),
+                    'file' => $requestFile->getClientOriginalName(),
+                ];
+                continue;
+            }
+
+            $filesUploaded[] = $file;
         }
 
-        $file->file = $uploadedUri;
+        $ids = collect($filesUploaded)->pluck('id');
+        $equipment->files()->attach($ids);
 
-        if (! $file->save()) {
-            Storage::delete($uploadedUri);
-            return response()->json(['message' => __('app.database.save_error')], 422);
+        if (count($errors)) {
+            return response()->json([
+                'message' => __('app.files.upload_error'),
+                'errors' => $errors,
+                'files' => $filesUploaded,
+            ], 422);
         }
-
-        $equipment->files()->attach([$file->id]);
 
         return response()->json([
-            'message' => __('app.files.file_saved'),
-            'file' => $file,
+            'message' => __('app.files.upload_success'),
+            'files' => $filesUploaded,
         ]);
     }
 
