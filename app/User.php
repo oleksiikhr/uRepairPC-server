@@ -4,10 +4,13 @@ namespace App;
 
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
+    use SoftDeletes;
+
     /** @var int */
     private const RANDOM_PASSWORD_LEN = 10;
 
