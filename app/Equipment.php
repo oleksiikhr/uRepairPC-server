@@ -104,6 +104,12 @@ class Equipment extends Model
 
     public function files()
     {
-        return $this->belongsToMany(File::class);
+        return $this->belongsToMany(File::class)
+            ->select(
+                'files.*',
+                'users.first_name',
+                'users.last_name'
+            )
+            ->leftJoin('users', 'users.id', '=', 'files.user_id');
     }
 }
