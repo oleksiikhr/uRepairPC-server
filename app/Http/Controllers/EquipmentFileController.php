@@ -47,21 +47,15 @@ class EquipmentFileController extends Controller
             $uploadedUri = $fileHelper->store('equipments/' . $equipmentId);
 
             if (! $uploadedUri) {
-                $errors[] = [
-                    'message' => __('app.files.file_not_saved'),
-                    'file' => $requestFile->getClientOriginalName(),
-                ];
+                $errors[$requestFile->getClientOriginalName()] = [__('app.files.file_not_saved')];
                 continue;
             }
 
             $file->file = $uploadedUri;
 
             if (! $file->save()) {
+                $errors[$requestFile->getClientOriginalName()] = [__('app.database.save_error')];
                 Storage::delete($uploadedUri);
-                $errors[] = [
-                    'message' => __('app.database.save_error'),
-                    'file' => $requestFile->getClientOriginalName(),
-                ];
                 continue;
             }
 
