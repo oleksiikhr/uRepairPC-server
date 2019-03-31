@@ -42,14 +42,14 @@ class FilesHelper
             $uploadedUri = $fileHelper->store($storeFolder);
 
             if (! $uploadedUri) {
-                $errors[$file->getClientOriginalName()] = [__('app.files.file_not_saved')];
+                $this->_errors[$file->getClientOriginalName()] = [__('app.files.file_not_saved')];
                 continue;
             }
 
             $fileModel->file = $uploadedUri;
 
             if (! $fileModel->save()) {
-                $errors[$file->getClientOriginalName()] = [__('app.database.save_error')];
+                $this->_errors[$file->getClientOriginalName()] = [__('app.database.save_error')];
                 $fileHelper->delete();
                 continue;
             }
