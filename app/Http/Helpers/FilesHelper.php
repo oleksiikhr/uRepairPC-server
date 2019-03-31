@@ -4,7 +4,6 @@ namespace App\Http\Helpers;
 
 use App\File;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class FilesHelper
 {
@@ -50,7 +49,7 @@ class FilesHelper
 
             if (! $fileModel->save()) {
                 $this->_errors[$file->getClientOriginalName()] = [__('app.database.save_error')];
-                $fileHelper->delete();
+                FileHelper::delete($fileModel);
                 continue;
             }
 
@@ -88,6 +87,35 @@ class FilesHelper
     public function hasErrors()
     {
         return count($this->_errors) > 0;
+    }
+
+    /**
+     * Delete files from storage and records from File Model.
+     *
+     * @param  File[]  $files
+     * @return bool - is success
+     */
+    public static function delete($files): bool
+    {
+        $deleteIds = [];
+
+        foreach ($files as $file) {
+            $isDeleted = FileHelper::delete($file);
+
+            if ($isDeleted) {
+                $deleteIds[] = $file->id;
+            }
+        }
+
+        $countDeleteIds = count($deleteIds);
+        $isDestroyed = true;
+
+        // Delete records from DB when file is deleted / not found
+        if ($countDeleteIds) {
+            $isDestroyed = File::destroy($deleteIds);
+        }
+
+        return count($files) === $countDeleteIds && $isDestroyed;
     }
 
     /**

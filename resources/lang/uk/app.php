@@ -75,6 +75,7 @@ return [
      * Working with files.
      */
     'files' => [
+        'files_not_deleted' => 'Сталася помилка під час видалення запису / файлів',
         'file_not_saved' => 'Файл не зберігся',
         'upload_success' => 'Файли збережені',
         'upload_error' => 'З\'явилася помилка при завантаженні деяких файлів',

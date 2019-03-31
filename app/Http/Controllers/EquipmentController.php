@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\User;
 use App\Equipment;
+use Illuminate\Http\Request;
+use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\EquipmentRequest;
 
 class EquipmentController extends Controller
@@ -109,12 +111,27 @@ class EquipmentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param  Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        if (! Equipment::destroy($id)) {
+        $request->validate([
+            'files_delete' => 'boolean',
+        ]);
+
+        $equipment = Equipment::findOrFail($id);
+
+        if ($request->files_delete) {
+            $isSuccess = FilesHelper::delete($equipment->files);
+
+            if (! $isSuccess) {
+                return response()->json(['message' => __('app.files.files_not_deleted')]);
+            }
+        }
+
+        if (! $equipment->delete()) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
 
