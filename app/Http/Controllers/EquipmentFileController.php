@@ -2,14 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use App\Equipment;
-use Illuminate\Http\Request;
+use App\Http\Helpers\FileHelper;
 use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\FileRequest;
 use Illuminate\Support\Facades\Storage;
 
 class EquipmentFileController extends Controller
 {
+    public function __construct()
+    {
+        $this->allowRoles([
+            User::ROLE_WORKER => [
+                'index', 'store', 'show', 'update',
+            ],
+            User::ROLE_USER => [],
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -64,7 +75,7 @@ class EquipmentFileController extends Controller
      * @param  int  $fileId
      * @return \Illuminate\Http\Response
      */
-    public function show($equipmentId, $fileId)
+    public function show(int $equipmentId, int $fileId)
     {
         $file = Equipment::findOrFail($equipmentId)
             ->files()
@@ -80,23 +91,50 @@ class EquipmentFileController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  FileRequest  $request
+     * @param  int  $equipmentId
+     * @param  int  $fileId
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(FileRequest $request, int $equipmentId, int $fileId)
     {
-        //
+        $file = Equipment::findOrFail($equipmentId)
+            ->files()
+            ->findOrFail($fileId);
+
+        $file->name = $request->name;
+
+        if (! $file->save()) {
+            return response()->json(['message' => __('app.database.save_error')], 422);
+        }
+
+        return response()->json([
+            'message' => __('app.files.file_updated'),
+            'file' => $file,
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int  $equipmentId
+     * @param  int  $fileId
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $equipmentId, int $fileId)
     {
-        //
+        $file = Equipment::findOrFail($equipmentId)
+            ->files()
+            ->findOrFail($fileId);
+
+        FileHelper::delete($file);
+
+        if (! $file->delete()) {
+            return response()->json(['message' => __('app.database.destroy_error')], 422);
+        }
+
+        return response()->json([
+            'message' => __('app.files.file_destroyed'),
+        ]);
     }
 }

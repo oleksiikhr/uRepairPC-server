@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\FormRequest;
 
 class FileRequest extends FormRequest
@@ -19,13 +20,21 @@ class FileRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
+     * @param  Request  $request
      * @return array
      */
-    public function rules()
+    public function rules(Request $request)
     {
-        return [
-            'files'   => 'required|array',
-            'files.*' => 'file|max:20000',
-        ];
+        switch ($request->method) {
+            case Request::METHOD_POST:
+                return [
+                    'files' => 'required|array',
+                    'files.*' => 'file|max:20000',
+                ];
+            default:
+                return [
+                    'name' => 'required|string',
+                ];
+        }
     }
 }
