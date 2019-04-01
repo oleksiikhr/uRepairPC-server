@@ -49,7 +49,7 @@ class FilesHelper
 
             if (! $fileModel->save()) {
                 $this->_errors[$file->getClientOriginalName()] = [__('app.database.save_error')];
-                FileHelper::delete($fileModel);
+                FileHelper::delete($fileModel->file);
                 continue;
             }
 
@@ -100,7 +100,7 @@ class FilesHelper
         $deleteIds = [];
 
         foreach ($files as $file) {
-            $isDeleted = FileHelper::delete($file);
+            $isDeleted = FileHelper::delete($file->file);
 
             if ($isDeleted) {
                 $deleteIds[] = $file->id;

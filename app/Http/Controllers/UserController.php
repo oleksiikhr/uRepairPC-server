@@ -7,6 +7,7 @@ use App\Mail\UserCreated;
 use App\Mail\EmailChange;
 use Illuminate\Http\Request;
 use App\Http\Traits\ImageTrait;
+use App\Http\Helpers\FileHelper;
 use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -131,18 +132,30 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param  UserRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(int $id)
+    public function destroy(UserRequest $request, int $id)
     {
-        $me = Auth::user();
-
-        if ($me->id === $id) {
+        if (Auth::user()->id === $id) {
             return response()->json(['message' => __('app.users.self_destroy_error')], 403);
         }
 
-        if (! User::destroy($id)) {
+        $user = User::findOrFail($id);
+
+        if ($request->image_delete && $user->image) {
+            $deleted = FileHelper::delete($user->image);
+
+            if (! $deleted) {
+                return response()->json('ER'); // TODO
+            }
+
+            $user->image = null;
+            $user->save();
+        }
+
+        if (! $user->delete()) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
 

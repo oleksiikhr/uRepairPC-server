@@ -127,7 +127,7 @@ class EquipmentFileController extends Controller
             ->files()
             ->findOrFail($fileId);
 
-        FileHelper::delete($file);
+        FileHelper::delete($file->file);
 
         if (! $file->delete()) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);

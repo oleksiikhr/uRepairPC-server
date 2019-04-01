@@ -39,6 +39,12 @@ class UserRequest extends FormRequest
             ];
         }
 
+        if ($method === Request::METHOD_DELETE) {
+            return [
+                'image_delete' => 'boolean',
+            ];
+        }
+
         $rules = [
             'first_name' => 'string|between:1,191',
             'middle_name' => 'nullable|string|max:191',

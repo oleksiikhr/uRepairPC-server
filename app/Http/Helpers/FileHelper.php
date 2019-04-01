@@ -70,21 +70,21 @@ class FileHelper
     /**
      * Delete file from storage.
      *
-     * @param  File  $file
+     * @param  string  $file
      *
      * @return bool
      */
-    public static function delete(File $file): bool
+    public static function delete(string $file): bool
     {
-        if (! $file->file) {
+        if (! $file) {
             return true;
         }
 
-        if (! Storage::exists($file->file)) {
+        if (! Storage::exists($file)) {
             return true;
         }
 
-        $isDeleted = Storage::delete($file->file);
+        $isDeleted = Storage::delete($file);
 
 //        TODO Notify on errors
 
