@@ -2,6 +2,8 @@
 
 return [
 
+//    TODO Translate to en, ru
+
     'middleware' => [
         'no_permission' => 'Немає прав',
     ],
@@ -77,6 +79,7 @@ return [
     'files' => [
         'files_not_deleted' => 'Сталася помилка під час видалення запису / файлів',
         'file_not_saved' => 'Файл не зберігся',
+        'file_not_found' => 'Файл не знайдений',
         'upload_success' => 'Файли збережені',
         'upload_error' => 'З\'явилася помилка при завантаженні деяких файлів',
     ],

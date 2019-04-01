@@ -6,6 +6,7 @@ use App\Equipment;
 use Illuminate\Http\Request;
 use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\FileRequest;
+use Illuminate\Support\Facades\Storage;
 
 class EquipmentFileController extends Controller
 {
@@ -59,12 +60,21 @@ class EquipmentFileController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int  $equipmentId
+     * @param  int  $fileId
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($equipmentId, $fileId)
     {
-        //
+        $file = Equipment::findOrFail($equipmentId)
+            ->files()
+            ->findOrFail($fileId);
+
+        if (! Storage::exists($file->file)) {
+            return response()->json(['message' => __('app.files.file_not_found')], 422);
+        }
+
+        return Storage::download($file->file, $file->name . '.' . $file->ext);
     }
 
     /**
