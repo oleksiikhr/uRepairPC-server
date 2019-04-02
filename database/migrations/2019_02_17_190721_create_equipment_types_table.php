@@ -17,6 +17,7 @@ class CreateEquipmentTypesTable extends Migration
             $table->increments('id');
             $table->string('name')->unique();
             $table->text('description')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -21,6 +21,7 @@ class CreateEquipmentsTable extends Migration
             $table->unsignedInteger('manufacturer_id')->nullable();
             $table->unsignedInteger('model_id')->nullable();
             $table->text('description')->nullable();
+            $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('type_id')->references('id')->on('equipment_types')

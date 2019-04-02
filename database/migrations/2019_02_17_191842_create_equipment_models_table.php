@@ -19,6 +19,7 @@ class CreateEquipmentModelsTable extends Migration
             $table->unsignedInteger('manufacturer_id');
             $table->string('name');
             $table->text('description')->nullable();
+            $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('type_id')->references('id')->on('equipment_types')
