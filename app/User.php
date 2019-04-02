@@ -4,11 +4,16 @@ namespace App;
 
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
+    use SoftDeletes;
+
+    /** @var int */
+    private const RANDOM_PASSWORD_LEN = 10;
+
     /** @var string - DB */
     const ROLE_ADMIN = 'admin';
 
@@ -47,15 +52,18 @@ class User extends Authenticatable implements JWTSubject
         'created_at',
     ];
 
-    use Notifiable;
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'email',
+        'phone',
+        'description',
     ];
 
     /**
@@ -64,7 +72,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
     ];
 
     /**
@@ -94,7 +102,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function toArray()
     {
-        // Hide role
+        // Only admin can see user role or current user own role
         if (Auth::user()->role !== self::ROLE_ADMIN && Auth::user()->id !== $this->id) {
             $this->makeHidden('role');
         }
@@ -133,13 +141,38 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
-     * User role is Admin.
-     *
-     * @param  string  $role
+     * @param  User  $user
+     * @param  String  $role
      * @return bool
      */
-    public function hasRole($role)
+    public static function setRole(User &$user, string $role)
     {
-        return $this->role === $role;
+        $me = Auth::user();
+
+        if (empty($role)) {
+            return false;
+        }
+
+        // No admin can't set a role
+        if (! $me->admin()) {
+            return false;
+        }
+
+        // Block change myself a role
+        if ($me->id === $user->id) {
+            return false;
+        }
+
+        $user->role = $role;
+
+        return true;
+    }
+
+    /**
+     * @return string
+     */
+    public static function generateRandomStrPassword()
+    {
+        return str_random(self::RANDOM_PASSWORD_LEN);
     }
 }

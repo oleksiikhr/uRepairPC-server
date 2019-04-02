@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Equipment;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -25,16 +26,30 @@ class EquipmentRequest extends FormRequest
      */
     public function rules(Request $request)
     {
+        $method = $request->method;
+
+        // List of all equipments
+        if ($method === Request::METHOD_GET && $request->route()->getName() === 'equipments.index') {
+            return [
+                'search' => 'string',
+                'columns.*' => 'string|in:' . join(',', Equipment::ALLOW_COLUMNS_SEARCH),
+                'sortColumn' => 'string|in:' . join(',', Equipment::ALLOW_COLUMNS_SORT),
+                'sortOrder' => 'string|in:ascending,descending',
+            ];
+        }
+
         $rules = [
             'serial_number' => 'nullable|string|between:1,191',
             'inventory_number' => 'nullable|string|max:600',
-            'manufacturer_id' => 'integer|exists:equipment_manufacturers,id',
-            'type_id' => 'nullable|integer|exists:equipment_types,id',
+            'type_id' => 'integer|exists:equipment_types,id',
+            'manufacturer_id' => 'nullable|integer|exists:equipment_manufacturers,id',
             'model_id' => 'nullable|integer|exists:equipment_models,id',
+            'description' => 'nullable|string|max:600',
         ];
 
-        if ($request->method === 'POST') {
-            $rules['manufacturer_id'] = 'required|' . $rules['manufacturer_id'];
+        // Store
+        if ($method === Request::METHOD_POST) {
+            $rules['type_id'] = 'required|' . $rules['type_id'];
         }
 
         return $rules;

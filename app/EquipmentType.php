@@ -6,6 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class EquipmentType extends Model
 {
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name',
+        'description',
+    ];
+
     /* | ---------------------------------------------------------------
      * | Relationships
      * | ---------------------------------------------------------------

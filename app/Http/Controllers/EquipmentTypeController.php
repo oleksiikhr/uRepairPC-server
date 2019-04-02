@@ -40,15 +40,17 @@ class EquipmentTypeController extends Controller
      */
     public function store(EquipmentTypeRequest $request)
     {
-        $model = new EquipmentType;
-        $model->name = $request->name;
-        $model->description = $request->description;
+        $equipmentType = new EquipmentType;
+        $equipmentType->fill($request->all());
 
-        if (! $model->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+        if (! $equipmentType->save()) {
+            return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        return response()->json(['message' => 'Збережено', 'model' => $model]);
+        return response()->json([
+            'message' => __('app.equipment_type.store'),
+            'equipment_type' => $equipmentType,
+        ]);
     }
 
     /**
@@ -59,9 +61,12 @@ class EquipmentTypeController extends Controller
      */
     public function show($id)
     {
-        $model = EquipmentType::findOrFail($id);
+        $equipmentType = EquipmentType::findOrFail($id);
 
-        return response()->json(['message' => 'Тип обладнання отриман', 'model' => $model]);
+        return response()->json([
+            'message' => __('app.equipment_type.show'),
+            'equipment_type' => $equipmentType,
+        ]);
     }
 
     /**
@@ -73,15 +78,17 @@ class EquipmentTypeController extends Controller
      */
     public function update(EquipmentTypeRequest $request, $id)
     {
-        $model = EquipmentType::findOrFail($id);
-        $model->name = $request->has('name') ? $request->name : $model->name;
-        $model->description = $request->has('description') ? $request->description : $model->description;
+        $equipmentType = EquipmentType::findOrFail($id);
+        $equipmentType->fill($request->all());
 
-        if (! $model->save()) {
-            return response()->json(['message' => 'Виникла помилка при збереженні'], 422);
+        if (! $equipmentType->save()) {
+            return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        return response()->json(['message' => 'Збережено', 'model' => $model]);
+        return response()->json([
+            'message' => __('app.equipment_type.update'),
+            'equipment_type' => $equipmentType,
+        ]);
     }
 
     /**
@@ -92,10 +99,12 @@ class EquipmentTypeController extends Controller
      */
     public function destroy($id)
     {
-        if (EquipmentType::destroy($id)) {
-            return response()->json(['message' => 'Тип обладнання видалений']);
+        if (! EquipmentType::destroy($id)) {
+            return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
 
-        return response()->json(['message' => 'Виникла помилка при видаленні'], 422);
+        return response()->json([
+            'message' => __('app.equipment_type.destroy'),
+        ]);
     }
 }
