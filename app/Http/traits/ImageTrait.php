@@ -3,27 +3,25 @@
 namespace App\Http\Traits;
 
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
+use App\Http\Helpers\FileHelper;
+use App\Http\Requests\ImageRequest;
 use Illuminate\Support\Facades\Storage;
 
 trait ImageTrait
 {
+    private $_folderAvatars = 'avatars';
+
     /**
      * Get image by model.
      *
-     * @param  Request  $request
-     *
+     * @param  ImageRequest  $request
      * @return false|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|int
      */
-    public function getImage(Request $request)
+    public function getImage(ImageRequest $request)
     {
-        $request->validate([
-            'path' => 'required|string'
-        ]);
-
         $tableName = (new $this->_model)->getTable();
 
-        if (! Str::startsWith($request->path, $tableName . '/avatars/')) {
+        if (! Str::startsWith($request->path, $tableName . '/' . $this->_folderAvatars . '/')) {
             return response(null);
         }
 
@@ -43,89 +41,65 @@ trait ImageTrait
      * Set image by model.
      *
      * @param  string  $id
-     * @param  Request  $request
-     *
+     * @param  ImageRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function setImage(Request $request, $id)
+    public function setImage(ImageRequest $request, $id)
     {
-        $request->validate([
-            'image' => 'required|file|mimes:jpeg,jpg,png|max:2000'
-        ]);
-
         $file = $request->file('image');
         $model = $this->_model::findOrFail($id);
         $tableName = (new $this->_model)->getTable();
 
-        if (Storage::exists($model->image)) {
-            Storage::delete($model->image);
-        }
+        FileHelper::delete($model->image);
 
         $md5 = md5($id);
         $f = substr($md5, 0, 3);
         $s = substr($md5, 3, 3);
 
         $uploadedUri = $file->storeAs(
-            $tableName . '/avatars/' . $f . '/' . $s,
+            $tableName . '/' . $this->_folderAvatars . '/' . $f . '/' . $s,
             str_replace('.', '_', uniqid('', true)) . '.' . $file->extension()
         );
 
         if (! $uploadedUri) {
-            return response()->json(['message' => 'Файл не зберігся'], 422);
+            return response()->json(['message' => __('app.files.file_not_saved')], 422);
         }
 
         $model->image = $uploadedUri;
 
         if (! $model->save()) {
-            Storage::delete($uploadedUri);
-            return response()->json(['message' => 'Помилка створення запису в БД'], 422);
+            FileHelper::delete($uploadedUri);
+            return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        self::decodeImageToHtml($model);
-
-        return response()->json(['message' => 'Зображення збережено', 'image' => $model->image]);
+        return response()->json([
+            'message' => __('app.files.file_saved'),
+            'image' => $model->image,
+        ]);
     }
 
     /**
      * Delete avatar by model.
      *
      * @param string $id
-     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function deleteImage($id)
     {
         $model = $this->_model::findOrFail($id);
-        $deleted = true;
 
-        if (Storage::exists($model->image)) {
-            $deleted = Storage::delete($model->image);
-        }
-
-        if (! $deleted) {
-            return response()->json(['message' => 'Зображення не вилучено'], 422);
+        if (! FileHelper::delete($model->image)) {
+            return response()->json(['message' => __('app.files.file_not_deleted')], 422);
         }
 
         $model->image = null;
 
         if (! $model->save()) {
-            return response()->json(['message' => 'Помилка видалення зображення з БД'], 422);
+            return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        return response()->json(['message' => 'Видалено зображення', 'deleted' => $deleted]);
-    }
-
-    /**
-     * Get images from storage and decode it.
-     *
-     * @param  object  $image
-     *
-     * @return void
-     */
-    public static function decodeImageToHtml(&$image)
-    {
-        if ($image && Storage::exists($image)) {
-            $image = 'data:image/jpeg;base64,' . base64_encode(Storage::get($image));
-        }
+        return response()->json([
+            'message' => __('app.files.file_destroyed'),
+        ]);
     }
 }

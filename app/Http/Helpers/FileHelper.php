@@ -74,7 +74,7 @@ class FileHelper
      *
      * @return bool
      */
-    public static function delete(string $file): bool
+    public static function delete(?string $file): bool
     {
         if (! $file) {
             return true;

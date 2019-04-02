@@ -77,11 +77,13 @@ return [
      * Working with files.
      */
     'files' => [
-        'files_not_deleted' => 'Сталася помилка під час видалення запису / файлів',
+        'files_not_deleted' => 'Виникла помилка під час видалення файлів',
+        'file_not_deleted' => 'Виникла помилка під час видалення файлу',
         'file_not_saved' => 'Файл не зберігся',
         'file_not_found' => 'Файл не знайдений',
         'file_destroyed' => 'Файл видалений',
         'file_updated' => 'Файл оновлено',
+        'file_saved' => 'Файл збережено',
         'upload_success' => 'Файли збережені',
         'upload_error' => 'З\'явилася помилка при завантаженні деяких файлів',
     ],

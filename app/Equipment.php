@@ -111,6 +111,6 @@ class Equipment extends Model
                 'users.last_name'
             )
             ->leftJoin('users', 'users.id', '=', 'files.user_id')
-            ->orderByDesc('updated_at');
+            ->orderByDesc('id');
     }
 }
