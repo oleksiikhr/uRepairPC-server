@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -55,7 +56,7 @@ class Settings extends Model
     public static function getFrontendRecords(): array
     {
         return Cache::rememberForever(self::CACHE_KEY . '_' . self::SECTION_FRONTEND, function () {
-            $list = self::select('name', 'value')
+            $list = self::select('name', 'value', 'type')
                 ->where('name', 'LIKE', self::SECTION_FRONTEND . '_%')
                 ->get();
 
@@ -76,7 +77,7 @@ class Settings extends Model
         $clearCache = false;
 
         foreach ($array as $key => $value) {
-            if (array_key_exists($key, $settings) && $value !== $settings[$key]) {
+            if ($value !== $settings[$key] && array_key_exists($key, $settings)) {
                 DB::table('settings')
                     ->where('name', self::SECTION_FRONTEND . '_' . $key)
                     ->update([
@@ -116,11 +117,30 @@ class Settings extends Model
      * ]
      * ---> ['key1' => 'value1', 'key2' => 'value2']
      */
-    private static function mapWithKeysSubstrSection(Collection  $list, string $section): array
+    private static function mapWithKeysSubstrSection(Collection $list, string $section): array
     {
         return $list->mapWithKeys(function ($item) use ($section) {
             $name = Str::after($item['name'], $section . '_');
-            return [$name => $item['value']];
+            return [$name => self::normalizeValue($item['value'], $item['type'])];
         })->all();
+    }
+
+    /**
+     * @param  {mixed}  $value
+     * @param  {string}  $type
+     * @return mixed
+     */
+    private static function normalizeValue($value, $type)
+    {
+        if (!$value) {
+            return null;
+        }
+
+        switch ($type) {
+            case 'file':
+                return Storage::url($value);
+            default:
+                return $value;
+        }
     }
 }

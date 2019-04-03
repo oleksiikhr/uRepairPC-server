@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Settings;
-use Illuminate\Http\Request;
+use App\Http\Helpers\FileHelper;
+use App\Http\Requests\SettingsFrontendRequest;
 
 class SettingsFrontendController extends Controller
 {
@@ -22,12 +23,24 @@ class SettingsFrontendController extends Controller
     /**
      * Update all resources in storage.
      *
-     * @param  Request  $request
+     * @param  SettingsFrontendRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(SettingsFrontendRequest $request)
     {
-        Settings::updateFrontendRecords($request->all());
+        $settings = Settings::getFrontendRecords();
+        $data = $request->all();
+
+        // Replace file to path in storage.
+        foreach ($data as $key => &$value) {
+            if ($request->hasFile($key)) {
+                FileHelper::delete($settings[$key], 'public');
+                $fileHelper = new FileHelper($value);
+                $value = $fileHelper->store('global', 'public');
+            }
+        }
+
+        Settings::updateFrontendRecords($data);
 
         return response()->json([
             'message' => __('app.settings.store'),
