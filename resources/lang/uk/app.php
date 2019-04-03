@@ -4,8 +4,18 @@ return [
 
 //    TODO Translate to en, ru
 
+    /**
+     * Middleware.
+     */
     'middleware' => [
         'no_permission' => 'Немає прав',
+    ],
+
+    /**
+     * Settings controllers
+     */
+    'settings' => [
+        'store' => 'Налаштування оновлені',
     ],
 
     /**

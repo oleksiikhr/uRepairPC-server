@@ -13,9 +13,11 @@ class SettingsTableSeeder extends Seeder
     public function run()
     {
         $frontend = [
+            ['name' => 'title', 'value' => config('app.name')],
             ['name' => 'name', 'value' => config('app.name')],
             ['name' => 'logo_home', 'value' => null],
             ['name' => 'logo_header', 'value' => null],
+            ['name' => 'favicon', 'value' => null],
         ];
 
         foreach ($frontend as $record) {

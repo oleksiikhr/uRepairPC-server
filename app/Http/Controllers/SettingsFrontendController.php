@@ -20,21 +20,18 @@ class SettingsFrontendController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Update all resources in storage.
      *
      * @param  Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        $settings = new Settings;
-
-        if (! $settings->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
-        }
+        Settings::updateFrontendRecords($request->all());
 
         return response()->json([
-//            'message' => __(''),
+            'message' => __('app.settings.store'),
+            'settings' => Settings::getFrontendRecords(),
         ]);
     }
 }

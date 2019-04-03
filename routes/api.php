@@ -11,12 +11,7 @@
 |
 */
 
-/*
- * Section: Settings
- */
-Route::group(['prefix' => 'settings'], function () {
-    Route::get('/frontend', 'SettingsFrontendController@index');
-});
+Route::get('settings/frontend', 'SettingsFrontendController@index');
 
 /*
  * Section: Auth
@@ -34,6 +29,11 @@ Route::group(['prefix' => 'auth'], function () {
 });
 
 Route::group(['middleware' => ['jwt.auth']], function () {
+
+    /*
+     * Section: Settings
+     */
+    Route::post('settings/frontend', 'SettingsFrontendController@store');
 
     /*
      * Section: Users
