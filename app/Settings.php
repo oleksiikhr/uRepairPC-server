@@ -132,7 +132,7 @@ class Settings extends Model
      */
     private static function normalizeValue($value, $type)
     {
-        if (!$value) {
+        if (! $value) {
             return null;
         }
 

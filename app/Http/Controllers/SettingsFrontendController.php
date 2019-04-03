@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Settings;
+use Illuminate\Support\Str;
 use App\Http\Helpers\FileHelper;
 use App\Http\Requests\SettingsFrontendRequest;
 
@@ -34,7 +35,7 @@ class SettingsFrontendController extends Controller
         // Replace file to path in storage.
         foreach ($data as $key => &$value) {
             if ($request->hasFile($key)) {
-                FileHelper::delete($settings[$key], 'public');
+                FileHelper::delete(Str::after($settings[$key], 'storage/'), 'public');
                 $fileHelper = new FileHelper($value);
                 $value = $fileHelper->store('global', 'public');
             }
