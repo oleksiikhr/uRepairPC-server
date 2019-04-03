@@ -15,7 +15,7 @@
  * Section: Settings
  */
 Route::group(['prefix' => 'settings'], function () {
-    Route::get('/frontend', 'SettingsController@frontend');
+    Route::get('/frontend', 'SettingsFrontendController@index');
 });
 
 /*
