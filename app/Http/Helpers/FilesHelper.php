@@ -62,7 +62,7 @@ class FilesHelper
      */
     public function getUploadedIds()
     {
-        return collect($this->_filesUploaded)->pluck('id');
+        return $this->_filesUploaded->pluck('id');
     }
 
     /**

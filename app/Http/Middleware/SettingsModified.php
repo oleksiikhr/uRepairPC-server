@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use App\Settings;
+use Hamcrest\Core\Set;
+use Illuminate\Support\Facades\Cache;
+
+class SettingsModified
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    public function handle($request, Closure $next)
+    {
+        $response = $next($request);
+
+        $response->header('App-Settings-Modified', Settings::getFrontendModified());
+
+        return $response;
+    }
+}

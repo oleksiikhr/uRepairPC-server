@@ -37,8 +37,8 @@ class WorkerController extends Controller
             $query->orWhere('role', $role);
         }
 
-        $collection = collect($query->get());
+        $list = $query->get()->groupBy('role');
 
-        return response()->json($collection->groupBy('role'));
+        return response()->json($list);
     }
 }
