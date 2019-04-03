@@ -29,6 +29,13 @@ Route::group(['prefix' => 'auth'], function () {
 Route::group(['middleware' => ['jwt.auth']], function () {
 
     /*
+     * Section: Settings
+     */
+    Route::group(['prefix' => 'settings'], function () {
+        Route::get('/frontend', 'SettingsController@frontend');
+    });
+
+    /*
      * Section: Users
      */
     Route::apiResource('users', 'UserController');
