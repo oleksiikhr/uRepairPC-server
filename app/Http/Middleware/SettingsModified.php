@@ -4,8 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use App\Settings;
-use Hamcrest\Core\Set;
-use Illuminate\Support\Facades\Cache;
 
 class SettingsModified
 {
