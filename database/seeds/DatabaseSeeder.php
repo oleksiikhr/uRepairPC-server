@@ -15,9 +15,11 @@ class DatabaseSeeder extends Seeder
         $this->call(UsersTableSeeder::class);
 
         // Equipments
-        $this->call(EquipmentTypesTableSeeder::class);
-        $this->call(EquipmentManufacturersTableSeeder::class);
-        $this->call(EquipmentModelsTableSeeder::class);
-        $this->call(EquipmentsTableSeeder::class);
+        if (config('app.env') === 'local') {
+            $this->call(EquipmentTypesTableSeeder::class);
+            $this->call(EquipmentManufacturersTableSeeder::class);
+            $this->call(EquipmentModelsTableSeeder::class);
+            $this->call(EquipmentsTableSeeder::class);
+        }
     }
 }
