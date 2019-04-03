@@ -32,7 +32,7 @@ class EquipmentModelRequest extends FormRequest
             'manufacturer_id' => 'integer|exists:equipment_manufacturers,id,deleted_at,NULL',
         ];
 
-        if ($request->method === 'POST') {
+        if ($request->method === Request::METHOD_POST) {
             $rules['name'] = 'required|' . $rules['name'];
             $rules['type_id'] = 'required|' . $rules['type_id'];
             $rules['manufacturer_id'] = 'required|' . $rules['manufacturer_id'];
