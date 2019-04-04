@@ -46,6 +46,7 @@ class SettingsFrontendController extends Controller
         return response()->json([
             'message' => __('app.settings.store'),
             'settings' => Settings::getFrontendRecords(),
+            'modified' => Settings::getFrontendModified(),
         ]);
     }
 }

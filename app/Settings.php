@@ -40,15 +40,6 @@ class Settings extends Model
     }
 
     /**
-     * @param  string  $section
-     * @return int
-     */
-    public static function getSectionModified(string $section): int
-    {
-        return Cache::get(self::CACHE_KEY . '_' . $section . '_modified', -1);
-    }
-
-    /**
      * Get data for frontend section and cache forever.
      *
      * @return array
@@ -123,6 +114,15 @@ class Settings extends Model
             $name = Str::after($item['name'], $section . '_');
             return [$name => self::normalizeValue($item['value'], $item['type'])];
         })->all();
+    }
+
+    /**
+     * @param  string  $section
+     * @return int
+     */
+    private static function getSectionModified(string $section): int
+    {
+        return Cache::get(self::CACHE_KEY . '_' . $section . '_modified', -1);
     }
 
     /**
