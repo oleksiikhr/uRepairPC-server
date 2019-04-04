@@ -18,6 +18,7 @@ class SettingsTableSeeder extends Seeder
             ['name' => 'logo_auth', 'value' => null, 'type' => 'file'],
             ['name' => 'logo_header', 'value' => null, 'type' => 'file'],
             ['name' => 'favicon', 'value' => null, 'type' => 'file'],
+            ['name' => 'name_and_logo', 'value' => false, 'type' => 'bool'],
         ];
 
         foreach ($frontend as $record) {

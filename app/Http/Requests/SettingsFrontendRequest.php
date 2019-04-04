@@ -29,6 +29,7 @@ class SettingsFrontendRequest extends FormRequest
             'logo_home' => 'nullable|file|mimes:jpeg,jpg,png|max:2000',
             'logo_header' => 'nullable|file|mimes:jpeg,jpg,png|max:2000',
             'favicon' => 'nullable|file|mimes:ico,png|max:200',
+            'name_and_logo' => 'boolean',
         ];
     }
 }
