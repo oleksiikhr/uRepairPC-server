@@ -77,7 +77,7 @@ class Settings extends Model
         $clearCache = false;
 
         foreach ($array as $key => $value) {
-            if ($value !== $settings[$key] && array_key_exists($key, $settings)) {
+            if (array_key_exists($key, $settings) && $value !== $settings[$key]) {
                 DB::table('settings')
                     ->where('name', self::SECTION_FRONTEND . '_' . $key)
                     ->update([
