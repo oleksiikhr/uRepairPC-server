@@ -33,7 +33,7 @@ class EquipmentController extends Controller
         $query = Equipment::querySelectJoins();
 
         // Search
-        if ($request->has('search') && $request->has('columns') && count($request->columns)) {
+        if ($request->has('search') && $request->has('columns') && ! empty($request->columns)) {
             foreach ($request->columns as $column) {
                 $query->orWhere(Equipment::SEARCH_RELATIONSHIP[$column] ?? $column, 'LIKE', '%' . $request->search . '%');
             }

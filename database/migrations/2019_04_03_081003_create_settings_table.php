@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateEquipmentTypesTable extends Migration
+class CreateSettingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateEquipmentTypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('equipment_types', function (Blueprint $table) {
+        Schema::create('settings', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->unique();
-            $table->text('description')->nullable();
-            $table->softDeletes();
+            $table->string('value')->nullable();
+            $table->string('type')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ class CreateEquipmentTypesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('equipment_types');
+        Schema::dropIfExists('settings');
     }
 }

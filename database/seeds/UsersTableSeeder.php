@@ -22,6 +22,8 @@ class UsersTableSeeder extends Seeder
             'created_at' => \Carbon\Carbon::now(),
         ]);
 
-        factory(App\User::class, 70)->create();
+        if (config('app.env') === 'local') {
+            factory(App\User::class, 70)->create();
+        }
     }
 }

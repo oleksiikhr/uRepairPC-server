@@ -28,11 +28,11 @@ class EquipmentModelRequest extends FormRequest
         $rules = [
             'name' => 'string|between:1,191',
             'description' => 'nullable|string|max:600',
-            'type_id' => 'integer|exists:equipment_types,id',
-            'manufacturer_id' => 'integer|exists:equipment_manufacturers,id',
+            'type_id' => 'integer|exists:equipment_types,id,deleted_at,NULL',
+            'manufacturer_id' => 'integer|exists:equipment_manufacturers,id,deleted_at,NULL',
         ];
 
-        if ($request->method === 'POST') {
+        if ($request->method === Request::METHOD_POST) {
             $rules['name'] = 'required|' . $rules['name'];
             $rules['type_id'] = 'required|' . $rules['type_id'];
             $rules['manufacturer_id'] = 'required|' . $rules['manufacturer_id'];

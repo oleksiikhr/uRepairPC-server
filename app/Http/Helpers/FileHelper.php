@@ -52,10 +52,13 @@ class FileHelper
     }
 
     /**
-     * @param string $folder
+     * Store the uploaded file on a filesystem disk.
+     *
+     * @param  string  $folder
+     * @param  string  $disk
      * @return string|false
      */
-    public function store($folder)
+    public function store(string $folder, string $disk = 'local')
     {
         $md5 = md5($this->_name);
         $f = substr($md5, 0, 3);
@@ -63,7 +66,8 @@ class FileHelper
 
         return $this->_file->storeAs(
             $folder . '/' . $f . '/' . $s,
-            str_replace('.', '_', uniqid('', true)) . '.' . $this->_ext
+            str_replace('.', '_', uniqid('', true)) . '.' . $this->_ext,
+            $disk
         );
     }
 
@@ -71,20 +75,20 @@ class FileHelper
      * Delete file from storage.
      *
      * @param  string  $file
-     *
+     * @param  string  $disk
      * @return bool
      */
-    public static function delete(?string $file): bool
+    public static function delete(?string $file, string $disk = 'local'): bool
     {
         if (! $file) {
             return true;
         }
 
-        if (! Storage::exists($file)) {
+        if (! Storage::disk($disk)->exists($file)) {
             return true;
         }
 
-        $isDeleted = Storage::delete($file);
+        $isDeleted = Storage::disk($disk)->delete($file);
 
 //        TODO Notify on errors
 

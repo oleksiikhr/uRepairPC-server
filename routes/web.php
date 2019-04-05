@@ -11,6 +11,8 @@
 |
 */
 
-//Route::get('/', function () {
-//    return view('welcome');
-//});
+Route::any('{all}', function () {
+
+    return response()->json(['message' => 'Only API']);
+
+})->where('all', '.*');

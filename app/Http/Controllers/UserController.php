@@ -46,7 +46,7 @@ class UserController extends Controller
         $query = User::query();
 
         // Search
-        if ($request->has('search') && $request->has('columns') && count($request->columns)) {
+        if ($request->has('search') && $request->has('columns') && ! empty($request->columns)) {
             foreach ($request->columns as $column) {
                 $query->orWhere($column, 'LIKE', '%' . $request->search . '%');
             }
