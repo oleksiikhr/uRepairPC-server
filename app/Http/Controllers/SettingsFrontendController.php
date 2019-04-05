@@ -32,12 +32,14 @@ class SettingsFrontendController extends Controller
         $settings = Settings::getFrontendRecords();
         $data = $request->all();
 
-        // Replace file to path in storage.
+        // Replace file to path in storage and delete old file.
         foreach ($data as $key => &$value) {
-            if ($request->hasFile($key)) {
+            if (in_array($key, Settings::ATTR_FILES)) {
                 FileHelper::delete(Str::after($settings[$key], 'storage/'), 'public');
-                $fileHelper = new FileHelper($value);
-                $value = $fileHelper->store('global', 'public');
+                if ($request->hasFile($key)) {
+                    $fileHelper = new FileHelper($value);
+                    $value = $fileHelper->store('global', 'public');
+                }
             }
         }
 

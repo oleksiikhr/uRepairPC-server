@@ -25,6 +25,15 @@ class Settings extends Model
     const CACHE_KEY = 'settings';
 
     /**
+     * @var array
+     */
+    const ATTR_FILES = [
+        'logo_auth',
+        'logo_header',
+        'favicon',
+    ];
+
+    /**
      * The table associated with the model.
      *
      * @var string
