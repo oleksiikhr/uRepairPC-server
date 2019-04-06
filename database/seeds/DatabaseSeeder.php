@@ -12,8 +12,8 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call(SettingsTableSeeder::class);
-        $this->call(UsersTableSeeder::class);
         $this->call(RolesAndPermissionsSeeder::class);
+        $this->call(UsersTableSeeder::class);
 
         // Equipments
         if (config('app.env') === 'local') {

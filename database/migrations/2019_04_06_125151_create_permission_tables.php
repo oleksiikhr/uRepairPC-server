@@ -31,6 +31,7 @@ class CreatePermissionTables extends Migration
             $table->string('display_name');
             $table->string('color')->nullable();
             $table->string('guard_name');
+            $table->boolean('default')->default(false);
             $table->timestamps();
         });
 

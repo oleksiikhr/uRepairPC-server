@@ -1,6 +1,5 @@
 <?php
 
-use App\User;
 use App\Enums\Permissions;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -74,42 +73,38 @@ class RolesAndPermissionsSeeder extends Seeder
         Role::create([
             'name' => 'admin',
             'display_name' => __('roles_and_permissions.roles.admins'),
-            'color' => '#f56c6c'
+            'color' => '#f56c6c',
         ])
             ->givePermissionTo(collect($permissions)->pluck('name'));;
 
         Role::create([
             'name' => 'worker',
             'display_name' => __('roles_and_permissions.roles.workers'),
-            'color' => '#409eff'
+            'color' => '#409eff',
         ])
             ->givePermissionTo([
                 // Equipments
-                'equipments.view',
-                'equipments.edit',
-                'equipments.create',
-                'equipments.delete',
+                Permissions::EQUIPMENTS_VIEW,
+                Permissions::EQUIPMENTS_EDIT,
+                Permissions::EQUIPMENTS_CREATE,
+                Permissions::EQUIPMENTS_DELETE,
 
                 // Equipment Files
-                'equipments.files.view',
-                'equipments.files.download',
-                'equipments.files.edit',
-                'equipments.files.create',
-                'equipments.files.delete',
+                Permissions::EQUIPMENTS_FILES_VIEW,
+                Permissions::EQUIPMENTS_FILES_DOWNLOAD,
+                Permissions::EQUIPMENTS_FILES_EDIT,
+                Permissions::EQUIPMENTS_FILES_CREATE,
+                Permissions::EQUIPMENTS_FILES_DELETE,
             ]);
 
         Role::create([
             'name' => 'user',
             'display_name' => __('roles_and_permissions.roles.users'),
-            'color' => '#67c23a'
+            'color' => '#67c23a',
+            'default' => true,
         ])
-            ->givePermissionTo('profile.edit');
-
-        /* | -----------------------------------------------------------------------------------
-         * | Other
-         * | -----------------------------------------------------------------------------------
-         */
-
-        User::find(1)->assignRole('admin');
+            ->givePermissionTo([
+                Permissions::PROFILE_EDIT,
+            ]);
     }
 }

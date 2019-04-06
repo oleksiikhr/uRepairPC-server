@@ -12,13 +12,14 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        User::create([
+        $user = User::create([
             'first_name' => 'Admin',
             'last_name' => 'Admin',
             'email' => 'admin@example.com',
             'password' => '$2y$10$wUVz4ckveO.3O4Qvbuik/.fleI13a/VxQmeSEbPwaqZ8GbdLedmNC', // admin123
-            'role' => 'admin',
         ]);
+
+        $user->assignRole('admin');
 
         if (config('app.env') === 'local') {
             factory(App\User::class, 70)->create();
