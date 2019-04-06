@@ -43,7 +43,7 @@ class FileHelper
     public function fill(): File
     {
         $file = new File;
-        $file->user_id = Auth::user()->id;
+        $file->user_id = Auth::id();
         $file->name = $this->_name;
         $file->ext = $this->_ext;
         $file->size = $this->_size;

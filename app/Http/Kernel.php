@@ -64,6 +64,7 @@ class Kernel extends HttpKernel
         'jwt.auth' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
         'block.request' => \App\Http\Middleware\Role::class,
         'admin.or.current' => \App\Http\Middleware\OnlyAdminOrCurrentUser::class,
+        'user.edit.profile' => \App\Http\Middleware\UserEditProfile::class,
         'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,

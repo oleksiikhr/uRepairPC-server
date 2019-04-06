@@ -24,14 +24,14 @@ class RolesAndPermissionsSeeder extends Seeder
          */
 
         $permissions = [
+            // Profile
+            ['name' => Permissions::PROFILE_EDIT, 'section_key' => 'profile'],
+
             // Users
             ['name' => Permissions::USERS_VIEW, 'section_key' => 'users'],
             ['name' => Permissions::USERS_EDIT, 'section_key' => 'users'],
             ['name' => Permissions::USERS_CREATE, 'section_key' => 'users'],
             ['name' => Permissions::USERS_DELETE, 'section_key' => 'users'],
-
-            // Profile
-            ['name' => Permissions::PROFILE_EDIT, 'section_key' => 'profile'],
 
             // Groups
             ['name' => Permissions::GROUPS_VIEW, 'section_key' => 'groups'],
@@ -83,6 +83,12 @@ class RolesAndPermissionsSeeder extends Seeder
             'color' => '#409eff',
         ])
             ->givePermissionTo([
+                // Profile
+                Permissions::PROFILE_EDIT,
+
+                // Users
+                Permissions::USERS_VIEW,
+
                 // Equipments
                 Permissions::EQUIPMENTS_VIEW,
                 Permissions::EQUIPMENTS_EDIT,
@@ -104,7 +110,11 @@ class RolesAndPermissionsSeeder extends Seeder
             'default' => true,
         ])
             ->givePermissionTo([
+                // Profile
                 Permissions::PROFILE_EDIT,
+
+                // Users
+                Permissions::USERS_VIEW,
             ]);
     }
 }
