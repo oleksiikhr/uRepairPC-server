@@ -25,37 +25,43 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $permissions = [
             // Users
-            ['name' => 'users.view', 'action_name' => 'Перегядати', 'section_name' => 'Користувачі'],
-            ['name' => 'users.edit', 'action_name' => 'Редагувати', 'section_name' => 'Користувачі'],
-            ['name' => 'users.create', 'action_name' => 'Створювати', 'section_name' => 'Користувачі'],
-            ['name' => 'users.delete', 'action_name' => 'Видаляти', 'section_name' => 'Користувачі'],
+            ['name' => 'users.view', 'section_name' => 'Користувачі'],
+            ['name' => 'users.edit', 'section_name' => 'Користувачі'],
+            ['name' => 'users.create', 'section_name' => 'Користувачі'],
+            ['name' => 'users.delete', 'section_name' => 'Користувачі'],
 
             // Profile
-            ['name' => 'profile.edit', 'action_name' => 'Редагувати', 'section_name' => 'Профіль'],
+            ['name' => 'profile.edit', 'section_name' => 'Профіль'],
 
             // Groups
-            ['name' => 'groups.view', 'action_name' => 'Перегядати', 'section_name' => 'Групи'],
-            ['name' => 'groups.manage', 'action_name' => 'Керувати', 'section_name' => 'Групи'],
+            ['name' => 'groups.view', 'section_name' => 'Групи'],
+            ['name' => 'groups.manage', 'section_name' => 'Групи'],
 
             // Equipments
-            ['name' => 'equipments.view', 'action_name' => 'Перегядати', 'section_name' => 'Обладнання'],
-            ['name' => 'equipments.edit', 'action_name' => 'Редагувати', 'section_name' => 'Обладнання'],
-            ['name' => 'equipments.create', 'action_name' => 'Створювати', 'section_name' => 'Обладнання'],
-            ['name' => 'equipments.delete', 'action_name' => 'Видаляти', 'section_name' => 'Обладнання'],
+            ['name' => 'equipments.view', 'section_name' => 'Обладнання'],
+            ['name' => 'equipments.edit', 'section_name' => 'Обладнання'],
+            ['name' => 'equipments.create', 'section_name' => 'Обладнання'],
+            ['name' => 'equipments.delete', 'section_name' => 'Обладнання'],
 
             // Equipment Files
-            ['name' => 'equipments.files.view', 'action_name' => 'Перегядати', 'section_name' => 'Обладнання - файли'],
-            ['name' => 'equipments.files.download', 'action_name' => 'Завантажувати', 'section_name' => 'Обладнання - файли'],
-            ['name' => 'equipments.files.edit', 'action_name' => 'Редагувати', 'section_name' => 'Обладнання - файли'],
-            ['name' => 'equipments.files.create', 'action_name' => 'Створювати', 'section_name' => 'Обладнання - файли'],
-            ['name' => 'equipments.files.delete', 'action_name' => 'Видаляти', 'section_name' => 'Обладнання - файли'],
+            ['name' => 'equipments.files.view', 'section_name' => 'Обладнання - файли'],
+            ['name' => 'equipments.files.download', 'section_name' => 'Обладнання - файли'],
+            ['name' => 'equipments.files.edit', 'section_name' => 'Обладнання - файли'],
+            ['name' => 'equipments.files.create', 'section_name' => 'Обладнання - файли'],
+            ['name' => 'equipments.files.delete', 'section_name' => 'Обладнання - файли'],
 
             // Other
-            ['name' => 'other.global_settings', 'action_name' => 'Глобальні налаштування', 'section_name' => 'Інше'],
+            ['name' => 'other.global_settings', 'section_name' => 'Інше'],
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create($permission);
+            $arrName = explode('.', $permission['name']);
+
+            Permission::create([
+                'name' => $permission['name'],
+                'display_name' => __('roles_and_permissions.actions.' . end($arrName)),
+                'section_name' => $permission['section_name'],
+            ]);
         }
 
         /* | -----------------------------------------------------------------------------------
@@ -64,10 +70,18 @@ class RolesAndPermissionsSeeder extends Seeder
          */
 
         // Not create a Gate!
-        Role::create(['name' => 'admin', 'display_name' => 'Адміністратор', 'color' => '#f56c6c'])
+        Role::create([
+            'name' => 'admin',
+            'display_name' => __('roles_and_permissions.roles.admins'),
+            'color' => '#f56c6c'
+        ])
             ->givePermissionTo(collect($permissions)->pluck('name'));;
 
-        Role::create(['name' => 'worker', 'display_name' => 'Робочий', 'color' => '#409eff'])
+        Role::create([
+            'name' => 'worker',
+            'display_name' => __('roles_and_permissions.roles.workers'),
+            'color' => '#409eff'
+        ])
             ->givePermissionTo([
                 // Equipments
                 'equipments.view',
@@ -83,7 +97,11 @@ class RolesAndPermissionsSeeder extends Seeder
                 'equipments.files.delete',
             ]);
 
-        Role::create(['name' => 'user', 'display_name' => 'Користувач', 'color' => '#67c23a'])
+        Role::create([
+            'name' => 'user',
+            'display_name' => __('roles_and_permissions.roles.users'),
+            'color' => '#67c23a'
+        ])
             ->givePermissionTo('profile.edit');
 
         /* | -----------------------------------------------------------------------------------
