@@ -3,13 +3,16 @@
 namespace App;
 
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use SoftDeletes;
+    use SoftDeletes, HasRoles;
+
+    protected $guard_name = 'api';
 
     /** @var int */
     private const RANDOM_PASSWORD_LEN = 10;
