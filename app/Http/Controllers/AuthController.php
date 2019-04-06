@@ -42,7 +42,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => __('app.auth.token_refresh'),
-            'token' => JWTAuth::refresh($token)
+            'token' => JWTAuth::refresh($token),
         ]);
     }
 

@@ -18,7 +18,7 @@ class OnlyAdminOrCurrentUser
     {
         $user = Auth::user();
 
-        if (! $user->admin() && $user->id !== $request->user) {
+        if (! $user->admin() && $user->id !== (int)$request->user) {
             return response()->json(['message' => __('app.middleware.no_permission')], 403);
         }
 
