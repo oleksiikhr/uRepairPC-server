@@ -1,7 +1,7 @@
 <?php
 
+use App\Settings;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class SettingsTableSeeder extends Seeder
 {
@@ -22,12 +22,10 @@ class SettingsTableSeeder extends Seeder
         ];
 
         foreach ($frontend as $record) {
-            DB::table('settings')->insert([
+            Settings::create([
                 'name' => 'frontend_' . $record['name'],
                 'value' => $record['value'],
                 'type' => $record['type'],
-                'updated_at' => \Carbon\Carbon::now(),
-                'created_at' => \Carbon\Carbon::now(),
             ]);
         }
     }
