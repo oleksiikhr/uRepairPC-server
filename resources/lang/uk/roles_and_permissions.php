@@ -21,4 +21,13 @@ return [
         'users' => 'Користувачі',
     ],
 
+    'sections' => [
+        'users' => 'Користувачі',
+        'profile' => 'Профіль',
+        'groups' => 'Групи',
+        'equipments' => 'Обладнання',
+        'equipment_files' => 'Обладнання - Файли',
+        'other' => 'Інше',
+    ],
+
 ];

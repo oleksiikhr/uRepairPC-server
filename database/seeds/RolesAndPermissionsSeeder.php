@@ -1,6 +1,7 @@
 <?php
 
 use App\User;
+use App\Enums\Permissions;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -25,33 +26,33 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $permissions = [
             // Users
-            ['name' => 'users.view', 'section_name' => 'Користувачі'],
-            ['name' => 'users.edit', 'section_name' => 'Користувачі'],
-            ['name' => 'users.create', 'section_name' => 'Користувачі'],
-            ['name' => 'users.delete', 'section_name' => 'Користувачі'],
+            ['name' => Permissions::USERS_VIEW, 'section_key' => 'users'],
+            ['name' => Permissions::USERS_EDIT, 'section_key' => 'users'],
+            ['name' => Permissions::USERS_CREATE, 'section_key' => 'users'],
+            ['name' => Permissions::USERS_DELETE, 'section_key' => 'users'],
 
             // Profile
-            ['name' => 'profile.edit', 'section_name' => 'Профіль'],
+            ['name' => Permissions::PROFILE_EDIT, 'section_key' => 'profile'],
 
             // Groups
-            ['name' => 'groups.view', 'section_name' => 'Групи'],
-            ['name' => 'groups.manage', 'section_name' => 'Групи'],
+            ['name' => Permissions::GROUPS_VIEW, 'section_key' => 'groups'],
+            ['name' => Permissions::GROUPS_MANAGE, 'section_key' => 'groups'],
 
             // Equipments
-            ['name' => 'equipments.view', 'section_name' => 'Обладнання'],
-            ['name' => 'equipments.edit', 'section_name' => 'Обладнання'],
-            ['name' => 'equipments.create', 'section_name' => 'Обладнання'],
-            ['name' => 'equipments.delete', 'section_name' => 'Обладнання'],
+            ['name' => Permissions::EQUIPMENTS_VIEW, 'section_key' => 'equipments'],
+            ['name' => Permissions::EQUIPMENTS_EDIT, 'section_key' => 'equipments'],
+            ['name' => Permissions::EQUIPMENTS_CREATE, 'section_key' => 'equipments'],
+            ['name' => Permissions::EQUIPMENTS_DELETE, 'section_key' => 'equipments'],
 
             // Equipment Files
-            ['name' => 'equipments.files.view', 'section_name' => 'Обладнання - файли'],
-            ['name' => 'equipments.files.download', 'section_name' => 'Обладнання - файли'],
-            ['name' => 'equipments.files.edit', 'section_name' => 'Обладнання - файли'],
-            ['name' => 'equipments.files.create', 'section_name' => 'Обладнання - файли'],
-            ['name' => 'equipments.files.delete', 'section_name' => 'Обладнання - файли'],
+            ['name' => Permissions::EQUIPMENTS_FILES_VIEW, 'section_key' => 'equipment_files'],
+            ['name' => Permissions::EQUIPMENTS_FILES_DOWNLOAD, 'section_key' => 'equipment_files'],
+            ['name' => Permissions::EQUIPMENTS_FILES_EDIT, 'section_key' => 'equipment_files'],
+            ['name' => Permissions::EQUIPMENTS_FILES_CREATE, 'section_key' => 'equipment_files'],
+            ['name' => Permissions::EQUIPMENTS_FILES_DELETE, 'section_key' => 'equipment_files'],
 
             // Other
-            ['name' => 'other.global_settings', 'section_name' => 'Інше'],
+            ['name' => Permissions::OTHER_GLOBAL_SETTINGS, 'section_key' => 'other'],
         ];
 
         foreach ($permissions as $permission) {
@@ -60,7 +61,7 @@ class RolesAndPermissionsSeeder extends Seeder
             Permission::create([
                 'name' => $permission['name'],
                 'display_name' => __('roles_and_permissions.actions.' . end($arrName)),
-                'section_name' => $permission['section_name'],
+                'section_name' => __('roles_and_permissions.sections.' . $permission['section_key']),
             ]);
         }
 
