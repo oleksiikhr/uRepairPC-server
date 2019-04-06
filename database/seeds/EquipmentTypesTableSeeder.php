@@ -1,5 +1,6 @@
 <?php
 
+use App\EquipmentType;
 use Illuminate\Database\Seeder;
 
 class EquipmentTypesTableSeeder extends Seeder
@@ -14,10 +15,8 @@ class EquipmentTypesTableSeeder extends Seeder
         $names = ['Ноутбуки', 'Планшети', 'Монітори'];
 
         foreach ($names as $name) {
-            DB::table('equipment_types')->insert([
+            EquipmentType::create([
                 'name' => $name,
-                'updated_at' => \Carbon\Carbon::now(),
-                'created_at' => \Carbon\Carbon::now(),
             ]);
         }
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Equipment;
 use Illuminate\Database\Seeder;
 
 class EquipmentsTableSeeder extends Seeder
@@ -16,14 +17,12 @@ class EquipmentsTableSeeder extends Seeder
         ];
 
         foreach ($arr as $item) {
-            DB::table('equipments')->insert([
+            Equipment::create([
                 'serial_number' => $item['serial'],
                 'inventory_number' => $item['inventory'],
                 'manufacturer_id' => $item['manufacturer_id'],
                 'type_id' => $item['type_id'],
                 'model_id' => $item['model_id'],
-                'updated_at' => \Carbon\Carbon::now(),
-                'created_at' => \Carbon\Carbon::now(),
             ]);
         }
     }
