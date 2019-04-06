@@ -3,12 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Settings;
+use App\Enums\Permissions;
 use Illuminate\Support\Str;
 use App\Http\Helpers\FileHelper;
 use App\Http\Requests\SettingsFrontendRequest;
 
 class SettingsFrontendController extends Controller
 {
+    public function __construct()
+    {
+        $this->allowPermissions([
+            'store' => Permissions::OTHER_GLOBAL_SETTINGS,
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      *

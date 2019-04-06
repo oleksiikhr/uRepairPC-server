@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
+use App\Enums\Permissions;
 use App\EquipmentManufacturer;
 use App\Http\Requests\EquipmentManufacturerRequest;
 
@@ -10,13 +10,12 @@ class EquipmentManufacturerController extends Controller
 {
     public function __construct()
     {
-        $this->allowRoles([
-            User::ROLE_WORKER => [
-                'index', 'store', 'show', 'update', 'destroy',
-            ],
-            User::ROLE_USER => [
-                'index', 'show',
-            ],
+        $this->allowPermissions([
+            'index' => Permissions::EQUIPMENTS_VIEW,
+            'show' => Permissions::EQUIPMENTS_VIEW,
+            'store' => Permissions::EQUIPMENTS_CREATE,
+            'update' => Permissions::EQUIPMENTS_EDIT,
+            'destroy' => Permissions::EQUIPMENTS_DELETE,
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -17,9 +18,28 @@ class Controller extends BaseController
 
     /**
      * Register middleware on depends key-value array.
+     *  key - method
+     *  value - list of permissions
+     *
+     * @param array $roles
+     */
+    public function allowPermissions(array $roles)
+    {
+        $activeMethod = Route::getCurrentRoute()->getActionMethod();
+
+        if (array_key_exists($activeMethod, $roles)) {
+            $role = $roles[$activeMethod];
+            $permissions = is_array($role) ? join('|', $role) : $role;
+            $this->middleware('permission:' . $permissions);
+        }
+    }
+
+    /**
+     * Register middleware on depends key-value array.
      * Allow only accept routes on current role.
      *
      * @param  array  $data
+     * @deprecated TODO
      */
     public function allowRoles($data) {
         if (! Auth::check()) {
