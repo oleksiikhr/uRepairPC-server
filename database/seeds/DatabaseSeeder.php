@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(SettingsTableSeeder::class);
         $this->call(UsersTableSeeder::class);
+        $this->call(RolesAndPermissionsSeeder::class);
 
         // Equipments
         if (config('app.env') === 'local') {
