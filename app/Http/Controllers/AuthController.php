@@ -20,10 +20,13 @@ class AuthController extends Controller
             return response()->json(['message' => __('app.auth.login_error')], 422);
         }
 
+        $user = Auth::user();
+
         return response()->json([
             'message' => __('app.auth.login_success'),
             'token' => $token,
-            'user' => Auth::user(),
+            'user' => $user,
+            'permissions' => $user->getAllPermissions()->pluck('name'),
         ]);
     }
 

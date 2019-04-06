@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\User;
 use App\Mail\UserCreated;
 use App\Mail\EmailChange;
+use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Http\Traits\ImageTrait;
 use App\Http\Helpers\FileHelper;
+use Spatie\Permission\Models\Role;
 use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -21,17 +23,16 @@ class UserController extends Controller
 
     public function __construct()
     {
-        $this->middleware('admin.or.current')->only([
+        $this->middleware('user.edit.profile')->only([
             'update', 'updateEmail', 'setImage', 'deleteImage', 'updatePassword',
         ]);
 
-        $this->allowRoles([
-            User::ROLE_WORKER => [
-                'index', 'show', 'update', 'updatePassword', 'updateEmail', 'getImage', 'setImage', 'deleteImage',
-            ],
-            User::ROLE_USER => [
-                'index', 'show', 'update', 'updatePassword', 'updateEmail', 'getImage', 'setImage', 'deleteImage',
-            ],
+        $this->allowPermissions([
+            'index' => Permissions::USERS_VIEW,
+            'show' => Permissions::USERS_VIEW,
+            'getImage' => Permissions::USERS_VIEW,
+            'store' => Permissions::USERS_CREATE,
+            'delete' => Permissions::USERS_DELETE,
         ]);
     }
 
@@ -43,7 +44,7 @@ class UserController extends Controller
      */
     public function index(UserRequest $request)
     {
-        $query = User::query();
+        $query = User::with('roles');
 
         // Search
         if ($request->has('search') && $request->has('columns') && ! empty($request->columns)) {
@@ -70,13 +71,14 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
+        $defaultRoles = Role::where('default', true)->get();
         $password = User::generateRandomStrPassword();
 
         $user = new User;
         $user->fill($request->all());
         $user->email = $request->email;
         $user->password = bcrypt($password);
-        User::setRole($user, $request->role);
+        $user->assignRole($defaultRoles);
 
         if (! $user->save()) {
             return response()->json(['message' => __('app.database.save_error')], 422);
@@ -99,11 +101,18 @@ class UserController extends Controller
     public function show(int $id)
     {
         $user = User::findOrFail($id);
+        $me = Auth::user();
 
-        return response()->json([
+        $output = [
             'message' => __('app.users.show'),
             'user' => $user,
-        ]);
+        ];
+
+        if ($me->can(Permissions::GROUPS_VIEW) || $me->id === $user->id) {
+            $output['permissions'] = $user->getAllPermissions()->pluck('name');
+        }
+
+        return response()->json($output);
     }
 
     /**
@@ -117,7 +126,6 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $user->fill($request->all());
-        User::setRole($user, $request->role);
 
         if (! $user->save()) {
             return response()->json(['message' => __('app.database.save_error')], 422);
@@ -129,6 +137,8 @@ class UserController extends Controller
         ]);
     }
 
+//        TODO updateRoles method
+
     /**
      * Remove the specified resource from storage.
      *
@@ -138,17 +148,18 @@ class UserController extends Controller
      */
     public function destroy(UserRequest $request, int $id)
     {
-        if (Auth::user()->id === $id) {
+        if (Auth::id() === $id) {
             return response()->json(['message' => __('app.users.self_destroy_error')], 403);
         }
 
         $user = User::findOrFail($id);
 
+        // Destroy profile image (avatar)
         if ($request->image_delete && $user->image) {
             $deleted = FileHelper::delete($user->image);
 
             if (! $deleted) {
-                return response()->json('ER'); // TODO
+                return response()->json(['message' => __('app.files.file_not_deleted')]);
             }
 
             $user->image = null;
@@ -206,7 +217,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         // We can change only for own profile.
-        if (Auth::user()->id === $id) {
+        if (Auth::id() === $id) {
             return $this->setPasswordProfile($request, $user);
         }
 
@@ -232,7 +243,9 @@ class UserController extends Controller
 
         Mail::to($user)->send(new UserCreated($password));
 
-        return response()->json(['message' => __('app.users.password_email_changed')]);
+        return response()->json([
+            'message' => __('app.users.password_email_changed'),
+        ]);
     }
 
     /**
@@ -252,6 +265,8 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        return response()->json(['message' => __('app.users.password_changed')]);
+        return response()->json([
+            'message' => __('app.users.password_changed'),
+        ]);
     }
 }

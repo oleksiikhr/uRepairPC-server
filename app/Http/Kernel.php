@@ -62,8 +62,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'jwt.auth' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
-        'block.request' => \App\Http\Middleware\Role::class,
-        'admin.or.current' => \App\Http\Middleware\OnlyAdminOrCurrentUser::class,
         'user.edit.profile' => \App\Http\Middleware\UserEditProfile::class,
         'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,

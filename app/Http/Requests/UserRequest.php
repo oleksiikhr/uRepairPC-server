@@ -49,7 +49,6 @@ class UserRequest extends FormRequest
             'first_name' => 'string|between:1,191',
             'middle_name' => 'nullable|string|max:191',
             'last_name' => 'string|between:1,191',
-            'role' => 'string|in:' . implode(',', User::ROLES),
             'phone' => 'nullable|string|max:191',
             'description' => 'nullable|string|max:600',
         ];
@@ -59,10 +58,6 @@ class UserRequest extends FormRequest
             $rules['email'] = 'required|email|unique:users,email';
             $rules['first_name'] = 'required|' . $rules['first_name'];
             $rules['last_name'] = 'required|' . $rules['last_name'];
-
-            if (Auth::user()->admin()) {
-                $rules['role'] = 'required|' . $rules['role'];
-            }
         }
 
         return $rules;
