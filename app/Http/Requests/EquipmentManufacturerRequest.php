@@ -34,7 +34,7 @@ class EquipmentManufacturerRequest extends FormRequest
             $rules['name'] = $rules['name'] . ',' . $request->manufacturer;
         }
 
-        if ($request->method === 'POST') {
+        if ($request->method === Request::METHOD_POST) {
             $rules['name'] = 'required|' . $rules['name'];
         }
 

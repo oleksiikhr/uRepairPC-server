@@ -34,7 +34,7 @@ class EquipmentTypeRequest extends FormRequest
             $rules['name'] = $rules['name'] . ',' . $request->type;
         }
 
-        if ($request->method === 'POST') {
+        if ($request->method === Request::METHOD_POST) {
             $rules['name'] = 'required|' . $rules['name'];
         }
 

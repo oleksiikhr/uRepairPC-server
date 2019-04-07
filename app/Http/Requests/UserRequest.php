@@ -54,7 +54,7 @@ class UserRequest extends FormRequest
         ];
 
         // Store
-        if ($method === 'POST') {
+        if ($method === Request::METHOD_POST) {
             $rules['email'] = 'required|email|unique:users,email';
             $rules['first_name'] = 'required|' . $rules['first_name'];
             $rules['last_name'] = 'required|' . $rules['last_name'];
