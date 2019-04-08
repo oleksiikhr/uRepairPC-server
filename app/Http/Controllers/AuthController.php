@@ -9,6 +9,16 @@ use Illuminate\Support\Facades\Auth;
 class AuthController extends Controller
 {
     /**
+     * Add middleware depends on user permissions.
+     *
+     * @return array
+     */
+    public function permissions(): array
+    {
+        return [];
+    }
+
+    /**
      * Auth the user by login and email.
      *
      * @param  AuthRequest  $request

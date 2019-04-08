@@ -2,13 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\RoleRequest;
+use App\Enums\Permissions;
 use Illuminate\Http\Request;
+use App\Http\Requests\RoleRequest;
 use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
-//    TODO Constructor
+    /**
+     * Add middleware depends on user permissions.
+     *
+     * @return array
+     */
+    public function permissions(): array
+    {
+        return [
+            'index' => Permissions::GROUPS_VIEW,
+            'store' => Permissions::GROUPS_MANAGE,
+            'show' => Permissions::GROUPS_MANAGE,
+            'update' => Permissions::GROUPS_MANAGE,
+            'destroy' => Permissions::GROUPS_MANAGE,
+        ];
+    }
 
     /**
      * Display a listing of the resource.

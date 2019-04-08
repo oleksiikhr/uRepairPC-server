@@ -10,11 +10,16 @@ use App\Http\Requests\SettingsFrontendRequest;
 
 class SettingsFrontendController extends Controller
 {
-    public function __construct()
+    /**
+     * Add middleware depends on user permissions.
+     *
+     * @return array
+     */
+    public function permissions(): array
     {
-        $this->allowPermissions([
+        return [
             'store' => Permissions::OTHER_GLOBAL_SETTINGS,
-        ]);
+        ];
     }
 
     /**

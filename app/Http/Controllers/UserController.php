@@ -23,18 +23,27 @@ class UserController extends Controller
 
     public function __construct()
     {
+        parent::__construct();
         $this->middleware('user.edit.profile')->only([
             'update', 'updateEmail', 'setImage', 'deleteImage', 'updatePassword',
         ]);
+    }
 
-        $this->allowPermissions([
+    /**
+     * Add middleware depends on user permissions.
+     *
+     * @return array
+     */
+    public function permissions(): array
+    {
+        return [
             'index' => Permissions::USERS_VIEW,
             'show' => Permissions::USERS_VIEW,
             'getImage' => Permissions::USERS_VIEW,
             'store' => Permissions::USERS_CREATE,
             'delete' => Permissions::USERS_DELETE,
             'updateRoles' => Permissions::GROUPS_MANAGE,
-        ]);
+        ];
     }
 
     /**

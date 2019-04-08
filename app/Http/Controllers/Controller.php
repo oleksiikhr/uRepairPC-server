@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\IPermissions;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-class Controller extends BaseController
+abstract class Controller extends BaseController implements IPermissions
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /** @var int */
     const PAGINATE_DEFAULT = 50;
+
+    public function __construct()
+    {
+        $this->allowPermissions($this->permissions());
+    }
 
     /**
      * Register middleware on depends key-value array.
@@ -22,11 +28,11 @@ class Controller extends BaseController
      *
      * @param array $roles
      */
-    public function allowPermissions(array $roles)
+    private function allowPermissions(array $roles)
     {
         $activeRoute = Route::getCurrentRoute();
 
-        if (! $activeRoute) {
+        if (! $activeRoute || empty($roles)) {
             return;
         }
 

@@ -8,15 +8,20 @@ use App\Http\Requests\EquipmentManufacturerRequest;
 
 class EquipmentManufacturerController extends Controller
 {
-    public function __construct()
+    /**
+     * Add middleware depends on user permissions.
+     *
+     * @return array
+     */
+    public function permissions(): array
     {
-        $this->allowPermissions([
+        return [
             'index' => Permissions::EQUIPMENTS_VIEW,
             'show' => Permissions::EQUIPMENTS_VIEW,
             'store' => Permissions::EQUIPMENTS_CREATE,
             'update' => Permissions::EQUIPMENTS_EDIT,
             'destroy' => Permissions::EQUIPMENTS_DELETE,
-        ]);
+        ];
     }
 
     /**

@@ -11,15 +11,20 @@ use Illuminate\Support\Facades\Storage;
 
 class EquipmentFileController extends Controller
 {
-    public function __construct()
+    /**
+     * Add middleware depends on user permissions.
+     *
+     * @return array
+     */
+    public function permissions(): array
     {
-        $this->allowPermissions([
+        return [
             'index' => Permissions::EQUIPMENTS_FILES_VIEW,
             'show' => Permissions::EQUIPMENTS_FILES_DOWNLOAD,
             'store' => Permissions::EQUIPMENTS_FILES_CREATE,
             'update' => Permissions::EQUIPMENTS_FILES_EDIT,
             'destroy' => Permissions::EQUIPMENTS_FILES_DELETE,
-        ]);
+        ];
     }
 
     /**

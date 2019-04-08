@@ -2,12 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Permissions;
 use App\Http\Requests\PermissionRequest;
 use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
 {
-//    TODO Constructor
+    /**
+     * Add middleware depends on user permissions.
+     *
+     * @return array
+     */
+    public function permissions(): array
+    {
+        return [
+            'index' => Permissions::GROUPS_VIEW,
+        ];
+    }
 
     /**
      * Display a listing of the resource.
