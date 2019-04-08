@@ -7,6 +7,8 @@ use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
 {
+//    TODO Constructor
+
     /**
      * Display a listing of the resource.
      *

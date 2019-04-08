@@ -58,6 +58,11 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::apiResource('equipments/{equipment}/files', 'EquipmentFileController');
 
     /*
+     * Section: Roles
+     */
+    Route::apiResource('roles', 'RoleController');
+
+    /*
      * Section: Permission
      */
     Route::get('permissions', 'PermissionController@index');
