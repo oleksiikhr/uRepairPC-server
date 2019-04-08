@@ -24,7 +24,13 @@ class Controller extends BaseController
      */
     public function allowPermissions(array $roles)
     {
-        $activeMethod = Route::getCurrentRoute()->getActionMethod();
+        $activeRoute = Route::getCurrentRoute();
+
+        if (! $activeRoute) {
+            return;
+        }
+
+        $activeMethod = $activeRoute->getActionMethod();
 
         if (array_key_exists($activeMethod, $roles)) {
             $role = $roles[$activeMethod];
