@@ -33,6 +33,7 @@ class UserRequest extends FormRequest
         if ($method === Request::METHOD_GET && $request->route()->getName() === 'users.index') {
             return [
                 'search' => 'string',
+                'columns' => 'array',
                 'columns.*' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SEARCH),
                 'sortColumn' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SORT),
                 'sortOrder' => 'string|in:ascending,descending',

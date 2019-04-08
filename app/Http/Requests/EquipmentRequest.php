@@ -32,6 +32,7 @@ class EquipmentRequest extends FormRequest
         if ($method === Request::METHOD_GET && $request->route()->getName() === 'equipments.index') {
             return [
                 'search' => 'string',
+                'columns' => 'array',
                 'columns.*' => 'string|in:' . join(',', Equipment::ALLOW_COLUMNS_SEARCH),
                 'sortColumn' => 'string|in:' . join(',', Equipment::ALLOW_COLUMNS_SORT),
                 'sortOrder' => 'string|in:ascending,descending',

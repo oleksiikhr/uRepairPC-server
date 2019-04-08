@@ -33,6 +33,7 @@ class UserController extends Controller
             'getImage' => Permissions::USERS_VIEW,
             'store' => Permissions::USERS_CREATE,
             'delete' => Permissions::USERS_DELETE,
+            'updateRoles' => Permissions::GROUPS_MANAGE,
         ]);
     }
 
@@ -137,8 +138,6 @@ class UserController extends Controller
         ]);
     }
 
-//        TODO updateRoles method
-
     /**
      * Remove the specified resource from storage.
      *
@@ -172,6 +171,28 @@ class UserController extends Controller
 
         return response()->json([
             'message' => __('app.users.destroy'),
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  Request  $request
+     * @param  int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateRoles(Request $request, int $id)
+    {
+        $request->validate([
+            'roles' => 'array',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->syncRoles($request->roles);
+
+        return response()->json([
+            'message' => __('app.users.roles_changed'),
+            'user' => $user,
         ]);
     }
 
