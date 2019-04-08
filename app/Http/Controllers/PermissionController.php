@@ -16,7 +16,7 @@ class PermissionController extends Controller
     public function permissions(): array
     {
         return [
-            'index' => Permissions::GROUPS_VIEW,
+            'index' => Permissions::ROLES_VIEW,
         ];
     }
 

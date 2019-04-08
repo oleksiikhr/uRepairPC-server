@@ -97,7 +97,7 @@ class User extends Authenticatable implements JWTSubject
         $user = Auth::user();
 
         // Only admin can see user role or current user own role
-        if (! $user->can(Permissions::GROUPS_VIEW) && $user->id !== $this->id) {
+        if (! $user->can(Permissions::ROLES_VIEW) && $user->id !== $this->id) {
             $this->makeHidden('roles');
         }
 

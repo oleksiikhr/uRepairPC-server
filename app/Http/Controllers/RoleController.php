@@ -17,11 +17,11 @@ class RoleController extends Controller
     public function permissions(): array
     {
         return [
-            'index' => Permissions::GROUPS_VIEW,
-            'store' => Permissions::GROUPS_MANAGE,
-            'show' => Permissions::GROUPS_MANAGE,
-            'update' => Permissions::GROUPS_MANAGE,
-            'destroy' => Permissions::GROUPS_MANAGE,
+            'index' => Permissions::ROLES_VIEW,
+            'store' => Permissions::ROLES_MANAGE,
+            'show' => Permissions::ROLES_MANAGE,
+            'update' => Permissions::ROLES_MANAGE,
+            'destroy' => Permissions::ROLES_MANAGE,
         ];
     }
 

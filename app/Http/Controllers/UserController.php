@@ -42,7 +42,7 @@ class UserController extends Controller
             'getImage' => Permissions::USERS_VIEW,
             'store' => Permissions::USERS_CREATE,
             'delete' => Permissions::USERS_DELETE,
-            'updateRoles' => Permissions::GROUPS_MANAGE,
+            'updateRoles' => Permissions::ROLES_MANAGE,
         ];
     }
 
@@ -118,7 +118,7 @@ class UserController extends Controller
             'user' => $user,
         ];
 
-        if ($me->can(Permissions::GROUPS_VIEW) || $me->id === $user->id) {
+        if ($me->can(Permissions::ROLES_VIEW) || $me->id === $user->id) {
             $output['permissions'] = $user->getAllPermissions()->pluck('name');
         }
 

@@ -24,7 +24,7 @@ return [
     'sections' => [
         'users' => 'Користувачі',
         'profile' => 'Профіль',
-        'groups' => 'Групи',
+        'roles' => 'Ролі',
         'equipments' => 'Обладнання',
         'equipment_files' => 'Обладнання - Файли',
         'other' => 'Інше',

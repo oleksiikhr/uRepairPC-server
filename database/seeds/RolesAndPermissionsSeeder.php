@@ -34,8 +34,8 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => Permissions::USERS_DELETE, 'section_key' => 'users'],
 
             // Groups
-            ['name' => Permissions::GROUPS_VIEW, 'section_key' => 'groups'],
-            ['name' => Permissions::GROUPS_MANAGE, 'section_key' => 'groups'],
+            ['name' => Permissions::ROLES_VIEW, 'section_key' => 'roles'],
+            ['name' => Permissions::ROLES_MANAGE, 'section_key' => 'roles'],
 
             // Equipments
             ['name' => Permissions::EQUIPMENTS_VIEW, 'section_key' => 'equipments'],

@@ -18,10 +18,10 @@ abstract class Permissions
     const PROFILE_EDIT = 'profile.edit';
 
     /*
-     * Groups
+     * Roles
      */
-    const GROUPS_VIEW = 'groups.view';
-    const GROUPS_MANAGE = 'groups.manage';
+    const ROLES_VIEW = 'roles.view';
+    const ROLES_MANAGE = 'roles.manage';
 
     /*
      * Equipments
