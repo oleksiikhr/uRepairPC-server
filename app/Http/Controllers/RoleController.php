@@ -53,13 +53,6 @@ class RoleController extends Controller
 
         $list = $query->paginate($request->count ?? self::PAGINATE_DEFAULT);
 
-        if ($request->permissions) {
-            $list = $list->map(function ($item, $key) {
-                $item['permissions_grouped'] = $item->permissions->groupBy('section_name');
-                return $item;
-            });
-        }
-
         return response()->json($list);
     }
 
