@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Interfaces\IPermissions;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -16,9 +17,9 @@ abstract class Controller extends BaseController implements IPermissions
     /** @var int */
     const PAGINATE_DEFAULT = 50;
 
-    public function __construct()
+    public function __construct(Request $request)
     {
-        $this->allowPermissions($this->permissions());
+        $this->allowPermissions($this->permissions($request));
     }
 
     /**
@@ -41,7 +42,9 @@ abstract class Controller extends BaseController implements IPermissions
         if (array_key_exists($activeMethod, $roles)) {
             $role = $roles[$activeMethod];
             $permissions = is_array($role) ? join('|', $role) : $role;
-            $this->middleware('permission:' . $permissions);
+            if (! empty($permissions)) {
+                $this->middleware('permission:' . $permissions);
+            }
         }
     }
 }

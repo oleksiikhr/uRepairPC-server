@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\EquipmentType;
 use App\Enums\Permissions;
+use Illuminate\Http\Request;
 use App\Http\Requests\EquipmentTypeRequest;
 
 class EquipmentTypeController extends Controller
@@ -11,9 +12,10 @@ class EquipmentTypeController extends Controller
     /**
      * Add middleware depends on user permissions.
      *
+     * @param  Request  $request
      * @return array
      */
-    public function permissions(): array
+    public function permissions(Request $request): array
     {
         return [
             'index' => Permissions::EQUIPMENTS_VIEW,

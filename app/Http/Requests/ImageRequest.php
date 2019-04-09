@@ -20,20 +20,12 @@ class ImageRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @param  Request  $request
      * @return array
      */
-    public function rules(Request $request)
+    public function rules()
     {
-        switch ($request->method) {
-            case Request::METHOD_GET:
-                return [
-                    'path' => 'required|string',
-                ];
-            default:
-                return [
-                    'image' => 'required|file|mimes:jpeg,jpg,png|max:2000',
-                ];
-        }
+        return [
+            'image' => 'required|file|mimes:jpeg,jpg,png|max:2000',
+        ];
     }
 }

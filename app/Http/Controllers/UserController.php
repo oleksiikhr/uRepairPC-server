@@ -21,25 +21,25 @@ class UserController extends Controller
     /** @var string */
     private $_model = User::class;
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->middleware('user.edit.profile')->only([
-            'update', 'updateEmail', 'setImage', 'deleteImage', 'updatePassword',
-        ]);
-    }
-
     /**
      * Add middleware depends on user permissions.
      *
+     * @param  Request  $request
      * @return array
      */
-    public function permissions(): array
+    public function permissions(Request $request): array
     {
+        $isOwnProfile = (int)$request->user === Auth::id();
+
         return [
             'index' => Permissions::USERS_VIEW,
-            'show' => Permissions::USERS_VIEW,
-            'getImage' => Permissions::USERS_VIEW,
+            'show' => $isOwnProfile ? null : Permissions::USERS_VIEW,
+            'getImage' => $isOwnProfile ? null : Permissions::USERS_VIEW,
+            'update' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
+            'updateEmail' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
+            'setImage' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
+            'deleteImage' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
+            'updatePassword' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
             'store' => Permissions::USERS_CREATE,
             'delete' => Permissions::USERS_DELETE,
             'updateRoles' => Permissions::ROLES_MANAGE,

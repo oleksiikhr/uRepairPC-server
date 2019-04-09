@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Permission;
 use App\Enums\Permissions;
+use Illuminate\Http\Request;
 use App\Http\Requests\PermissionRequest;
 
 class PermissionController extends Controller
@@ -11,9 +12,10 @@ class PermissionController extends Controller
     /**
      * Add middleware depends on user permissions.
      *
+     * @param  Request  $request
      * @return array
      */
-    public function permissions(): array
+    public function permissions(Request $request): array
     {
         return [
             'index' => Permissions::ROLES_VIEW,

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Equipment;
 use App\Enums\Permissions;
+use Illuminate\Http\Request;
 use App\Http\Helpers\FileHelper;
 use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\FileRequest;
@@ -14,9 +15,10 @@ class EquipmentFileController extends Controller
     /**
      * Add middleware depends on user permissions.
      *
+     * @param  Request  $request
      * @return array
      */
-    public function permissions(): array
+    public function permissions(Request $request): array
     {
         return [
             'index' => Permissions::EQUIPMENTS_FILES_VIEW,

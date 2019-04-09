@@ -13,9 +13,10 @@ class EquipmentController extends Controller
     /**
      * Add middleware depends on user permissions.
      *
+     * @param  Request  $request
      * @return array
      */
-    public function permissions(): array
+    public function permissions(Request $request): array
     {
         return [
             'index' => Permissions::EQUIPMENTS_VIEW,

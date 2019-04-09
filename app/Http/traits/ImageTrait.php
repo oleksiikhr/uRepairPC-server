@@ -2,9 +2,9 @@
 
 namespace App\Http\Traits;
 
-use Illuminate\Support\Str;
 use App\Http\Helpers\FileHelper;
 use App\Http\Requests\ImageRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 trait ImageTrait
@@ -14,27 +14,19 @@ trait ImageTrait
     /**
      * Get image by model.
      *
-     * @param  ImageRequest  $request
      * @return false|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|int
      */
-    public function getImage(ImageRequest $request)
+    public function getImage()
     {
-        $tableName = (new $this->_model)->getTable();
+        $user = Auth::user();
 
-        if (! Str::startsWith($request->path, $tableName . '/' . $this->_folderAvatars . '/')) {
+        if (! Storage::exists($user->image)) {
             return response(null);
         }
 
-        if (! Storage::exists($request->path)) {
-            return response(null);
-        }
+        $file = Storage::path($user->image);
 
-        $type = Storage::mimeType($request->path);
-        $file = Storage::path($request->path);
-
-        header('Content-Type:' . $type);
-        header('Content-Length:' . filesize($file));
-        return readfile($file);
+        return response()->download($file);
     }
 
     /**

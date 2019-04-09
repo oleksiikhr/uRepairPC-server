@@ -40,10 +40,10 @@ Route::group(['middleware' => ['jwt.auth']], function () {
      */
     Route::apiResource('users', 'UserController');
     Route::group(['prefix' => 'users'], function () {
-        Route::get('get/image', 'UserController@getImage');
         Route::put('{user}/email', 'UserController@updateEmail');
         Route::put('{user}/password', 'UserController@updatePassword');
         Route::put('{user}/roles', 'UserController@updateRoles');
+        Route::get('{user}/image', 'UserController@getImage');
         Route::post('{user}/image', 'UserController@setImage');
         Route::delete('{user}/image', 'UserController@deleteImage');
     });
