@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Role;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -32,8 +33,8 @@ class RoleRequest extends FormRequest
             return [
                 'search' => 'string',
                 'columns' => 'array',
-                'columns.*' => 'string|in:name,display_name,guard_name',
-                'sortColumn' => 'string|in:name,display_name,guard_name',
+                'columns.*' => 'string|in:' . join(',', Role::ALLOW_COLUMNS_SEARCH),
+                'sortColumn' => 'string|in:' . join(',', Role::ALLOW_COLUMNS_SORT),
                 'sortOrder' => 'string|in:ascending,descending',
                 'permissions' => 'boolean',
                 'count' => 'int',

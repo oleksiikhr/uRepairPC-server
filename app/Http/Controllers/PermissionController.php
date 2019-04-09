@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Permission;
 use App\Enums\Permissions;
 use App\Http\Requests\PermissionRequest;
-use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
 {

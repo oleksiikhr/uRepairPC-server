@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Role;
 use App\User;
 use App\Mail\UserCreated;
 use App\Mail\EmailChange;
@@ -9,7 +10,6 @@ use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Http\Traits\ImageTrait;
 use App\Http\Helpers\FileHelper;
-use Spatie\Permission\Models\Role;
 use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
