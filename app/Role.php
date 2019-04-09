@@ -27,4 +27,16 @@ class Role extends SpatieRole
         'updated_at',
         'created_at',
     ];
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name',
+        'display_name',
+        'color',
+        'default',
+    ];
 }

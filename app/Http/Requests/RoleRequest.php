@@ -41,6 +41,19 @@ class RoleRequest extends FormRequest
             ];
         }
 
-        return [];
+        $rules = [
+            'name' => 'string|between:1,191',
+            'display_name' => 'string|max:191',
+            'color' => 'nullable|string|regex:/^#([a-zA-Z0-9]{6})$/i',
+            'default' => 'boolean',
+        ];
+
+        // Store
+        if ($method === Request::METHOD_POST) {
+            $rules['name'] = 'required|' . $rules['name'];
+            $rules['display_name'] = 'required|' . $rules['display_name'];
+        }
+
+        return $rules;
     }
 }

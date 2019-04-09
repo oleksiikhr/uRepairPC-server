@@ -60,12 +60,22 @@ class RoleController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  RoleRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(RoleRequest $request)
     {
-        //
+        $role = new Role;
+        $role->fill($request->all());
+
+        if (! $role->save()) {
+            return response()->json(['message' => __('app.database.save_error')], 422);
+        }
+
+        return response()->json([
+            'message' => __('app.roles.store'),
+            'role' => $role,
+        ]);
     }
 
     /**
