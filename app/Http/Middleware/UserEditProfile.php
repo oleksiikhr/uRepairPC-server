@@ -27,6 +27,8 @@ class UserEditProfile
             return $next($request);
         }
 
-        return response()->json(['message' => __('app.middleware.no_permission')], 403);
+        return response()->json([
+            'message' => __('app.middleware.no_permission'),
+        ], 403);
     }
 }

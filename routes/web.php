@@ -13,6 +13,8 @@
 
 Route::any('{all}', function () {
 
-    return response()->json(['message' => 'Only API']);
+    return response()->json([
+        'message' => 'Only /api',
+    ], 422);
 
 })->where('all', '.*');
