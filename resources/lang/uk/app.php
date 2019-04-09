@@ -46,6 +46,13 @@ return [
     ],
 
     /*
+     * RoleController.
+     */
+    'roles' => [
+        'show' => 'Роль отримана',
+    ],
+
+    /*
      * EquipmentController.
      */
     'equipments' => [
