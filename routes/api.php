@@ -40,18 +40,12 @@ Route::group(['middleware' => ['jwt.auth']], function () {
      */
     Route::apiResource('users', 'UserController');
     Route::group(['prefix' => 'users'], function () {
-        Route::get('get/image', 'UserController@getImage');
         Route::put('{user}/email', 'UserController@updateEmail');
         Route::put('{user}/password', 'UserController@updatePassword');
+        Route::put('{user}/roles', 'UserController@updateRoles');
+        Route::get('{user}/image', 'UserController@getImage');
         Route::post('{user}/image', 'UserController@setImage');
         Route::delete('{user}/image', 'UserController@deleteImage');
-    });
-
-    /*
-     * Section: Workers (users*)
-     */
-    Route::group(['prefix' => 'workers'], function () {
-        Route::get('/', 'WorkerController@index');
     });
 
     /*
@@ -62,5 +56,15 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::apiResource('equipments/models', 'EquipmentModelController');
     Route::apiResource('equipments', 'EquipmentController');
     Route::apiResource('equipments/{equipment}/files', 'EquipmentFileController');
+
+    /*
+     * Section: Roles
+     */
+    Route::apiResource('roles', 'RoleController');
+
+    /*
+     * Section: Permission
+     */
+    Route::get('permissions', 'PermissionController@index');
 
 });

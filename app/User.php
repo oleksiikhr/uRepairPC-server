@@ -2,29 +2,24 @@
 
 namespace App;
 
+use App\Enums\Permissions;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use SoftDeletes;
+    use SoftDeletes, HasRoles;
+
+    protected $guard_name = 'api';
 
     /** @var int */
     private const RANDOM_PASSWORD_LEN = 10;
 
     /** @var string - DB */
     const ROLE_ADMIN = 'admin';
-
-    /** @var string - DB */
-    const ROLE_WORKER = 'worker';
-
-    /** @var string - DB */
-    const ROLE_USER = 'user';
-
-    /** @var array */
-    const ROLES = [self::ROLE_ADMIN, self::ROLE_WORKER, self::ROLE_USER];
 
     /** @var array */
     const ALLOW_COLUMNS_SEARCH = [
@@ -33,7 +28,6 @@ class User extends Authenticatable implements JWTSubject
         'middle_name',
         'last_name',
         'email',
-        'role',
         'phone',
         'updated_at',
         'created_at',
@@ -46,7 +40,6 @@ class User extends Authenticatable implements JWTSubject
         'middle_name',
         'last_name',
         'email',
-        'role',
         'phone',
         'updated_at',
         'created_at',
@@ -61,7 +54,6 @@ class User extends Authenticatable implements JWTSubject
         'first_name',
         'middle_name',
         'last_name',
-        'email',
         'phone',
         'description',
     ];
@@ -102,70 +94,14 @@ class User extends Authenticatable implements JWTSubject
      */
     public function toArray()
     {
+        $user = Auth::user();
+
         // Only admin can see user role or current user own role
-        if (Auth::user()->role !== self::ROLE_ADMIN && Auth::user()->id !== $this->id) {
-            $this->makeHidden('role');
+        if (! $user->can(Permissions::ROLES_VIEW) && $user->id !== $this->id) {
+            $this->makeHidden('roles');
         }
 
         return parent::toArray();
-    }
-
-    /**
-     * Role of the user is Admin.
-     *
-     * @return bool
-     */
-    public function admin()
-    {
-        return $this->role === self::ROLE_ADMIN;
-    }
-
-    /**
-     * Role of the user is Worker.
-     *
-     * @return bool
-     */
-    public function worker()
-    {
-        return $this->role === self::ROLE_WORKER;
-    }
-
-    /**
-     * Role of the user is User.
-     *
-     * @return bool
-     */
-    public function user()
-    {
-        return $this->role === self::ROLE_USER;
-    }
-
-    /**
-     * @param  User  $user
-     * @param  String  $role
-     * @return bool
-     */
-    public static function setRole(User &$user, string $role)
-    {
-        $me = Auth::user();
-
-        if (empty($role)) {
-            return false;
-        }
-
-        // No admin can't set a role
-        if (! $me->admin()) {
-            return false;
-        }
-
-        // Block change myself a role
-        if ($me->id === $user->id) {
-            return false;
-        }
-
-        $user->role = $role;
-
-        return true;
     }
 
     /**

@@ -18,7 +18,9 @@ class SettingsModified
     {
         $response = $next($request);
 
-        $response->header('App-Settings-Modified', Settings::getFrontendModified());
+        if (method_exists($response, 'header')) {
+            $response->header('App-Settings-Modified', Settings::getFrontendModified());
+        }
 
         return $response;
     }

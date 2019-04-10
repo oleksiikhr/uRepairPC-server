@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use App\Equipment;
+use App\Enums\Permissions;
+use Illuminate\Http\Request;
 use App\Http\Helpers\FileHelper;
 use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\FileRequest;
@@ -11,14 +12,21 @@ use Illuminate\Support\Facades\Storage;
 
 class EquipmentFileController extends Controller
 {
-    public function __construct()
+    /**
+     * Add middleware depends on user permissions.
+     *
+     * @param  Request  $request
+     * @return array
+     */
+    public function permissions(Request $request): array
     {
-        $this->allowRoles([
-            User::ROLE_WORKER => [
-                'index', 'store', 'show', 'update',
-            ],
-            User::ROLE_USER => [],
-        ]);
+        return [
+            'index' => Permissions::EQUIPMENTS_FILES_VIEW,
+            'show' => Permissions::EQUIPMENTS_FILES_DOWNLOAD,
+            'store' => Permissions::EQUIPMENTS_FILES_CREATE,
+            'update' => Permissions::EQUIPMENTS_FILES_EDIT,
+            'destroy' => Permissions::EQUIPMENTS_FILES_DELETE,
+        ];
     }
 
     /**

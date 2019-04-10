@@ -2,22 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use App\EquipmentType;
+use App\Enums\Permissions;
+use Illuminate\Http\Request;
 use App\Http\Requests\EquipmentTypeRequest;
 
 class EquipmentTypeController extends Controller
 {
-    public function __construct()
+    /**
+     * Add middleware depends on user permissions.
+     *
+     * @param  Request  $request
+     * @return array
+     */
+    public function permissions(Request $request): array
     {
-        $this->allowRoles([
-            User::ROLE_WORKER => [
-                'index', 'store', 'show', 'update', 'destroy',
-            ],
-            User::ROLE_USER => [
-                'index', 'show',
-            ],
-        ]);
+        return [
+            'index' => Permissions::EQUIPMENTS_VIEW,
+            'show' => Permissions::EQUIPMENTS_VIEW,
+            'store' => Permissions::EQUIPMENTS_CREATE,
+            'update' => Permissions::EQUIPMENTS_EDIT,
+            'destroy' => Permissions::EQUIPMENTS_DELETE,
+        ];
     }
 
     /**

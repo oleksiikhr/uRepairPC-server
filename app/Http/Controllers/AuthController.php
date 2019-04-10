@@ -3,11 +3,23 @@
 namespace App\Http\Controllers;
 
 use JWTAuth;
+use Illuminate\Http\Request;
 use App\Http\Requests\AuthRequest;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    /**
+     * Add middleware depends on user permissions.
+     *
+     * @param  Request  $request
+     * @return array
+     */
+    public function permissions(Request $request): array
+    {
+        return [];
+    }
+
     /**
      * Auth the user by login and email.
      *
@@ -20,10 +32,13 @@ class AuthController extends Controller
             return response()->json(['message' => __('app.auth.login_error')], 422);
         }
 
+        $user = Auth::user();
+
         return response()->json([
             'message' => __('app.auth.login_success'),
             'token' => $token,
-            'user' => Auth::user(),
+            'user' => $user,
+            'permissions' => $user->getAllPermissions()->pluck('name'),
         ]);
     }
 
@@ -42,7 +57,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => __('app.auth.token_refresh'),
-            'token' => JWTAuth::refresh($token)
+            'token' => JWTAuth::refresh($token),
         ]);
     }
 

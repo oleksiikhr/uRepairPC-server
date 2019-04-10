@@ -2,35 +2,49 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use App\Interfaces\IPermissions;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-class Controller extends BaseController
+abstract class Controller extends BaseController implements IPermissions
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /** @var int */
     const PAGINATE_DEFAULT = 50;
 
+    public function __construct(Request $request)
+    {
+        $this->allowPermissions($this->permissions($request));
+    }
+
     /**
      * Register middleware on depends key-value array.
-     * Allow only accept routes on current role.
+     *  key - method
+     *  value - list of permissions
      *
-     * @param  array  $data
+     * @param array $roles
      */
-    public function allowRoles($data) {
-        if (! Auth::check()) {
-            $this->middleware('block.request');
+    private function allowPermissions(array $roles)
+    {
+        $activeRoute = Route::getCurrentRoute();
+
+        if (! $activeRoute || empty($roles)) {
             return;
         }
 
-        $me = Auth::user();
+        $activeMethod = $activeRoute->getActionMethod();
 
-        if (array_key_exists($me->role, $data)) {
-            $this->middleware('block.request')->except($data[$me->role]);
+        if (array_key_exists($activeMethod, $roles)) {
+            $role = $roles[$activeMethod];
+            $permissions = is_array($role) ? join('|', $role) : $role;
+            if (! empty($permissions)) {
+                $this->middleware('permission:' . $permissions);
+            }
         }
     }
 }

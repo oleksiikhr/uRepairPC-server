@@ -33,6 +33,7 @@ class UserRequest extends FormRequest
         if ($method === Request::METHOD_GET && $request->route()->getName() === 'users.index') {
             return [
                 'search' => 'string',
+                'columns' => 'array',
                 'columns.*' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SEARCH),
                 'sortColumn' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SORT),
                 'sortOrder' => 'string|in:ascending,descending',
@@ -49,20 +50,15 @@ class UserRequest extends FormRequest
             'first_name' => 'string|between:1,191',
             'middle_name' => 'nullable|string|max:191',
             'last_name' => 'string|between:1,191',
-            'role' => 'string|in:' . implode(',', User::ROLES),
             'phone' => 'nullable|string|max:191',
             'description' => 'nullable|string|max:600',
         ];
 
         // Store
-        if ($method === 'POST') {
+        if ($method === Request::METHOD_POST) {
             $rules['email'] = 'required|email|unique:users,email';
             $rules['first_name'] = 'required|' . $rules['first_name'];
             $rules['last_name'] = 'required|' . $rules['last_name'];
-
-            if (Auth::user()->admin()) {
-                $rules['role'] = 'required|' . $rules['role'];
-            }
         }
 
         return $rules;

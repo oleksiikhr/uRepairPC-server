@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Role;
 use App\User;
 use App\Mail\UserCreated;
 use App\Mail\EmailChange;
+use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Http\Traits\ImageTrait;
 use App\Http\Helpers\FileHelper;
@@ -19,20 +21,29 @@ class UserController extends Controller
     /** @var string */
     private $_model = User::class;
 
-    public function __construct()
+    /**
+     * Add middleware depends on user permissions.
+     *
+     * @param  Request  $request
+     * @return array
+     */
+    public function permissions(Request $request): array
     {
-        $this->middleware('admin.or.current')->only([
-            'update', 'updateEmail', 'setImage', 'deleteImage', 'updatePassword',
-        ]);
+        $isOwnProfile = (int)$request->user === Auth::id();
 
-        $this->allowRoles([
-            User::ROLE_WORKER => [
-                'index', 'show', 'update', 'updatePassword', 'updateEmail', 'getImage', 'setImage', 'deleteImage',
-            ],
-            User::ROLE_USER => [
-                'index', 'show', 'update', 'updatePassword', 'updateEmail', 'getImage', 'setImage', 'deleteImage',
-            ],
-        ]);
+        return [
+            'index' => Permissions::USERS_VIEW,
+            'show' => $isOwnProfile ? null : Permissions::USERS_VIEW,
+            'getImage' => $isOwnProfile ? null : Permissions::USERS_VIEW,
+            'update' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
+            'updateEmail' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
+            'setImage' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
+            'deleteImage' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
+            'updatePassword' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
+            'store' => Permissions::USERS_CREATE,
+            'delete' => Permissions::USERS_DELETE,
+            'updateRoles' => Permissions::ROLES_MANAGE,
+        ];
     }
 
     /**
@@ -43,7 +54,7 @@ class UserController extends Controller
      */
     public function index(UserRequest $request)
     {
-        $query = User::query();
+        $query = User::with('roles');
 
         // Search
         if ($request->has('search') && $request->has('columns') && ! empty($request->columns)) {
@@ -70,13 +81,14 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
+        $defaultRoles = Role::where('default', true)->get();
         $password = User::generateRandomStrPassword();
 
         $user = new User;
         $user->fill($request->all());
         $user->email = $request->email;
         $user->password = bcrypt($password);
-        User::setRole($user, $request->role);
+        $user->assignRole($defaultRoles);
 
         if (! $user->save()) {
             return response()->json(['message' => __('app.database.save_error')], 422);
@@ -99,11 +111,18 @@ class UserController extends Controller
     public function show(int $id)
     {
         $user = User::findOrFail($id);
+        $me = Auth::user();
 
-        return response()->json([
+        $output = [
             'message' => __('app.users.show'),
             'user' => $user,
-        ]);
+        ];
+
+        if ($me->can(Permissions::ROLES_VIEW) || $me->id === $user->id) {
+            $output['permissions'] = $user->getAllPermissions()->pluck('name');
+        }
+
+        return response()->json($output);
     }
 
     /**
@@ -117,7 +136,6 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $user->fill($request->all());
-        User::setRole($user, $request->role);
 
         if (! $user->save()) {
             return response()->json(['message' => __('app.database.save_error')], 422);
@@ -138,17 +156,18 @@ class UserController extends Controller
      */
     public function destroy(UserRequest $request, int $id)
     {
-        if (Auth::user()->id === $id) {
+        if (Auth::id() === $id) {
             return response()->json(['message' => __('app.users.self_destroy_error')], 403);
         }
 
         $user = User::findOrFail($id);
 
+        // Destroy profile image (avatar)
         if ($request->image_delete && $user->image) {
             $deleted = FileHelper::delete($user->image);
 
             if (! $deleted) {
-                return response()->json('ER'); // TODO
+                return response()->json(['message' => __('app.files.file_not_deleted')]);
             }
 
             $user->image = null;
@@ -161,6 +180,28 @@ class UserController extends Controller
 
         return response()->json([
             'message' => __('app.users.destroy'),
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  Request  $request
+     * @param  int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateRoles(Request $request, int $id)
+    {
+        $request->validate([
+            'roles' => 'array',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->syncRoles($request->roles);
+
+        return response()->json([
+            'message' => __('app.users.roles_changed'),
+            'user' => $user,
         ]);
     }
 
@@ -206,7 +247,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         // We can change only for own profile.
-        if (Auth::user()->id === $id) {
+        if (Auth::id() === $id) {
             return $this->setPasswordProfile($request, $user);
         }
 
@@ -232,7 +273,9 @@ class UserController extends Controller
 
         Mail::to($user)->send(new UserCreated($password));
 
-        return response()->json(['message' => __('app.users.password_email_changed')]);
+        return response()->json([
+            'message' => __('app.users.password_email_changed'),
+        ]);
     }
 
     /**
@@ -252,6 +295,8 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        return response()->json(['message' => __('app.users.password_changed')]);
+        return response()->json([
+            'message' => __('app.users.password_changed'),
+        ]);
     }
 }

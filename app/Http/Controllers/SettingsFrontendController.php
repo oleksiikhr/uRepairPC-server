@@ -3,12 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Settings;
+use App\Enums\Permissions;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use App\Http\Helpers\FileHelper;
 use App\Http\Requests\SettingsFrontendRequest;
 
 class SettingsFrontendController extends Controller
 {
+    /**
+     * Add middleware depends on user permissions.
+     *
+     * @param  Request  $request
+     * @return array
+     */
+    public function permissions(Request $request): array
+    {
+        return [
+            'store' => Permissions::OTHER_GLOBAL_SETTINGS,
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      *

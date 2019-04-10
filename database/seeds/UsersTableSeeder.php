@@ -1,7 +1,7 @@
 <?php
 
+use App\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class UsersTableSeeder extends Seeder
 {
@@ -12,18 +12,21 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('users')->insert([
-            'first_name' => 'Admin',
-            'last_name' => 'Admin',
+        $user = User::create([
+            'first_name' => 'Oliver',
+            'last_name' => 'Noah',
             'email' => 'admin@example.com',
             'password' => '$2y$10$wUVz4ckveO.3O4Qvbuik/.fleI13a/VxQmeSEbPwaqZ8GbdLedmNC', // admin123
-            'role' => 'admin',
-            'updated_at' => \Carbon\Carbon::now(),
-            'created_at' => \Carbon\Carbon::now(),
         ]);
 
+        $user->assignRole('admin');
+
         if (config('app.env') === 'local') {
-            factory(App\User::class, 70)->create();
+            factory(App\User::class, 70)
+                ->create()
+                ->each(function ($user) {
+                    $user->assignRole('user');
+                });
         }
     }
 }

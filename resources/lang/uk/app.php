@@ -41,7 +41,16 @@ return [
         'self_destroy_error' => 'Неможливо видалити самого себе',
         'email_changed' => 'E-mail змінений',
         'password_changed' => 'Пароль змінений',
+        'roles_changed' => 'Ролі змінені',
         'password_email_changed' => 'Пароль змінений та відправлений на почту',
+    ],
+
+    /*
+     * RoleController.
+     */
+    'roles' => [
+        'show' => 'Роль отримана',
+        'store' => 'Роль створена',
     ],
 
     /*
