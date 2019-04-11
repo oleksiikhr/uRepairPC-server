@@ -25,7 +25,7 @@ class AuthRequest extends FormRequest
     {
         return [
             'email' => 'required|email|max:191',
-            'password' => 'required|between:6,191'
+            'password' => 'required|between:6,191',
         ];
     }
 }

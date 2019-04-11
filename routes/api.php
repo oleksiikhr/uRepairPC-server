@@ -19,7 +19,6 @@ Route::get('settings/frontend', 'SettingsFrontendController@index');
 Route::group(['prefix' => 'auth'], function () {
     Route::group(['middleware' => 'guest'], function () {
         Route::post('login', 'AuthController@login');
-        Route::post('forgot', 'AuthController@forgot');
         Route::post('refresh', 'AuthController@refresh');
     });
 
