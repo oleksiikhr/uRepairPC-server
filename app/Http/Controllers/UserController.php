@@ -29,7 +29,8 @@ class UserController extends Controller
      */
     public function permissions(Request $request): array
     {
-        $isOwnProfile = (int)$request->user === Auth::id();
+        $requestId = (int)$request->user;
+        $isOwnProfile = $requestId === Auth::id();
 
         return [
             'index' => Permissions::USERS_VIEW,
@@ -42,7 +43,7 @@ class UserController extends Controller
             'updatePassword' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
             'store' => Permissions::USERS_CREATE,
             'delete' => Permissions::USERS_DELETE,
-            'updateRoles' => Permissions::ROLES_MANAGE,
+            'updateRoles' => $requestId === 1 ? Permissions::DISABLE : Permissions::ROLES_MANAGE,
         ];
     }
 
