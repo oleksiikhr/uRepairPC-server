@@ -66,6 +66,7 @@ class RoleController extends Controller
     public function store(RoleRequest $request)
     {
         $role = new Role;
+        $role->name = $request->name;
         $role->fill($request->all());
 
         if (! $role->save()) {
@@ -98,13 +99,24 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  RoleRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(RoleRequest $request, $id)
     {
-        //
+        $role = Role::findOrFail($id);
+        $role->name = $request->name;
+        $role->fill($request->all());
+
+        if (! $role->save()) {
+            return response()->json(['message' => __('app.database.save_error')], 422);
+        }
+
+        return response()->json([
+            'message' => __('app.roles.update'),
+            'role' => $role,
+        ]);
     }
 
     /**
