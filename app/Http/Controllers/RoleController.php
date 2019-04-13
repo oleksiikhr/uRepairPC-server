@@ -17,12 +17,14 @@ class RoleController extends Controller
      */
     public function permissions(Request $request): array
     {
+        $requestId = (int)$request->role;
+
         return [
             'index' => Permissions::ROLES_VIEW,
             'store' => Permissions::ROLES_MANAGE,
             'show' => Permissions::ROLES_MANAGE,
             'update' => Permissions::ROLES_MANAGE,
-            'destroy' => Permissions::ROLES_MANAGE,
+            'destroy' => $requestId === 1 ? Permissions::DISABLE : Permissions::ROLES_MANAGE,
         ];
     }
 
@@ -127,6 +129,14 @@ class RoleController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $role = Role::findOrFail($id);
+
+        if (! $role->delete()) {
+            return response()->json(['message' => __('app.database.destroy_error')], 422);
+        }
+
+        return response()->json([
+            'message' => __('app.roles.destroy'),
+        ]);
     }
 }
