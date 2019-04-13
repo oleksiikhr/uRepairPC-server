@@ -42,7 +42,7 @@ class UserController extends Controller
             'deleteImage' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
             'updatePassword' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
             'store' => Permissions::USERS_CREATE,
-            'delete' => Permissions::USERS_DELETE,
+            'delete' => $requestId === 1 || $isOwnProfile ? Permissions::DISABLE : Permissions::USERS_DELETE,
             'updateRoles' => $requestId === 1 ? Permissions::DISABLE : Permissions::ROLES_MANAGE,
         ];
     }
@@ -55,7 +55,11 @@ class UserController extends Controller
      */
     public function index(UserRequest $request)
     {
-        $query = User::with('roles');
+        $query = User::query();
+
+        if (Auth::user()->can(Permissions::ROLES_VIEW)) {
+            $query->with('roles');
+        }
 
         // Search
         if ($request->has('search') && $request->has('columns') && ! empty($request->columns)) {
@@ -157,10 +161,6 @@ class UserController extends Controller
      */
     public function destroy(UserRequest $request, int $id)
     {
-        if (Auth::id() === $id) {
-            return response()->json(['message' => __('app.users.self_destroy_error')], 403);
-        }
-
         $user = User::findOrFail($id);
 
         // Destroy profile image (avatar)
