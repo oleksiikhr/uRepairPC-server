@@ -38,4 +38,13 @@ class Role extends SpatieRole
         'color',
         'default',
     ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'default' => 'boolean',
+    ];
 }
