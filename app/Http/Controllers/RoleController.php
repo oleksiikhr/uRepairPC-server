@@ -87,7 +87,7 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
         $role = Role::with('permissions')->findOrFail($id);
         $role['permissions_grouped'] = $role->permissions->groupBy('section_name');
@@ -105,7 +105,7 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(RoleRequest $request, $id)
+    public function update(RoleRequest $request, int $id)
     {
         $role = Role::findOrFail($id);
         $role->name = $request->name;
@@ -122,12 +122,24 @@ class RoleController extends Controller
     }
 
     /**
+     * Update the specified resource in storage.
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updatePermissions(Request $request, int $id)
+    {
+        // TODO
+    }
+
+    /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $role = Role::findOrFail($id);
 

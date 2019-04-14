@@ -32,7 +32,9 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     /*
      * Section: Settings
      */
-    Route::post('settings/frontend', 'SettingsFrontendController@store');
+    Route::group(['prefix' => 'settings'], function () {
+        Route::post('frontend', 'SettingsFrontendController@store');
+    });
 
     /*
      * Section: Users
@@ -50,16 +52,21 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     /*
      * Section: Equipments
      */
-    Route::apiResource('equipments/types', 'EquipmentTypeController');
-    Route::apiResource('equipments/manufacturers', 'EquipmentManufacturerController');
-    Route::apiResource('equipments/models', 'EquipmentModelController');
     Route::apiResource('equipments', 'EquipmentController');
-    Route::apiResource('equipments/{equipment}/files', 'EquipmentFileController');
+    Route::group(['prefix' => 'equipments'], function () {
+        Route::apiResource('types', 'EquipmentTypeController');
+        Route::apiResource('manufacturers', 'EquipmentManufacturerController');
+        Route::apiResource('models', 'EquipmentModelController');
+        Route::apiResource('{equipment}/files', 'EquipmentFileController');
+    });
 
     /*
      * Section: Roles
      */
     Route::apiResource('roles', 'RoleController');
+    Route::group(['prefix' => 'roles'], function () {
+        Route::put('{role}/permissions', 'RoleController@updatePermissions');
+    });
 
     /*
      * Section: Permission

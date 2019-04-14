@@ -65,7 +65,7 @@ class EquipmentTypeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
         $equipmentType = EquipmentType::findOrFail($id);
 
@@ -82,7 +82,7 @@ class EquipmentTypeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(EquipmentTypeRequest $request, $id)
+    public function update(EquipmentTypeRequest $request, int $id)
     {
         $equipmentType = EquipmentType::findOrFail($id);
         $equipmentType->fill($request->all());
@@ -103,7 +103,7 @@ class EquipmentTypeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         if (! EquipmentType::destroy($id)) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
