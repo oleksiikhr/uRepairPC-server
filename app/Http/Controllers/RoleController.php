@@ -25,6 +25,7 @@ class RoleController extends Controller
             'show' => Permissions::ROLES_MANAGE,
             'update' => Permissions::ROLES_MANAGE,
             'destroy' => $requestId === 1 ? Permissions::DISABLE : Permissions::ROLES_MANAGE,
+            'updatePermissions' => $requestId === 1 ? Permissions::DISABLE : Permissions::ROLES_MANAGE,
         ];
     }
 
@@ -130,7 +131,19 @@ class RoleController extends Controller
      */
     public function updatePermissions(Request $request, int $id)
     {
-        // TODO
+        $request->validate([
+            'permissions' => 'array',
+            'permissions.*' => 'string'
+        ]);
+
+        $role = Role::findOrFail($id);
+        $role->syncPermissions($request->permissions);
+        $role['permissions_grouped'] = $role->permissions->groupBy('section_name');
+
+        return response()->json([
+            'message' => __('app.roles.update_permissions'),
+            'role' => $role,
+        ]);
     }
 
     /**
