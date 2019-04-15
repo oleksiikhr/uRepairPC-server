@@ -73,6 +73,13 @@ class UserController extends Controller
             $query->orderBy($request->sortColumn, $request->sortOrder === 'descending' ? 'desc' : 'asc');
         }
 
+        // Filter
+        if ($request->has('filterRoleById')) {
+            $query->whereHas('roles', function ($q) use ($request) {
+                $q->where('id', $request->filterRoleById);
+            });
+        }
+
         $list = $query->paginate(self::PAGINATE_DEFAULT);
 
         return response()->json($list);
