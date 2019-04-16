@@ -69,7 +69,6 @@ class RoleController extends Controller
     public function store(RoleRequest $request)
     {
         $role = new Role;
-        $role->name = $request->name;
         $role->fill($request->all());
 
         if (! $role->save()) {
@@ -91,7 +90,6 @@ class RoleController extends Controller
     public function show(int $id)
     {
         $role = Role::with('permissions')->findOrFail($id);
-        $role['permissions_grouped'] = $role->permissions->groupBy('section_name');
 
         return response()->json([
             'message' => __('app.roles.show'),
@@ -109,7 +107,6 @@ class RoleController extends Controller
     public function update(RoleRequest $request, int $id)
     {
         $role = Role::findOrFail($id);
-        $role->name = $request->name;
         $role->fill($request->all());
 
         if (! $role->save()) {
@@ -138,7 +135,6 @@ class RoleController extends Controller
 
         $role = Role::findOrFail($id);
         $role->syncPermissions($request->permissions);
-        $role['permissions_grouped'] = $role->permissions->groupBy('section_name');
 
         return response()->json([
             'message' => __('app.roles.update_permissions'),

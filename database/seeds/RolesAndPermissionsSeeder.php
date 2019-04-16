@@ -71,15 +71,13 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Not create a Gate!
         Role::create([
-            'name' => 'admin',
-            'display_name' => __('roles_and_permissions.roles.admins'),
+            'name' => __('roles_and_permissions.roles.admins'),
             'color' => '#f56c6c',
         ])
             ->givePermissionTo(collect($permissions)->pluck('name'));;
 
         Role::create([
-            'name' => 'worker',
-            'display_name' => __('roles_and_permissions.roles.workers'),
+            'name' => __('roles_and_permissions.roles.workers'),
             'color' => '#409eff',
         ])
             ->givePermissionTo([
@@ -104,8 +102,7 @@ class RolesAndPermissionsSeeder extends Seeder
             ]);
 
         Role::create([
-            'name' => 'user',
-            'display_name' => __('roles_and_permissions.roles.users'),
+            'name' => __('roles_and_permissions.roles.users'),
             'color' => '#67c23a',
             'default' => true,
         ])
