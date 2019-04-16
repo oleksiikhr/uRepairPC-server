@@ -24,11 +24,13 @@ class EquipmentType extends Model
      * | ---------------------------------------------------------------
      */
 
-    public function models() {
+    public function models()
+    {
         return $this->hasMany(EquipmentModel::class);
     }
 
-    public function equipments() {
+    public function equipments()
+    {
         return $this->hasMany(Equipment::class);
     }
 }

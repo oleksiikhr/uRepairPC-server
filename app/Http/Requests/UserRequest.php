@@ -37,6 +37,7 @@ class UserRequest extends FormRequest
                 'columns.*' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SEARCH),
                 'sortColumn' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SORT),
                 'sortOrder' => 'string|in:ascending,descending',
+                'filterRoleById' => 'integer',
             ];
         }
 

@@ -17,12 +17,15 @@ class RoleController extends Controller
      */
     public function permissions(Request $request): array
     {
+        $requestId = (int)$request->role;
+
         return [
             'index' => Permissions::ROLES_VIEW,
             'store' => Permissions::ROLES_MANAGE,
             'show' => Permissions::ROLES_MANAGE,
             'update' => Permissions::ROLES_MANAGE,
-            'destroy' => Permissions::ROLES_MANAGE,
+            'destroy' => $requestId === 1 ? Permissions::DISABLE : Permissions::ROLES_MANAGE,
+            'updatePermissions' => $requestId === 1 ? Permissions::DISABLE : Permissions::ROLES_MANAGE,
         ];
     }
 
@@ -66,6 +69,7 @@ class RoleController extends Controller
     public function store(RoleRequest $request)
     {
         $role = new Role;
+        $role->name = $request->name;
         $role->fill($request->all());
 
         if (! $role->save()) {
@@ -84,7 +88,7 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
         $role = Role::with('permissions')->findOrFail($id);
         $role['permissions_grouped'] = $role->permissions->groupBy('section_name');
@@ -98,13 +102,48 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  RoleRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(RoleRequest $request, int $id)
     {
-        //
+        $role = Role::findOrFail($id);
+        $role->name = $request->name;
+        $role->fill($request->all());
+
+        if (! $role->save()) {
+            return response()->json(['message' => __('app.database.save_error')], 422);
+        }
+
+        return response()->json([
+            'message' => __('app.roles.update'),
+            'role' => $role,
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updatePermissions(Request $request, int $id)
+    {
+        $request->validate([
+            'permissions' => 'array',
+            'permissions.*' => 'string'
+        ]);
+
+        $role = Role::findOrFail($id);
+        $role->syncPermissions($request->permissions);
+        $role['permissions_grouped'] = $role->permissions->groupBy('section_name');
+
+        return response()->json([
+            'message' => __('app.roles.update_permissions'),
+            'role' => $role,
+        ]);
     }
 
     /**
@@ -113,8 +152,16 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
-        //
+        $role = Role::findOrFail($id);
+
+        if (! $role->delete()) {
+            return response()->json(['message' => __('app.database.destroy_error')], 422);
+        }
+
+        return response()->json([
+            'message' => __('app.roles.destroy'),
+        ]);
     }
 }

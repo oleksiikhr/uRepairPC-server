@@ -34,9 +34,17 @@ class Role extends SpatieRole
      * @var array
      */
     protected $fillable = [
-        'name',
         'display_name',
         'color',
         'default',
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'default' => 'boolean',
     ];
 }

@@ -44,4 +44,7 @@ abstract class Permissions
      * Other
      */
     const OTHER_GLOBAL_SETTINGS = 'other.global_settings';
+
+    // Permission not created - blocks all requests
+    const DISABLE = 'disable';
 }
