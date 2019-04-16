@@ -22,7 +22,7 @@ class RoleController extends Controller
         return [
             'index' => Permissions::ROLES_VIEW,
             'store' => Permissions::ROLES_MANAGE,
-            'show' => Permissions::ROLES_MANAGE,
+            'show' => Permissions::ROLES_VIEW,
             'update' => Permissions::ROLES_MANAGE,
             'destroy' => $requestId === 1 ? Permissions::DISABLE : Permissions::ROLES_MANAGE,
             'updatePermissions' => $requestId === 1 ? Permissions::DISABLE : Permissions::ROLES_MANAGE,
