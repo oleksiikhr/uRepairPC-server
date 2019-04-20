@@ -2,6 +2,8 @@
 
 namespace App\Http\Traits;
 
+use App\User;
+use Illuminate\Http\Request;
 use App\Http\Helpers\FileHelper;
 use App\Http\Requests\ImageRequest;
 use Illuminate\Support\Facades\Auth;
@@ -14,11 +16,12 @@ trait ImageTrait
     /**
      * Get image by model.
      *
+     * @param  Request  $request
      * @return false|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|int
      */
-    public function getImage()
+    public function getImage(Request $request)
     {
-        $user = Auth::user();
+        $user = User::findOrFail($request->user);
 
         if (! Storage::exists($user->image)) {
             return response(null);

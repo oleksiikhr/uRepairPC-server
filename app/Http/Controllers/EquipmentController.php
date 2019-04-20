@@ -81,7 +81,7 @@ class EquipmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
         $equipment = Equipment::querySelectJoins()->findOrFail($id);
 
@@ -98,7 +98,7 @@ class EquipmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(EquipmentRequest $request, $id)
+    public function update(EquipmentRequest $request, int $id)
     {
         $equipment = Equipment::findOrFail($id);
         $equipment->fill($request->all());
@@ -120,7 +120,7 @@ class EquipmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, int $id)
     {
         $request->validate([
             'files_delete' => 'boolean',

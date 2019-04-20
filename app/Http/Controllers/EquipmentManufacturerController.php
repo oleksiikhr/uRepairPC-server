@@ -65,7 +65,7 @@ class EquipmentManufacturerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
         $equipmentManufacturer = EquipmentManufacturer::findOrFail($id);
 
@@ -82,7 +82,7 @@ class EquipmentManufacturerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(EquipmentManufacturerRequest $request, $id)
+    public function update(EquipmentManufacturerRequest $request, int $id)
     {
         $equipmentManufacturer = EquipmentManufacturer::findOrFail($id);
         $equipmentManufacturer->fill($request->all());
@@ -103,7 +103,7 @@ class EquipmentManufacturerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         if (! EquipmentManufacturer::destroy($id)) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);

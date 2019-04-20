@@ -65,7 +65,7 @@ class EquipmentModelController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
         $equipmentModel = EquipmentModel::querySelectJoins()->findOrFail($id);
 
@@ -82,7 +82,7 @@ class EquipmentModelController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(EquipmentModelRequest $request, $id)
+    public function update(EquipmentModelRequest $request, int $id)
     {
         $equipmentModel = EquipmentModel::findOrFail($id);
         $equipmentModel->fill($request->all());
@@ -103,7 +103,7 @@ class EquipmentModelController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         if (! EquipmentModel::destroy($id)) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);

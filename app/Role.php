@@ -10,7 +10,6 @@ class Role extends SpatieRole
     const ALLOW_COLUMNS_SEARCH = [
         'id',
         'name',
-        'display_name',
         'guard_name',
         'default',
         'updated_at',
@@ -21,7 +20,6 @@ class Role extends SpatieRole
     const ALLOW_COLUMNS_SORT = [
         'id',
         'name',
-        'display_name',
         'guard_name',
         'default',
         'updated_at',
@@ -35,8 +33,34 @@ class Role extends SpatieRole
      */
     protected $fillable = [
         'name',
-        'display_name',
         'color',
         'default',
     ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'default' => 'boolean',
+    ];
+
+    /**
+     * Convert the model instance to an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        if (! empty($this->permissions)) {
+            if (count($this->permissions) > 0) {
+                $this->setAttribute('permissions_grouped', $this->permissions->groupBy('section_name'));
+            } else {
+                $this->setAttribute('permissions_grouped', (object)[]);
+            }
+        }
+
+        return parent::toArray();
+    }
 }
