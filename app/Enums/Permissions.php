@@ -32,6 +32,14 @@ abstract class Permissions
     const EQUIPMENTS_DELETE = 'equipments.delete';
 
     /*
+     * Equipments
+     */
+    const EQUIPMENTS_CONFIG_VIEW = 'equipments.config.view';
+    const EQUIPMENTS_CONFIG_EDIT = 'equipments.config.edit';
+    const EQUIPMENTS_CONFIG_CREATE = 'equipments.config.create';
+    const EQUIPMENTS_CONFIG_DELETE = 'equipments.config.delete';
+
+    /*
      * Equipment Files
      */
     const EQUIPMENTS_FILES_VIEW = 'equipments.files.view';

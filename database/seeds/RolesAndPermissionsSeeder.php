@@ -43,6 +43,12 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => Permissions::EQUIPMENTS_CREATE, 'section_key' => 'equipments'],
             ['name' => Permissions::EQUIPMENTS_DELETE, 'section_key' => 'equipments'],
 
+            // Equipments - Config
+            ['name' => Permissions::EQUIPMENTS_CONFIG_VIEW, 'section_key' => 'equipments_config'],
+            ['name' => Permissions::EQUIPMENTS_CONFIG_EDIT, 'section_key' => 'equipments_config'],
+            ['name' => Permissions::EQUIPMENTS_CONFIG_CREATE, 'section_key' => 'equipments_config'],
+            ['name' => Permissions::EQUIPMENTS_CONFIG_DELETE, 'section_key' => 'equipments_config'],
+
             // Equipment Files
             ['name' => Permissions::EQUIPMENTS_FILES_VIEW, 'section_key' => 'equipment_files'],
             ['name' => Permissions::EQUIPMENTS_FILES_DOWNLOAD, 'section_key' => 'equipment_files'],
@@ -57,10 +63,10 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => Permissions::REQUESTS_DELETE, 'section_key' => 'requests'],
 
             // Requests - Config
-            ['name' => Permissions::REQUESTS_CONFIG_VIEW, 'section_key' => 'requests'],
-            ['name' => Permissions::REQUESTS_CONFIG_EDIT, 'section_key' => 'requests'],
-            ['name' => Permissions::REQUESTS_CONFIG_CREATE, 'section_key' => 'requests'],
-            ['name' => Permissions::REQUESTS_CONFIG_DELETE, 'section_key' => 'requests'],
+            ['name' => Permissions::REQUESTS_CONFIG_VIEW, 'section_key' => 'requests_config'],
+            ['name' => Permissions::REQUESTS_CONFIG_EDIT, 'section_key' => 'requests_config'],
+            ['name' => Permissions::REQUESTS_CONFIG_CREATE, 'section_key' => 'requests_config'],
+            ['name' => Permissions::REQUESTS_CONFIG_DELETE, 'section_key' => 'requests_config'],
 
             // Other
             ['name' => Permissions::OTHER_GLOBAL_SETTINGS, 'section_key' => 'other'],
@@ -104,6 +110,12 @@ class RolesAndPermissionsSeeder extends Seeder
                 Permissions::EQUIPMENTS_EDIT,
                 Permissions::EQUIPMENTS_CREATE,
                 Permissions::EQUIPMENTS_DELETE,
+
+                // Equipments - Config
+                Permissions::EQUIPMENTS_CONFIG_VIEW,
+                Permissions::EQUIPMENTS_CONFIG_EDIT,
+                Permissions::EQUIPMENTS_CONFIG_CREATE,
+                Permissions::EQUIPMENTS_CONFIG_DELETE,
 
                 // Equipment Files
                 Permissions::EQUIPMENTS_FILES_VIEW,

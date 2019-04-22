@@ -26,6 +26,7 @@ return [
         'profile' => 'Профіль',
         'roles' => 'Ролі',
         'equipments' => 'Обладнання',
+        'equipments_config' => 'Обладнання - Конфігурація',
         'equipment_files' => 'Обладнання - Файли',
         'other' => 'Інше',
         'requests' => 'Заявки',

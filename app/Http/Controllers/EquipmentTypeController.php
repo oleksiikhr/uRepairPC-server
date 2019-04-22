@@ -18,11 +18,11 @@ class EquipmentTypeController extends Controller
     public function permissions(Request $request): array
     {
         return [
-            'index' => Permissions::EQUIPMENTS_VIEW,
-            'show' => Permissions::EQUIPMENTS_VIEW,
-            'store' => Permissions::EQUIPMENTS_CREATE,
-            'update' => Permissions::EQUIPMENTS_EDIT,
-            'destroy' => Permissions::EQUIPMENTS_DELETE,
+            'index' => Permissions::EQUIPMENTS_CONFIG_VIEW,
+            'show' => Permissions::EQUIPMENTS_CONFIG_VIEW,
+            'store' => Permissions::EQUIPMENTS_CONFIG_CREATE,
+            'update' => Permissions::EQUIPMENTS_CONFIG_EDIT,
+            'destroy' => Permissions::EQUIPMENTS_CONFIG_DELETE,
         ];
     }
 
