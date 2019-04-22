@@ -97,6 +97,16 @@ return [
     ],
 
     /*
+     * RequestStatusController.
+     */
+    'request_status' => [
+        'show' => 'Статус заявки отримано',
+        'store' => 'Статус заявки створено',
+        'update' => 'Статус заявки оновлено',
+        'destroy' => 'Статус заявки видалено',
+    ],
+
+    /*
      * Working with files.
      */
     'files' => [

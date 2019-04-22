@@ -69,8 +69,15 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     });
 
     /*
-     * Section: Permission
+     * Section: Permissions
      */
     Route::get('permissions', 'PermissionController@index');
+
+    /*
+     * Section: Requests
+     */
+    Route::group(['prefix' => 'requests'], function () {
+        Route::apiResource('statuses', 'RequestStatusController');
+    });
 
 });
