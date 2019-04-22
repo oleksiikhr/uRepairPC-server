@@ -28,6 +28,8 @@ return [
         'equipments' => 'Обладнання',
         'equipment_files' => 'Обладнання - Файли',
         'other' => 'Інше',
+        'requests' => 'Заявки',
+        'requests_config' => 'Заявки - Конфігурація',
     ],
 
 ];

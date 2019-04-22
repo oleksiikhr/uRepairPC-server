@@ -50,6 +50,18 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => Permissions::EQUIPMENTS_FILES_CREATE, 'section_key' => 'equipment_files'],
             ['name' => Permissions::EQUIPMENTS_FILES_DELETE, 'section_key' => 'equipment_files'],
 
+            // Requests
+            ['name' => Permissions::REQUESTS_VIEW, 'section_key' => 'requests'],
+            ['name' => Permissions::REQUESTS_EDIT, 'section_key' => 'requests'],
+            ['name' => Permissions::REQUESTS_CREATE, 'section_key' => 'requests'],
+            ['name' => Permissions::REQUESTS_DELETE, 'section_key' => 'requests'],
+
+            // Requests - Config
+            ['name' => Permissions::REQUESTS_CONFIG_VIEW, 'section_key' => 'requests'],
+            ['name' => Permissions::REQUESTS_CONFIG_EDIT, 'section_key' => 'requests'],
+            ['name' => Permissions::REQUESTS_CONFIG_CREATE, 'section_key' => 'requests'],
+            ['name' => Permissions::REQUESTS_CONFIG_DELETE, 'section_key' => 'requests'],
+
             // Other
             ['name' => Permissions::OTHER_GLOBAL_SETTINGS, 'section_key' => 'other'],
         ];
@@ -99,6 +111,18 @@ class RolesAndPermissionsSeeder extends Seeder
                 Permissions::EQUIPMENTS_FILES_EDIT,
                 Permissions::EQUIPMENTS_FILES_CREATE,
                 Permissions::EQUIPMENTS_FILES_DELETE,
+
+                // Requests
+                Permissions::REQUESTS_VIEW,
+                Permissions::REQUESTS_EDIT,
+                Permissions::REQUESTS_CREATE,
+                Permissions::REQUESTS_DELETE,
+
+                // Requests - Config
+                Permissions::REQUESTS_CONFIG_VIEW,
+                Permissions::REQUESTS_CONFIG_EDIT,
+                Permissions::REQUESTS_CONFIG_CREATE,
+                Permissions::REQUESTS_CONFIG_DELETE,
             ]);
 
         Role::create([
@@ -112,6 +136,12 @@ class RolesAndPermissionsSeeder extends Seeder
 
                 // Users
                 Permissions::USERS_VIEW,
+
+                // Equipments
+                Permissions::EQUIPMENTS_VIEW,
+
+                // Requests
+                Permissions::REQUESTS_VIEW,
             ]);
     }
 }

@@ -41,6 +41,22 @@ abstract class Permissions
     const EQUIPMENTS_FILES_DELETE = 'equipments.files.delete';
 
     /*
+     * Requests
+     */
+    const REQUESTS_VIEW = 'requests.view';
+    const REQUESTS_EDIT = 'requests.edit';
+    const REQUESTS_CREATE = 'requests.create';
+    const REQUESTS_DELETE = 'requests.delete';
+
+    /*
+     * Requests Config
+     */
+    const REQUESTS_CONFIG_VIEW = 'requests.config.view';
+    const REQUESTS_CONFIG_EDIT = 'requests.config.edit';
+    const REQUESTS_CONFIG_CREATE = 'requests.config.create';
+    const REQUESTS_CONFIG_DELETE = 'requests.config.delete';
+
+    /*
      * Other
      */
     const OTHER_GLOBAL_SETTINGS = 'other.global_settings';
