@@ -56,7 +56,7 @@ class Equipment extends Model
     protected $table = 'equipments';
 
     /**
-     * The attributes that aren't mass assignable.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
