@@ -49,6 +49,10 @@ class RequestStatusController extends Controller
         $requestStatus = new RequestStatus;
         $requestStatus->fill($request->all());
 
+        if ($request->has('default') && $request->default) {
+            RequestStatus::clearDefaultValues();
+        }
+
         if (! $requestStatus->save()) {
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
@@ -85,6 +89,15 @@ class RequestStatusController extends Controller
     public function update(RequestStatusRequest $request, int $id)
     {
         $requestStatus = RequestStatus::findOrFail($id);
+
+        if ($request->has('default') && $request->default !== $requestStatus->default) {
+            if (! $request->default) {
+                return response()->json(['message' => __('app.request_status.update_default')], 422);
+            }
+
+            RequestStatus::clearDefaultValues();
+        }
+
         $requestStatus->fill($request->all());
 
         if (! $requestStatus->save()) {
@@ -105,6 +118,12 @@ class RequestStatusController extends Controller
      */
     public function destroy(int $id)
     {
+        $requestStatus = RequestStatus::findOrFail($id);
+
+        if ($requestStatus->default) {
+            return response()->json(['message' => __('app.request_status.destroy_default')], 422);
+        }
+
         if (! RequestStatus::destroy($id)) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
