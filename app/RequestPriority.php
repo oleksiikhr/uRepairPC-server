@@ -27,4 +27,11 @@ class RequestPriority extends Model
     protected $casts = [
         'default' => 'boolean',
     ];
+
+    /**
+     * @return int
+     */
+    public static function clearDefaultValues() {
+        return self::where('default', true)->update(['default' => false]);
+    }
 }
