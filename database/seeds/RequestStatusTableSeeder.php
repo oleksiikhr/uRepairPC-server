@@ -20,11 +20,7 @@ class RequestStatusTableSeeder extends Seeder
         ];
 
         foreach ($items as $item) {
-            RequestStatus::create([
-                'name' => $item['name'],
-                'color' => $item['color'],
-                'default' => $item['default']
-            ]);
+            RequestStatus::create($item);
         }
     }
 }

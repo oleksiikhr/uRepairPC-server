@@ -17,11 +17,7 @@ class EquipmentModelsTableSeeder extends Seeder
         ];
 
         foreach ($arr as $item) {
-            EquipmentModel::create([
-                'name' => $item['name'],
-                'type_id' => $item['type_id'],
-                'manufacturer_id' => $item['manufacturer_id'],
-            ]);
+            EquipmentModel::create($item);
         }
     }
 }
