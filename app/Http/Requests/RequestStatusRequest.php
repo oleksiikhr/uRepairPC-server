@@ -26,7 +26,7 @@ class RequestStatusRequest extends FormRequest
     public function rules(Request $request)
     {
         $rules = [
-            'name' => 'string|between:1,191|unique:equipment_types,name',
+            'name' => 'string|between:1,191|unique:request_statuses,name',
             'color' => 'nullable|string|regex:/^#([a-zA-Z0-9]{6})$/i',
             'description' => 'nullable|string|max:600',
             'default' => 'boolean',
