@@ -13,17 +13,11 @@ class EquipmentsTableSeeder extends Seeder
     public function run()
     {
         $arr = [
-            ['serial' => '11111', 'inventory' => '22222', 'manufacturer_id' => 1, 'type_id' => 1, 'model_id' => 1]
+            ['serial_number' => '11111', 'inventory_number' => '22222', 'manufacturer_id' => 1, 'type_id' => 1, 'model_id' => 1]
         ];
 
         foreach ($arr as $item) {
-            Equipment::create([
-                'serial_number' => $item['serial'],
-                'inventory_number' => $item['inventory'],
-                'manufacturer_id' => $item['manufacturer_id'],
-                'type_id' => $item['type_id'],
-                'model_id' => $item['model_id'],
-            ]);
+            Equipment::create($item);
         }
     }
 }

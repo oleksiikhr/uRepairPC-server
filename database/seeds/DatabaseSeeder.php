@@ -15,8 +15,13 @@ class DatabaseSeeder extends Seeder
         $this->call(RolesAndPermissionsSeeder::class);
         $this->call(UsersTableSeeder::class);
 
-        // Equipments
+        // Requests
+        $this->call(RequestStatusTableSeeder::class);
+        $this->call(RequestPrioritiesTableSeeder::class);
+        $this->call(RequestTypesTableSeeder::class);
+
         if (config('app.env') === 'local') {
+            // Equipments
             $this->call(EquipmentTypesTableSeeder::class);
             $this->call(EquipmentManufacturersTableSeeder::class);
             $this->call(EquipmentModelsTableSeeder::class);

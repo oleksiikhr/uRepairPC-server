@@ -43,12 +43,30 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => Permissions::EQUIPMENTS_CREATE, 'section_key' => 'equipments'],
             ['name' => Permissions::EQUIPMENTS_DELETE, 'section_key' => 'equipments'],
 
+            // Equipments - Config
+            ['name' => Permissions::EQUIPMENTS_CONFIG_VIEW, 'section_key' => 'equipments_config'],
+            ['name' => Permissions::EQUIPMENTS_CONFIG_EDIT, 'section_key' => 'equipments_config'],
+            ['name' => Permissions::EQUIPMENTS_CONFIG_CREATE, 'section_key' => 'equipments_config'],
+            ['name' => Permissions::EQUIPMENTS_CONFIG_DELETE, 'section_key' => 'equipments_config'],
+
             // Equipment Files
             ['name' => Permissions::EQUIPMENTS_FILES_VIEW, 'section_key' => 'equipment_files'],
             ['name' => Permissions::EQUIPMENTS_FILES_DOWNLOAD, 'section_key' => 'equipment_files'],
             ['name' => Permissions::EQUIPMENTS_FILES_EDIT, 'section_key' => 'equipment_files'],
             ['name' => Permissions::EQUIPMENTS_FILES_CREATE, 'section_key' => 'equipment_files'],
             ['name' => Permissions::EQUIPMENTS_FILES_DELETE, 'section_key' => 'equipment_files'],
+
+            // Requests
+            ['name' => Permissions::REQUESTS_VIEW, 'section_key' => 'requests'],
+            ['name' => Permissions::REQUESTS_EDIT, 'section_key' => 'requests'],
+            ['name' => Permissions::REQUESTS_CREATE, 'section_key' => 'requests'],
+            ['name' => Permissions::REQUESTS_DELETE, 'section_key' => 'requests'],
+
+            // Requests - Config
+            ['name' => Permissions::REQUESTS_CONFIG_VIEW, 'section_key' => 'requests_config'],
+            ['name' => Permissions::REQUESTS_CONFIG_EDIT, 'section_key' => 'requests_config'],
+            ['name' => Permissions::REQUESTS_CONFIG_CREATE, 'section_key' => 'requests_config'],
+            ['name' => Permissions::REQUESTS_CONFIG_DELETE, 'section_key' => 'requests_config'],
 
             // Other
             ['name' => Permissions::OTHER_GLOBAL_SETTINGS, 'section_key' => 'other'],
@@ -71,15 +89,13 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Not create a Gate!
         Role::create([
-            'name' => 'admin',
-            'display_name' => __('roles_and_permissions.roles.admins'),
+            'name' => __('roles_and_permissions.roles.admins'),
             'color' => '#f56c6c',
         ])
             ->givePermissionTo(collect($permissions)->pluck('name'));;
 
         Role::create([
-            'name' => 'worker',
-            'display_name' => __('roles_and_permissions.roles.workers'),
+            'name' => __('roles_and_permissions.roles.workers'),
             'color' => '#409eff',
         ])
             ->givePermissionTo([
@@ -95,17 +111,34 @@ class RolesAndPermissionsSeeder extends Seeder
                 Permissions::EQUIPMENTS_CREATE,
                 Permissions::EQUIPMENTS_DELETE,
 
+                // Equipments - Config
+                Permissions::EQUIPMENTS_CONFIG_VIEW,
+                Permissions::EQUIPMENTS_CONFIG_EDIT,
+                Permissions::EQUIPMENTS_CONFIG_CREATE,
+                Permissions::EQUIPMENTS_CONFIG_DELETE,
+
                 // Equipment Files
                 Permissions::EQUIPMENTS_FILES_VIEW,
                 Permissions::EQUIPMENTS_FILES_DOWNLOAD,
                 Permissions::EQUIPMENTS_FILES_EDIT,
                 Permissions::EQUIPMENTS_FILES_CREATE,
                 Permissions::EQUIPMENTS_FILES_DELETE,
+
+                // Requests
+                Permissions::REQUESTS_VIEW,
+                Permissions::REQUESTS_EDIT,
+                Permissions::REQUESTS_CREATE,
+                Permissions::REQUESTS_DELETE,
+
+                // Requests - Config
+                Permissions::REQUESTS_CONFIG_VIEW,
+                Permissions::REQUESTS_CONFIG_EDIT,
+                Permissions::REQUESTS_CONFIG_CREATE,
+                Permissions::REQUESTS_CONFIG_DELETE,
             ]);
 
         Role::create([
-            'name' => 'user',
-            'display_name' => __('roles_and_permissions.roles.users'),
+            'name' => __('roles_and_permissions.roles.users'),
             'color' => '#67c23a',
             'default' => true,
         ])
@@ -115,6 +148,12 @@ class RolesAndPermissionsSeeder extends Seeder
 
                 // Users
                 Permissions::USERS_VIEW,
+
+                // Equipments
+                Permissions::EQUIPMENTS_VIEW,
+
+                // Requests
+                Permissions::REQUESTS_VIEW,
             ]);
     }
 }

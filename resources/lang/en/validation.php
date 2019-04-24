@@ -2,8 +2,6 @@
 
 return [
 
-    'message' => 'The given data was invalid',
-
     /*
     |--------------------------------------------------------------------------
     | Validation Language Lines
