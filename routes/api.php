@@ -79,6 +79,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::group(['prefix' => 'requests'], function () {
         Route::apiResource('statuses', 'RequestStatusController');
         Route::apiResource('priorities', 'RequestPriorityController');
+        Route::apiResource('types', 'RequestTypeController');
     });
 
 });

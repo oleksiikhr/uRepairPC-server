@@ -121,6 +121,18 @@ return [
     ],
 
     /*
+     * RequestTypeController.
+     */
+    'request_type' => [
+        'show' => 'Тип заявки отримано',
+        'store' => 'Тип заявки створено',
+        'update' => 'Тип заявки оновлено',
+        'destroy' => 'Тип заявки видалено',
+        'update_default' => 'Необхідно мати хоча б один тип за замовчуванням',
+        'destroy_default' => 'Необхідно мати хоча б один тип за замовчуванням',
+    ],
+
+    /*
      * Working with files.
      */
     'files' => [

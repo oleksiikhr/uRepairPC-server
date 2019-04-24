@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         // Requests
         $this->call(RequestStatusTableSeeder::class);
         $this->call(RequestPrioritiesTableSeeder::class);
+        $this->call(RequestTypesTableSeeder::class);
 
         if (config('app.env') === 'local') {
             // Equipments
