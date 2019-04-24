@@ -2,10 +2,13 @@
 
 namespace App;
 
+use App\Traits\ModelHasDefaultTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class RequestStatus extends Model
 {
+    use ModelHasDefaultTrait;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -26,11 +29,4 @@ class RequestStatus extends Model
     protected $casts = [
         'default' => 'boolean',
     ];
-
-    /**
-     * @return int
-     */
-    public static function clearDefaultValues() {
-        return self::where('default', true)->update(['default' => false]);
-    }
 }
