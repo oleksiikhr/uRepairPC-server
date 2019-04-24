@@ -33,8 +33,8 @@ class RequestPriorityRequest extends FormRequest
             'default' => 'boolean',
         ];
 
-        if ($request->input('request')) {
-            $rules['name'] = $rules['name'] . ',' . $request->input('request');
+        if ($request->priority) {
+            $rules['name'] = $rules['name'] . ',' . $request->priority;
         }
 
         if ($request->method === Request::METHOD_POST) {

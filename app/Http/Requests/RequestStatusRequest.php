@@ -32,8 +32,8 @@ class RequestStatusRequest extends FormRequest
             'default' => 'boolean',
         ];
 
-        if ($request->input('request')) {
-            $rules['name'] = $rules['name'] . ',' . $request->input('request');
+        if ($request->status) {
+            $rules['name'] = $rules['name'] . ',' . $request->status;
         }
 
         if ($request->method === Request::METHOD_POST) {
