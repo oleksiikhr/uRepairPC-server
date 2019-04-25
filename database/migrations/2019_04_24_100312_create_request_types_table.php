@@ -18,6 +18,7 @@ class CreateRequestTypesTable extends Migration
             $table->string('name')->unique();
             $table->text('description')->nullable();
             $table->boolean('default')->default(false);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

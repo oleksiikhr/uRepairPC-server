@@ -19,6 +19,7 @@ class CreateRequestStatusesTable extends Migration
             $table->string('color', 10)->nullable();
             $table->text('description')->nullable();
             $table->boolean('default')->default(false);
+            $table->softDeletes();
             $table->timestamps();
         });
     }
