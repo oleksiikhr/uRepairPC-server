@@ -32,6 +32,14 @@ abstract class Permissions
     const EQUIPMENTS_DELETE = 'equipments.delete';
 
     /*
+     * Equipments
+     */
+    const EQUIPMENTS_CONFIG_VIEW = 'equipments.config.view';
+    const EQUIPMENTS_CONFIG_EDIT = 'equipments.config.edit';
+    const EQUIPMENTS_CONFIG_CREATE = 'equipments.config.create';
+    const EQUIPMENTS_CONFIG_DELETE = 'equipments.config.delete';
+
+    /*
      * Equipment Files
      */
     const EQUIPMENTS_FILES_VIEW = 'equipments.files.view';
@@ -39,6 +47,22 @@ abstract class Permissions
     const EQUIPMENTS_FILES_EDIT = 'equipments.files.edit';
     const EQUIPMENTS_FILES_CREATE = 'equipments.files.create';
     const EQUIPMENTS_FILES_DELETE = 'equipments.files.delete';
+
+    /*
+     * Requests
+     */
+    const REQUESTS_VIEW = 'requests.view';
+    const REQUESTS_EDIT = 'requests.edit';
+    const REQUESTS_CREATE = 'requests.create';
+    const REQUESTS_DELETE = 'requests.delete';
+
+    /*
+     * Requests Config
+     */
+    const REQUESTS_CONFIG_VIEW = 'requests.config.view';
+    const REQUESTS_CONFIG_EDIT = 'requests.config.edit';
+    const REQUESTS_CONFIG_CREATE = 'requests.config.create';
+    const REQUESTS_CONFIG_DELETE = 'requests.config.delete';
 
     /*
      * Other

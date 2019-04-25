@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Traits;
+namespace App\Traits;
 
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Helpers\FileHelper;
 use App\Http\Requests\ImageRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 trait ImageTrait

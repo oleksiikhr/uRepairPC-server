@@ -19,7 +19,7 @@ class CreateFilesTable extends Migration
             $table->string('name');
             $table->string('ext');
             $table->string('file');
-            $table->integer('size');
+            $table->unsignedInteger('size');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')
