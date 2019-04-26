@@ -1,7 +1,6 @@
 /node_modules
 /public/hot
 /public/storage
-/public/dist
 /storage/*.key
 /vendor
 /.idea
@@ -12,3 +11,8 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+
+# Web repository files
+/public/assets
+/public/index.html
+/public/sw.js

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\File;
 
 Route::get("{any}", function(\Illuminate\Http\Request $request) {
 
-    $path = public_path('dist/index.html');
+    $path = public_path('index.html');
 
     if (file_exists($path)) {
         return File::get($path);
