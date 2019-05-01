@@ -13,7 +13,9 @@
 
 use Illuminate\Support\Facades\File;
 
-Route::get("{any}", function(\Illuminate\Http\Request $request) {
+Route::get('manifest.json', 'Stat\ManifestController@index');
+
+Route::get('{any}', function () {
 
     $path = public_path('index.html');
 
