@@ -68,8 +68,9 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => Permissions::REQUESTS_CONFIG_CREATE, 'section_key' => 'requests_config'],
             ['name' => Permissions::REQUESTS_CONFIG_DELETE, 'section_key' => 'requests_config'],
 
-            // Other
-            ['name' => Permissions::OTHER_GLOBAL_SETTINGS, 'section_key' => 'other'],
+            // Global
+            ['name' => Permissions::GLOBAL_SETTINGS, 'section_key' => 'global'],
+            ['name' => Permissions::GLOBAL_MANIFEST, 'section_key' => 'global']
         ];
 
         foreach ($permissions as $permission) {

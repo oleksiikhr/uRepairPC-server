@@ -20,7 +20,7 @@ class SettingsFrontendController extends Controller
     public function permissions(Request $request): array
     {
         return [
-            'store' => Permissions::OTHER_GLOBAL_SETTINGS,
+            'store' => Permissions::GLOBAL_SETTINGS,
         ];
     }
 
