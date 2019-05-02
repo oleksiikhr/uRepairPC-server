@@ -13,10 +13,10 @@ return [
     ],
 
     /**
-     * Settings controllers
+     * Stat Controllers.
      */
     'settings' => [
-        'store' => 'Налаштування оновлені',
+        'global' => 'Налаштування оновлені',
     ],
 
     /**

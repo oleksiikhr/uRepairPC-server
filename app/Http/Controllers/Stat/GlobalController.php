@@ -50,6 +50,9 @@ class GlobalController extends Controller
         $globalFile->transformDataAndRequestFiles($data);
         $globalFile->mergeAndSaveToFile($data);
 
-        return response()->json(new GlobalJsonResource($data));
+        return response()->json([
+            'message' => __('app.settings.global'),
+            'data' => new GlobalJsonResource($data),
+        ]);
     }
 }
