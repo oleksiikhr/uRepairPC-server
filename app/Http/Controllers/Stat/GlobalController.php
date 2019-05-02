@@ -5,20 +5,12 @@ namespace App\Http\Controllers\Stat;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Http\Json\GlobalFile;
-use App\Http\Helpers\FileHelper;
 use App\Http\Requests\GlobalRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\GlobalJsonResource;
 
 class GlobalController extends Controller
 {
-    /**
-     * List of attributes
-     */
-    private const LIST_FILES = [
-        'favicon', 'logo_auth', 'logo_header'
-    ];
-
     /**
      * Add middleware depends on user permissions.
      *
@@ -53,27 +45,11 @@ class GlobalController extends Controller
     public function store(GlobalRequest $request)
     {
         $globalFile = new GlobalFile;
-        $json = $globalFile->getData();
         $data = $request->validated();
 
-        // Replace file to path in storage and delete old file.
-        if ($globalFile->isFromFile) {
-            foreach ($data as $key => &$value) {
-                if (in_array($key, self::LIST_FILES)) {
-                    if (array_key_exists($key, $json)) {
-                        FileHelper::delete($json[$key], 'public');
-                    }
-                    if ($request->hasFile($key)) {
-                        $fileHelper = new FileHelper($value);
-                        $value = $fileHelper->store('global', 'public');
-                    }
-                }
-            }
-        }
+        $globalFile->transformDataAndRequestFiles($data);
+        $globalFile->mergeAndSaveToFile($data);
 
-        $outputData = array_merge($json, $data);
-        $globalFile->saveData($outputData);
-
-        return response()->json(new GlobalJsonResource($outputData));
+        return response()->json(new GlobalJsonResource($data));
     }
 }

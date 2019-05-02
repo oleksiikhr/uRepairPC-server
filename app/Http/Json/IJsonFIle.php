@@ -19,10 +19,19 @@ interface IJsonFile
     public function getDefaultData();
 
     /**
+     * Get attribute and type.
+     *
+     * @return mixed
+     * @example
+     *  ['attr' => 'string']
+     */
+    public function getAttributes();
+
+    /**
      * Save data to file.
      *
      * @param  array  $arr
      * @return object
      */
-    public function saveData($arr);
+    public function mergeAndSaveToFile($arr);
 }

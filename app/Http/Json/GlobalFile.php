@@ -8,7 +8,25 @@ class GlobalFile extends JsonFile
 
     public function __construct()
     {
-        parent::__construct(self::FILE_NAME);
+        parent::__construct(self::FILE_NAME, 'global', 'public');
+    }
+
+    /**
+     * Get attribute and type.
+     *
+     * @return mixed
+     * @example
+     *  ['attr' => 'string']
+     */
+    public function getAttributes() {
+        return [
+            'meta_title' => 'string',
+            'app_name' => 'string',
+            'logo_auth' => 'file',
+            'logo_header' => 'file',
+            'favicon' => 'file',
+            'name_and_logo' => 'bool',
+        ];
     }
 
     /**
