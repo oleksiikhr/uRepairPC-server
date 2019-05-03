@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UsersTableSeeder::class);
 
         // Requests
-        $this->call(RequestStatusTableSeeder::class);
+        $this->call(RequestStatusesTableSeeder::class);
         $this->call(RequestPrioritiesTableSeeder::class);
         $this->call(RequestTypesTableSeeder::class);
 
