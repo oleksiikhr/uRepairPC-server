@@ -16,6 +16,7 @@
  */
 Route::group(['prefix' => 'settings', 'namespace' => 'Stat'], function () {
     Route::get('global', 'GlobalController@index');
+    Route::get('manifest', 'ManifestController@index');
 });
 
 /*
@@ -39,6 +40,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
      */
     Route::group(['prefix' => 'settings', 'namespace' => 'Stat'], function () {
         Route::post('global', 'GlobalController@store');
+        Route::post('manifest', 'ManifestController@store');
     });
 
     /*
