@@ -11,7 +11,13 @@
 |
 */
 
-Route::get('settings/frontend', 'SettingsFrontendController@index');
+/*
+ * Section: Settings
+ */
+Route::group(['prefix' => 'settings', 'namespace' => 'Stat'], function () {
+    Route::get('global', 'GlobalController@index');
+    Route::get('manifest', 'ManifestController@index');
+});
 
 /*
  * Section: Auth
@@ -32,8 +38,9 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     /*
      * Section: Settings
      */
-    Route::group(['prefix' => 'settings'], function () {
-        Route::post('frontend', 'SettingsFrontendController@store');
+    Route::group(['prefix' => 'settings', 'namespace' => 'Stat'], function () {
+        Route::post('global', 'GlobalController@store');
+        Route::post('manifest', 'ManifestController@store');
     });
 
     /*

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SettingsFrontendRequest extends FormRequest
+class GlobalRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,9 @@ class SettingsFrontendRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'string',
-            'name' => 'string',
-            'logo_home' => 'nullable|file|mimes:jpeg,jpg,png|max:2000',
+            'meta_title' => 'nullable|string',
+            'app_name' => 'nullable|string',
+            'logo_auth' => 'nullable|file|mimes:jpeg,jpg,png|max:2000',
             'logo_header' => 'nullable|file|mimes:jpeg,jpg,png|max:2000',
             'favicon' => 'nullable|file|mimes:ico,png|max:200',
             'name_and_logo' => 'boolean',

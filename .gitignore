@@ -13,6 +13,6 @@ npm-debug.log
 yarn-error.log
 
 # Web repository files
-/public/assets
+/public/web
 /public/index.html
 /public/sw.js
