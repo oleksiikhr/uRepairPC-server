@@ -29,6 +29,7 @@ class Request extends Model
         'id',
         'title',
         'location',
+        'priority_name',
         'updated_at',
         'created_at',
     ];
@@ -47,14 +48,20 @@ class Request extends Model
     ];
 
     /**
+     * Correctly display ORM request.
+     *
+     * @var array
+     */
+    const SORT_RELATIONSHIP = [
+        'priority_name' => 'request_priorities.value',
+    ];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'type_id',
-        'priority_id',
-        'status_id',
         'equipment_id',
         'title',
         'description',

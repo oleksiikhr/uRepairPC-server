@@ -53,7 +53,10 @@ class RequestController extends Controller
 
         // Order
         if ($request->has('sortColumn')) {
-            $query->orderBy($request->sortColumn, $request->sortOrder === 'descending' ? 'desc' : 'asc');
+            $query->orderBy(
+                RequestModel::SORT_RELATIONSHIP[$request->sortColumn] ?? $request->sortColumn,
+                $request->sortOrder === 'descending' ? 'desc' : 'asc'
+            );
         }
 
         $list = $query->paginate(self::PAGINATE_DEFAULT);
