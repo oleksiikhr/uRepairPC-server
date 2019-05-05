@@ -12,7 +12,8 @@ return [
         'download' => 'Завантажувати',
 
         // Custom
-        'global_settings' => 'Глобальні налаштування'
+        'settings' => 'Налаштування',
+        'manifest' => 'Маніфест',
     ],
 
     'roles' => [
@@ -28,9 +29,9 @@ return [
         'equipments' => 'Обладнання',
         'equipments_config' => 'Обладнання - Конфігурація',
         'equipment_files' => 'Обладнання - Файли',
-        'other' => 'Інше',
         'requests' => 'Заявки',
         'requests_config' => 'Заявки - Конфігурація',
+        'global' => 'Глобальні',
     ],
 
 ];
