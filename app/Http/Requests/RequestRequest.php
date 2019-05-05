@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Request as RequestModel;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RequestRequest extends FormRequest
@@ -26,10 +28,10 @@ class RequestRequest extends FormRequest
      */
     public function rules(Request $request)
     {
-        $method = $request->method;
+        $me = Auth::user();
 
         // List of all users
-        if ($method === Request::METHOD_GET && $request->route()->getName() === 'requests.index') {
+        if ($request->route()->getName() === 'requests.index') {
             return [
                 'search' => 'string',
                 'columns' => 'array',
@@ -42,8 +44,21 @@ class RequestRequest extends FormRequest
             ];
         }
 
-        return [
-            //
+        $rules = [
+            'title' => 'string|between:1,191',
+            'location' => 'string|between:1,191',
+            'description' => 'nullable|string|max:1200',
         ];
+
+        if ($me->can(Permissions::EQUIPMENTS_VIEW)) {
+            $rules['equipment_id'] = 'integer|exists:equipments,id,deleted_at,NULL';
+        }
+
+        // Store
+        if ($request->method === Request::METHOD_POST) {
+            $rules['title'] = 'required|' . $rules['title'];
+        }
+
+        return $rules;
     }
 }

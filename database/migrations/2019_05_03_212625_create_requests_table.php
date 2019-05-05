@@ -23,7 +23,7 @@ class CreateRequestsTable extends Migration
             $table->unsignedInteger('equipment_id')->nullable();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->string('location');
+            $table->string('location')->nullable();
             $table->softDeletes();
             $table->timestamps();
 

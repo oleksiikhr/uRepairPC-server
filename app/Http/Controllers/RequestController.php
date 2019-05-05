@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\RequestType;
+use App\RequestStatus;
+use App\RequestPriority;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Request as RequestModel;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\RequestRequest;
 
 class RequestController extends Controller
 {
+    /**
+     * @var RequestModel
+     */
     private $_requestModel;
 
     /**
@@ -73,5 +80,30 @@ class RequestController extends Controller
         $list = $query->paginate(self::PAGINATE_DEFAULT);
 
         return response()->json($list);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  RequestRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(RequestRequest $request)
+    {
+        $requestModel = new RequestModel;
+        $requestModel->user_id = Auth::id();
+        $requestModel->type_id = RequestType::getDefaultValue()->id;
+        $requestModel->priority_id = RequestPriority::getDefaultValue()->id;
+        $requestModel->status_id = RequestStatus::getDefaultValue()->id;
+        $requestModel->fill($request->all());
+
+        if (! $requestModel->save()) {
+            return response()->json(['message' => __('app.database.save_error')], 422);
+        }
+
+        return response()->json([
+            'message' => __('app.requests.store'),
+            'request' => $requestModel,
+        ]);
     }
 }
