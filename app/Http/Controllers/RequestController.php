@@ -59,6 +59,17 @@ class RequestController extends Controller
             );
         }
 
+        // Filters
+        if ($request->priority_id) {
+            $query->where('requests.priority_id', $request->priority_id);
+        }
+        if ($request->status_id) {
+            $query->where('requests.status_id', $request->status_id);
+        }
+        if ($request->type_id) {
+            $query->where('requests.type_id', $request->type_id);
+        }
+
         $list = $query->paginate(self::PAGINATE_DEFAULT);
 
         return response()->json($list);

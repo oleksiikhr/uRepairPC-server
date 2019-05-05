@@ -36,6 +36,9 @@ class RequestRequest extends FormRequest
                 'columns.*' => 'string|in:' . join(',', RequestModel::ALLOW_COLUMNS_SEARCH),
                 'sortColumn' => 'string|in:' . join(',', RequestModel::ALLOW_COLUMNS_SORT),
                 'sortOrder' => 'string|in:ascending,descending',
+                'priority_id' => 'integer|min:1',
+                'status_id' => 'integer|min:1',
+                'type_id' => 'integer|min:1',
             ];
         }
 
