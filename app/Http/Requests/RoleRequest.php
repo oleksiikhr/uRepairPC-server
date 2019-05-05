@@ -26,10 +26,8 @@ class RoleRequest extends FormRequest
      */
     public function rules(Request $request)
     {
-        $method = $request->method;
-
         // List of all users
-        if ($method === Request::METHOD_GET && $request->route()->getName() === 'roles.index') {
+        if ($request->route()->getName() === 'roles.index') {
             return [
                 'search' => 'string',
                 'columns' => 'array',
@@ -48,7 +46,7 @@ class RoleRequest extends FormRequest
         ];
 
         // Store
-        if ($method === Request::METHOD_POST) {
+        if ($request->method === Request::METHOD_POST) {
             $rules['name'] = 'required|' . $rules['name'];
         }
 
