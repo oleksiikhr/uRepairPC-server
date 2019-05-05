@@ -26,10 +26,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(Kernel $kernel)
     {
-        if (config('app.env') !== 'local') {
-            $kernel->pushMiddleware(\Barryvdh\Cors\HandleCors::class);
-        }
-
 //        \Illuminate\Support\Facades\DB::listen(function ($query) {
 //            var_dump($query->sql);
 //        });

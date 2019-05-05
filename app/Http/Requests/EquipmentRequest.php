@@ -26,10 +26,8 @@ class EquipmentRequest extends FormRequest
      */
     public function rules(Request $request)
     {
-        $method = $request->method;
-
         // List of all equipments
-        if ($method === Request::METHOD_GET && $request->route()->getName() === 'equipments.index') {
+        if ($request->route()->getName() === 'equipments.index') {
             return [
                 'search' => 'string',
                 'columns' => 'array',
@@ -49,7 +47,7 @@ class EquipmentRequest extends FormRequest
         ];
 
         // Store
-        if ($method === Request::METHOD_POST) {
+        if ($request->method === Request::METHOD_POST) {
             $rules['type_id'] = 'required|' . $rules['type_id'];
         }
 
