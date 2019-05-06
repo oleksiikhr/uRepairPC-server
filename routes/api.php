@@ -29,6 +29,7 @@ Route::group(['prefix' => 'auth'], function () {
     });
 
     Route::group(['middleware' => ['jwt.auth']], function () {
+        Route::get('profile', 'AuthController@profile');
         Route::post('logout', 'AuthController@logout');
     });
 });

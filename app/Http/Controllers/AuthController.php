@@ -21,6 +21,21 @@ class AuthController extends Controller
     }
 
     /**
+     * Get a current user with permissions.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function profile()
+    {
+        $user = Auth::user();
+
+        return response()->json([
+            'user' => $user,
+            'permissions' => $user->getAllPermissions()->pluck('name'),
+        ]);
+    }
+
+    /**
      * Auth the user by login and email.
      *
      * @param  AuthRequest  $request
