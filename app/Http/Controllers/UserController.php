@@ -11,9 +11,10 @@ use App\Traits\ImageTrait;
 use Illuminate\Http\Request;
 use App\Http\Helpers\FileHelper;
 use App\Http\Requests\UserRequest;
+use App\Events\BroadcastWebsocket;
+use App\Events\Users as UsersEvent;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use App\Events\Users\Edit as UserEditEvent;
 
 class UserController extends Controller
 {
@@ -108,7 +109,6 @@ class UserController extends Controller
         }
 
         Mail::to($user)->send(new UserCreated($password));
-//        TODO Event
 
         return response()->json([
             'message' => __('app.users.store'),
@@ -155,7 +155,7 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        event(new UserEditEvent($user, 'data'));
+        event(new UsersEvent($id, $request->all(), Permissions::USERS_VIEW));
 
         return response()->json([
             'message' => __('app.users.update'),
@@ -190,7 +190,7 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
 
-//        TODO Event
+        event(new UsersEvent($id, null, Permissions::ROLES_VIEW, BroadcastWebsocket::ACTION_DELETE));
 
         return response()->json([
             'message' => __('app.users.destroy'),
@@ -213,7 +213,9 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->syncRoles($request->roles);
 
-        event(new UserEditEvent($user, 'roles'));
+        event(new UsersEvent($id, [
+            'roles' => $user->roles,
+        ], Permissions::ROLES_VIEW));
 
         return response()->json([
             'message' => __('app.users.roles_changed'),
@@ -242,7 +244,7 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        event(new UserEditEvent($user, 'email'));
+        event(new UsersEvent($id, $request->all(), Permissions::USERS_VIEW));
 
         return response()->json([
             'message' => __('app.users.email_changed'),
@@ -290,7 +292,6 @@ class UserController extends Controller
         }
 
         Mail::to($user)->send(new UserCreated($password));
-        event(new UserEditEvent($user, 'email'));
 
         return response()->json([
             'message' => __('app.users.password_email_changed'),
@@ -313,8 +314,6 @@ class UserController extends Controller
         if (! $user->save()) {
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
-
-        event(new UserEditEvent($user, 'password'));
 
         return response()->json([
             'message' => __('app.users.password_changed'),
