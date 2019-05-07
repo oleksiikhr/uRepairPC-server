@@ -52,9 +52,9 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         Route::put('{user}/email', 'UserController@updateEmail');
         Route::put('{user}/password', 'UserController@updatePassword');
         Route::put('{user}/roles', 'UserController@updateRoles');
-        Route::get('{user}/image', 'UserController@getImage');
-        Route::post('{user}/image', 'UserController@setImage');
-        Route::delete('{user}/image', 'UserController@deleteImage');
+        Route::get('images/{imagePath?}', 'UserController@showImage')->where('imagePath', '(.*)');
+        Route::post('{user}/image', 'UserController@updateImage');
+        Route::delete('{user}/image', 'UserController@destroyImage');
     });
 
     /*
