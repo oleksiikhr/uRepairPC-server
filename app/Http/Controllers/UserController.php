@@ -158,7 +158,8 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        event(new UsersEvent($id, $request->all(), Permissions::USERS_VIEW));
+        $eventData = array_add($request->all(), 'updated_at', $user->updated_at->toDateTimeString());
+        event(new UsersEvent($id, $eventData, Permissions::USERS_VIEW));
 
         return response()->json([
             'message' => __('app.users.update'),
@@ -193,7 +194,7 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
 
-        event(new UsersEvent($id, null, Permissions::ROLES_VIEW, BroadcastWebsocket::ACTION_DELETE));
+        event(new UsersEvent($id, null, Permissions::ROLES_VIEW, UsersEvent::ACTION_DELETE));
 
         return response()->json([
             'message' => __('app.users.destroy'),
@@ -239,6 +240,7 @@ class UserController extends Controller
 
         event(new UsersEvent($id, [
             'roles' => $user->roles,
+            'updated_at' => $user->updated_at->toDateTimeString(),
         ], Permissions::ROLES_VIEW));
 
         return response()->json([
@@ -268,7 +270,8 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        event(new UsersEvent($id, $request->all(), Permissions::USERS_VIEW));
+        $eventData = array_add($request->all(), 'updated_at', $user->updated_at->toDateTimeString());
+        event(new UsersEvent($id, $eventData, Permissions::USERS_VIEW));
 
         return response()->json([
             'message' => __('app.users.email_changed'),
@@ -328,7 +331,10 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        event(new UsersEvent($id, ['image' => $uploadedUri], Permissions::USERS_VIEW));
+        event(new UsersEvent($id, [
+            'image' => $uploadedUri,
+            'updated_at' => $user->updated_at->toDateTimeString(),
+        ], Permissions::USERS_VIEW));
 
         return response()->json([
             'message' => __('app.files.file_saved'),
@@ -356,7 +362,10 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        event(new UsersEvent($id, ['image' => null], Permissions::USERS_VIEW));
+        event(new UsersEvent($id, [
+            'image' => null,
+            'updated_at' => $user->updated_at->toDateTimeString(),
+        ], Permissions::USERS_VIEW));
 
         return response()->json([
             'message' => __('app.files.file_destroyed'),
