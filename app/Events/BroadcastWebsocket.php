@@ -13,6 +13,7 @@ abstract class BroadcastWebsocket implements ShouldBroadcast, IBroadcastWebsocke
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    const ACTION_CREATE = 'create';
     const ACTION_UPDATE = 'update';
     const ACTION_DELETE = 'delete';
 
@@ -57,9 +58,9 @@ abstract class BroadcastWebsocket implements ShouldBroadcast, IBroadcastWebsocke
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return \Illuminate\Broadcasting\Channel|array
+     * @return array
      */
-    public function broadcastOn()
+    public function broadcastOn(): array
     {
         return ['server.' . $this->section()];
     }
@@ -69,7 +70,7 @@ abstract class BroadcastWebsocket implements ShouldBroadcast, IBroadcastWebsocke
      *
      * @return array
      */
-    public function broadcastWith()
+    public function broadcastWith(): array
     {
         $fromUser = Auth::user();
         $section = $this->section();
@@ -79,7 +80,7 @@ abstract class BroadcastWebsocket implements ShouldBroadcast, IBroadcastWebsocke
             'permissions' => $this->permissions,
             'data' => [
                 'title' => __('roles_and_permissions.sections.' . $section),
-                'message' => 'Оновлено: [id: ' . $this->id . ']',
+                'message' => $this->getMessageByAction() . ': [id ' . $this->id . ']',
                 'permissions' => $this->permissions,
                 'data' => $this->data,
                 'section' => $section,
@@ -90,5 +91,22 @@ abstract class BroadcastWebsocket implements ShouldBroadcast, IBroadcastWebsocke
                 ],
             ],
         ];
+    }
+
+    /**
+     * @return string
+     */
+    private function getMessageByAction()
+    {
+        switch ($this->action) {
+            case self::ACTION_CREATE:
+                return __('broadcast.actions.created');
+            case self::ACTION_UPDATE:
+                return __('broadcast.actions.updated');
+            case self::ACTION_DELETE:
+                return __('broadcast.actions.deleted');
+            default:
+                return 'undefined';
+        }
     }
 }
