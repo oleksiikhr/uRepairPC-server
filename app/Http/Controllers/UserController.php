@@ -10,7 +10,6 @@ use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Http\Helpers\FileHelper;
 use App\Http\Requests\UserRequest;
-use App\Events\BroadcastWebsocket;
 use App\Events\Users as UsersEvent;
 use App\Http\Requests\ImageRequest;
 use Illuminate\Support\Facades\Auth;
