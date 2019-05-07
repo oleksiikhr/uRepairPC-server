@@ -2,13 +2,13 @@
 
 namespace App\Events;
 
-class Equipments extends BroadcastWebsocket
+class WebsocketRole extends BroadcastWebsocket
 {
     /**
      * @return string
      */
     public function section(): string
     {
-        return 'equipments';
+        return 'roles';
     }
 }

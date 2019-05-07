@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-class Users extends BroadcastWebsocket
+class WebsocketUser extends BroadcastWebsocket
 {
     /**
      * @return string
