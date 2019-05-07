@@ -328,6 +328,8 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        event(new UsersEvent($id, ['image' => $uploadedUri], Permissions::USERS_VIEW));
+
         return response()->json([
             'message' => __('app.files.file_saved'),
             'image' => $user->image,
@@ -353,6 +355,8 @@ class UserController extends Controller
         if (! $user->save()) {
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
+
+        event(new UsersEvent($id, ['image' => null], Permissions::USERS_VIEW));
 
         return response()->json([
             'message' => __('app.files.file_destroyed'),
