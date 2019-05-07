@@ -6,6 +6,7 @@ use App\Role;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Http\Requests\RoleRequest;
+use App\Events\Roles as RolesEvent;
 
 class RoleController extends Controller
 {
@@ -113,6 +114,8 @@ class RoleController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        event(new RolesEvent($id, $role, Permissions::REQUESTS_VIEW));
+
         return response()->json([
             'message' => __('app.roles.update'),
             'role' => $role,
@@ -136,6 +139,8 @@ class RoleController extends Controller
         $role = Role::findOrFail($id);
         $role->syncPermissions($request->permissions);
 
+        event(new RolesEvent($id, $role, Permissions::REQUESTS_VIEW));
+
         return response()->json([
             'message' => __('app.roles.update_permissions'),
             'role' => $role,
@@ -155,6 +160,8 @@ class RoleController extends Controller
         if (! $role->delete()) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
+
+        event(new RolesEvent($id, null, Permissions::REQUESTS_VIEW, RolesEvent::ACTION_DELETE));
 
         return response()->json([
             'message' => __('app.roles.destroy'),
