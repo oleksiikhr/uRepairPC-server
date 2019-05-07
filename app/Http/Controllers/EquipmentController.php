@@ -7,6 +7,7 @@ use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\EquipmentRequest;
+use App\Events\Equipments as EquipmentsEvent;
 
 class EquipmentController extends Controller
 {
@@ -107,6 +108,9 @@ class EquipmentController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        $eventData = array_add($request->all(), 'updated_at', $equipment->updated_at->toDateTimeString());
+        event(new EquipmentsEvent($id, $eventData, Permissions::EQUIPMENTS_VIEW));
+
         return response()->json([
             'message' => __('app.equipments.update'),
             'equipment' => Equipment::querySelectJoins()->find($equipment->id),
@@ -139,6 +143,8 @@ class EquipmentController extends Controller
         if (! $equipment->delete()) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
+
+        event(new EquipmentsEvent($id, null, Permissions::EQUIPMENTS_VIEW, EquipmentsEvent::ACTION_DELETE));
 
         return response()->json([
             'message' => __('app.equipments.destroy'),
