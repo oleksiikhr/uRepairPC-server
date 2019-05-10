@@ -6,7 +6,6 @@ use App\Equipment;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Http\Helpers\FilesHelper;
-use App\Events\Equipments\ECreate;
 use App\Events\Equipments\EDelete;
 use App\Events\Equipments\EUpdate;
 use App\Http\Requests\EquipmentRequest;
@@ -72,12 +71,9 @@ class EquipmentController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        $equipment = Equipment::querySelectJoins()->find($equipment->id);
-        event(new ECreate($equipment->toArray()));
-
         return response()->json([
             'message' => __('app.equipments.store'),
-            'equipment' => $equipment,
+            'equipment' => Equipment::querySelectJoins()->find($equipment->id),
         ]);
     }
 

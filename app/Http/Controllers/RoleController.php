@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Role;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
+use App\Events\Roles\EDelete;
+use App\Events\Roles\EUpdate;
 use App\Http\Requests\RoleRequest;
 
 class RoleController extends Controller
@@ -113,7 +115,7 @@ class RoleController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-//        event(new RoleEvent($id, $role, Permissions::REQUESTS_VIEW));
+        event(new EUpdate($id, $role));
 
         return response()->json([
             'message' => __('app.roles.update'),
@@ -138,7 +140,7 @@ class RoleController extends Controller
         $role = Role::findOrFail($id);
         $role->syncPermissions($request->permissions);
 
-//        event(new RoleEvent($id, $role, Permissions::REQUESTS_VIEW));
+        event(new EUpdate($id, $role));
 
         return response()->json([
             'message' => __('app.roles.update_permissions'),
@@ -160,7 +162,7 @@ class RoleController extends Controller
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
 
-//        event(new RoleEvent($id, null, Permissions::REQUESTS_VIEW, RoleEvent::ACTION_DELETE));
+        event(new EDelete($id));
 
         return response()->json([
             'message' => __('app.roles.destroy'),
