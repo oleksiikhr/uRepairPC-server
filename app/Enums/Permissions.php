@@ -57,6 +57,15 @@ abstract class Permissions
     const REQUESTS_DELETE = 'requests.delete';
 
     /*
+     * Requests Files
+     */
+    const REQUESTS_FILES_VIEW = 'requests.files.view';
+    const REQUESTS_FILES_DOWNLOAD = 'requests.files.download';
+    const REQUESTS_FILES_EDIT = 'requests.files.edit';
+    const REQUESTS_FILES_CREATE = 'requests.files.create';
+    const REQUESTS_FILES_DELETE = 'requests.files.delete';
+
+    /*
      * Requests Config
      */
     const REQUESTS_CONFIG_VIEW = 'requests.config.view';
