@@ -29,7 +29,7 @@ class ListenerController extends Controller
     public function sync()
     {
         $user = Auth::user();
-        $rooms = [];
+        $rooms = ['users.' . $user->id];
 
         if ($user->can(Permissions::EQUIPMENTS_CONFIG_VIEW)) {
             array_push($rooms, 'equipment_types', 'equipment_manufacturers', 'equipment_models');
