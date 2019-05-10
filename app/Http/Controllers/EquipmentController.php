@@ -6,8 +6,10 @@ use App\Equipment;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Http\Helpers\FilesHelper;
+use App\Events\Equipments\ECreate;
+use App\Events\Equipments\EDelete;
+use App\Events\Equipments\EUpdate;
 use App\Http\Requests\EquipmentRequest;
-use App\Events\WebsocketEquipment as EquipmentEvent;
 
 class EquipmentController extends Controller
 {
@@ -32,7 +34,7 @@ class EquipmentController extends Controller
      * Display a listing of the resource.
      *
      * @param  EquipmentRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(EquipmentRequest $request)
     {
@@ -59,7 +61,7 @@ class EquipmentController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  EquipmentRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(EquipmentRequest $request)
     {
@@ -70,9 +72,12 @@ class EquipmentController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        $equipment = Equipment::querySelectJoins()->find($equipment->id);
+        event(new ECreate($equipment->toArray()));
+
         return response()->json([
             'message' => __('app.equipments.store'),
-            'equipment' => Equipment::querySelectJoins()->find($equipment->id),
+            'equipment' => $equipment,
         ]);
     }
 
@@ -80,7 +85,7 @@ class EquipmentController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(int $id)
     {
@@ -97,7 +102,7 @@ class EquipmentController extends Controller
      *
      * @param  EquipmentRequest  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(EquipmentRequest $request, int $id)
     {
@@ -108,12 +113,12 @@ class EquipmentController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        $eventData = array_add($request->all(), 'updated_at', $equipment->updated_at->toDateTimeString());
-        event(new EquipmentEvent($id, $eventData, Permissions::EQUIPMENTS_VIEW));
+        $equipment = Equipment::querySelectJoins()->find($equipment->id);
+        event(new EUpdate($id, $equipment->toArray()));
 
         return response()->json([
             'message' => __('app.equipments.update'),
-            'equipment' => Equipment::querySelectJoins()->find($equipment->id),
+            'equipment' => $equipment,
         ]);
     }
 
@@ -122,7 +127,7 @@ class EquipmentController extends Controller
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, int $id)
     {
@@ -144,7 +149,7 @@ class EquipmentController extends Controller
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
 
-        event(new EquipmentEvent($id, null, Permissions::EQUIPMENTS_VIEW, EquipmentEvent::ACTION_DELETE));
+        event(new EDelete($id));
 
         return response()->json([
             'message' => __('app.equipments.destroy'),

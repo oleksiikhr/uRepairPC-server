@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Json\GlobalFile;
 use App\Http\Requests\GlobalRequest;
 use App\Http\Controllers\Controller;
+use App\Events\Settings\EGlobalUpdate;
 use App\Http\Resources\GlobalJsonResource;
 
 class GlobalController extends Controller
@@ -27,7 +28,7 @@ class GlobalController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
@@ -40,7 +41,7 @@ class GlobalController extends Controller
      * Update all resources in storage.
      *
      * @param  GlobalRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(GlobalRequest $request)
     {
@@ -50,9 +51,12 @@ class GlobalController extends Controller
         $globalFile->transformDataAndRequestFiles($data);
         $globalFile->mergeAndSaveToFile($data);
 
+        $jsonResource = new GlobalJsonResource($data);
+        event(new EGlobalUpdate($jsonResource));
+
         return response()->json([
             'message' => __('app.settings.global'),
-            'data' => new GlobalJsonResource($data),
+            'data' => $jsonResource,
         ]);
     }
 }

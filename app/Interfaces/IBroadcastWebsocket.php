@@ -5,9 +5,27 @@ namespace App\Interfaces;
 interface IBroadcastWebsocket
 {
     /**
-     * Uses in emit name, title and broadcastOn.
-     *
      * @return string
      */
-    public function section(): string;
+    public function event(): string;
+
+    /**
+     * @return string
+     */
+    public function type(): string;
+
+    /**
+     * @return array|string|null
+     */
+    public function rooms();
+
+    /**
+     * @return array|null
+     */
+    public function params(): ?array;
+
+    /**
+     * @return mixed
+     */
+    public function data();
 }

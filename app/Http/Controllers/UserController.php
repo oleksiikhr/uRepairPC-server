@@ -14,7 +14,6 @@ use App\Http\Requests\ImageRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
-use App\Events\WebsocketUser as UserEvent;
 
 class UserController extends Controller
 {
@@ -157,8 +156,8 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        $eventData = array_add($request->all(), 'updated_at', $user->updated_at->toDateTimeString());
-        event(new UserEvent($id, $eventData, Permissions::USERS_VIEW));
+//        $eventData = array_add($request->all(), 'updated_at', $user->updated_at->toDateTimeString());
+//        event(new UpdateEvent($id, $eventData));
 
         return response()->json([
             'message' => __('app.users.update'),
@@ -193,7 +192,7 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
 
-        event(new UserEvent($id, null, Permissions::ROLES_VIEW, UserEvent::ACTION_DELETE));
+//        event(new UserEvent($id, null, Permissions::ROLES_VIEW, UserEvent::ACTION_DELETE));
 
         return response()->json([
             'message' => __('app.users.destroy'),
@@ -204,7 +203,7 @@ class UserController extends Controller
      * Get avatar from user.
      *
      * @param  string  $path
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\JsonResponse
      */
     public function showImage(string $path)
     {
@@ -237,10 +236,10 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->syncRoles($request->roles);
 
-        event(new UserEvent($id, [
-            'roles' => $user->roles,
-            'updated_at' => $user->updated_at->toDateTimeString(),
-        ], Permissions::ROLES_VIEW));
+//        event(new UserEvent($id, [
+//            'roles' => $user->roles,
+//            'updated_at' => $user->updated_at->toDateTimeString(),
+//        ], Permissions::ROLES_VIEW));
 
         return response()->json([
             'message' => __('app.users.roles_changed'),
@@ -269,8 +268,8 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        $eventData = array_add($request->all(), 'updated_at', $user->updated_at->toDateTimeString());
-        event(new UserEvent($id, $eventData, Permissions::USERS_VIEW));
+//        $eventData = array_add($request->all(), 'updated_at', $user->updated_at->toDateTimeString());
+//        event(new UserEvent($id, $eventData, Permissions::USERS_VIEW));
 
         return response()->json([
             'message' => __('app.users.email_changed'),
@@ -330,10 +329,10 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        event(new UserEvent($id, [
-            'image' => $uploadedUri,
-            'updated_at' => $user->updated_at->toDateTimeString(),
-        ], Permissions::USERS_VIEW));
+//        event(new UserEvent($id, [
+//            'image' => $uploadedUri,
+//            'updated_at' => $user->updated_at->toDateTimeString(),
+//        ], Permissions::USERS_VIEW));
 
         return response()->json([
             'message' => __('app.files.file_saved'),
@@ -361,10 +360,10 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        event(new UserEvent($id, [
-            'image' => null,
-            'updated_at' => $user->updated_at->toDateTimeString(),
-        ], Permissions::USERS_VIEW));
+//        event(new UserEvent($id, [
+//            'image' => null,
+//            'updated_at' => $user->updated_at->toDateTimeString(),
+//        ], Permissions::USERS_VIEW));
 
         return response()->json([
             'message' => __('app.files.file_destroyed'),

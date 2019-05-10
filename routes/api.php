@@ -36,6 +36,11 @@ Route::group(['prefix' => 'auth'], function () {
 
 Route::group(['middleware' => ['jwt.auth']], function () {
 
+    Route::group(['prefix' => 'listeners'], function () {
+        Route::post('sync', 'ListenerController@sync');
+        Route::post('join', 'ListenerController@join');
+    });
+
     /*
      * Section: Settings
      */

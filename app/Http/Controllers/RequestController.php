@@ -45,7 +45,7 @@ class RequestController extends Controller
      * Display a listing of the resource.
      *
      * @param  RequestRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(RequestRequest $request)
     {
