@@ -338,7 +338,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => __('app.files.file_saved'),
-            'image' => $user->image,
+            'user' => $user,
         ]);
     }
 
@@ -369,6 +369,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => __('app.files.file_destroyed'),
+            'user' => $user,
         ]);
     }
 
