@@ -31,6 +31,16 @@ return [
         'logout' => 'Ви вийшли з системи',
     ],
 
+    /**
+     * RequestController.
+     */
+    'requests' => [
+        'show' => 'Заявка отримана',
+        'store' => 'Заявка створена',
+        'update' => 'Заявка оновлена',
+        'destroy' => 'Заявка видалена',
+    ],
+
     /*
      * UserController.
      */

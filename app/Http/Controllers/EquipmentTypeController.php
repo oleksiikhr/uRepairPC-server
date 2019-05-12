@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\EquipmentType;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
+use App\Events\EquipmentTypes\ECreate;
+use App\Events\EquipmentTypes\EDelete;
+use App\Events\EquipmentTypes\EUpdate;
 use App\Http\Requests\EquipmentTypeRequest;
 
 class EquipmentTypeController extends Controller
@@ -29,7 +32,7 @@ class EquipmentTypeController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
@@ -42,7 +45,7 @@ class EquipmentTypeController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  EquipmentTypeRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(EquipmentTypeRequest $request)
     {
@@ -52,6 +55,8 @@ class EquipmentTypeController extends Controller
         if (! $equipmentType->save()) {
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
+
+        event(new ECreate($equipmentType->toArray()));
 
         return response()->json([
             'message' => __('app.equipment_type.store'),
@@ -63,7 +68,7 @@ class EquipmentTypeController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(int $id)
     {
@@ -80,7 +85,7 @@ class EquipmentTypeController extends Controller
      *
      * @param  EquipmentTypeRequest  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(EquipmentTypeRequest $request, int $id)
     {
@@ -90,6 +95,8 @@ class EquipmentTypeController extends Controller
         if (! $equipmentType->save()) {
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
+
+        event(new EUpdate($id, $equipmentType));
 
         return response()->json([
             'message' => __('app.equipment_type.update'),
@@ -101,13 +108,15 @@ class EquipmentTypeController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(int $id)
     {
         if (! EquipmentType::destroy($id)) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
+
+        event(new EDelete($id));
 
         return response()->json([
             'message' => __('app.equipment_type.destroy'),

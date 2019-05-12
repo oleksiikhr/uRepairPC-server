@@ -23,7 +23,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $types = ['id', 'equipment', 'file', 'type', 'model', 'manufacturer'];
+        $types = ['id', 'equipment', 'file', 'type', 'model', 'manufacturer', 'request'];
 
         foreach ($types as $type) {
             Route::pattern($type, '[0-9]+');

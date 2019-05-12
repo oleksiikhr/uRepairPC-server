@@ -26,7 +26,7 @@ class PermissionController extends Controller
      * Display a listing of the resource.
      *
      * @param  PermissionRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(PermissionRequest $request)
     {

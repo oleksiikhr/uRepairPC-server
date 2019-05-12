@@ -29,11 +29,17 @@ Route::group(['prefix' => 'auth'], function () {
     });
 
     Route::group(['middleware' => ['jwt.auth']], function () {
+        Route::get('profile', 'AuthController@profile');
         Route::post('logout', 'AuthController@logout');
     });
 });
 
 Route::group(['middleware' => ['jwt.auth']], function () {
+
+    Route::group(['prefix' => 'listeners'], function () {
+        Route::post('sync', 'ListenerController@sync');
+        Route::post('join', 'ListenerController@join');
+    });
 
     /*
      * Section: Settings
@@ -51,9 +57,9 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         Route::put('{user}/email', 'UserController@updateEmail');
         Route::put('{user}/password', 'UserController@updatePassword');
         Route::put('{user}/roles', 'UserController@updateRoles');
-        Route::get('{user}/image', 'UserController@getImage');
-        Route::post('{user}/image', 'UserController@setImage');
-        Route::delete('{user}/image', 'UserController@deleteImage');
+        Route::get('images/{imagePath?}', 'UserController@showImage')->where('imagePath', '(.*)');
+        Route::post('{user}/image', 'UserController@updateImage');
+        Route::delete('{user}/image', 'UserController@destroyImage');
     });
 
     /*
@@ -83,6 +89,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     /*
      * Section: Requests
      */
+    Route::apiResource('requests', 'RequestController');
     Route::group(['prefix' => 'requests'], function () {
         Route::apiResource('statuses', 'RequestStatusController');
         Route::apiResource('priorities', 'RequestPriorityController');

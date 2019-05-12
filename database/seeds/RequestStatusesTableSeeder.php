@@ -3,7 +3,7 @@
 use App\RequestStatus;
 use Illuminate\Database\Seeder;
 
-class RequestStatusTableSeeder extends Seeder
+class RequestStatusesTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.

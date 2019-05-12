@@ -30,7 +30,7 @@ class UserRequest extends FormRequest
         $method = $request->method;
 
         // List of all users
-        if ($method === Request::METHOD_GET && $request->route()->getName() === 'users.index') {
+        if ($request->route()->getName() === 'users.index') {
             return [
                 'search' => 'string',
                 'columns' => 'array',

@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\RequestStatus;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
+use App\Events\RequestStatuses\ECreate;
+use App\Events\RequestStatuses\EDelete;
+use App\Events\RequestStatuses\EUpdate;
 use App\Http\Requests\RequestStatusRequest;
 
 class RequestStatusController extends Controller
@@ -29,7 +32,7 @@ class RequestStatusController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
@@ -42,7 +45,7 @@ class RequestStatusController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  RequestStatusRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(RequestStatusRequest $request)
     {
@@ -57,6 +60,8 @@ class RequestStatusController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        event(new ECreate($requestStatus));
+
         return response()->json([
             'message' => __('app.request_status.store'),
             'request_status' => $requestStatus,
@@ -67,7 +72,7 @@ class RequestStatusController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(int $id)
     {
@@ -84,7 +89,7 @@ class RequestStatusController extends Controller
      *
      * @param  RequestStatusRequest  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(RequestStatusRequest $request, int $id)
     {
@@ -104,6 +109,8 @@ class RequestStatusController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        event(new EUpdate($id, $requestStatus));
+
         return response()->json([
             'message' => __('app.request_status.update'),
             'request_status' => $requestStatus,
@@ -114,7 +121,7 @@ class RequestStatusController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(int $id)
     {
@@ -127,6 +134,8 @@ class RequestStatusController extends Controller
         if (! RequestStatus::destroy($id)) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
+
+        event(new EDelete($id));
 
         return response()->json([
             'message' => __('app.request_status.destroy'),

@@ -8,6 +8,7 @@ use App\Http\Json\ManifestFile;
 use App\Http\Helpers\FileHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ManifestRequest;
+use App\Events\Settings\EManifestUpdate;
 use App\Http\Resources\ManifestJsonResource;
 
 class ManifestController extends Controller
@@ -46,7 +47,7 @@ class ManifestController extends Controller
      * Update all resources in storage.
      *
      * @param ManifestRequest $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(ManifestRequest $request)
     {
@@ -96,9 +97,12 @@ class ManifestController extends Controller
 
         $manifestFile->mergeAndSaveToFile($data);
 
+        $jsonResource = new ManifestJsonResource($data);
+        event(new EManifestUpdate($jsonResource));
+
         return response()->json([
             'message' => __('app.settings.manifest'),
-            'data' => new ManifestJsonResource($data),
+            'data' => $jsonResource,
         ]);
     }
 }
