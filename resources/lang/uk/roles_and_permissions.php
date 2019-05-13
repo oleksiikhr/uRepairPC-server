@@ -31,7 +31,6 @@ return [
         'equipment_files' => 'Обладнання - Файли',
         'requests' => 'Заявки',
         'requests_config' => 'Заявки - Конфігурація',
-        'requests_files' => 'Заявки - Файли',
         'global' => 'Глобальні',
     ],
 

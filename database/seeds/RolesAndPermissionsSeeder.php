@@ -62,13 +62,6 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => Permissions::REQUESTS_CREATE, 'section_key' => 'requests'],
             ['name' => Permissions::REQUESTS_DELETE, 'section_key' => 'requests'],
 
-            // Requests - Files
-            ['name' => Permissions::REQUESTS_FILES_VIEW, 'section_key' => 'equipment_files'],
-            ['name' => Permissions::REQUESTS_FILES_DOWNLOAD, 'section_key' => 'equipment_files'],
-            ['name' => Permissions::REQUESTS_FILES_EDIT, 'section_key' => 'equipment_files'],
-            ['name' => Permissions::REQUESTS_FILES_CREATE, 'section_key' => 'equipment_files'],
-            ['name' => Permissions::REQUESTS_FILES_DELETE, 'section_key' => 'equipment_files'],
-
             // Requests - Config
             ['name' => Permissions::REQUESTS_CONFIG_VIEW, 'section_key' => 'requests_config'],
             ['name' => Permissions::REQUESTS_CONFIG_EDIT, 'section_key' => 'requests_config'],
