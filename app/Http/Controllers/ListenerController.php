@@ -79,6 +79,8 @@ class ListenerController extends Controller
     }
 
     /**
+     * TODO Optimize
+     *
      * @param  array  $rooms
      * @return array
      */
@@ -111,12 +113,13 @@ class ListenerController extends Controller
                         $filterRooms[] = $room;
                     }
                     break;
+                case 'request_comments':
+                case 'request_files':
                 case 'requests':
                     if ($this->_user->can(Permissions::REQUESTS_VIEW) ||
-                        RequestModel::where([
-                            ['user_id', '=', $this->_user->id],
-                            ['assign_id', '=', $this->_user->id],
-                        ])->exists()
+                        RequestModel::where('user_id', $this->_user->id)
+                            ->orWhere('assign_id', $this->_user->id)
+                            ->exists()
                     ) {
                         $filterRooms[] = $room;
                     }
