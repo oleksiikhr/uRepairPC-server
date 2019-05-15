@@ -165,18 +165,19 @@ class RequestController extends Controller
     public function update(RequestRequest $request, int $id)
     {
         $this->_requestModel->fill($request->all());
+        $canSeeConfig = $this->_currentUser->can(Permissions::REQUESTS_CONFIG_VIEW);
 
         // Only user, who can edit every request - can assign user to request
         if ($request->has('assign_id') && $this->_currentUser->can(Permissions::REQUESTS_EDIT)) {
             $this->_requestModel->assign_id = $request->assign_id;
         }
-        if ($request->has('type_id')) {
+        if ($request->has('type_id') && $canSeeConfig) {
             $this->_requestModel->type_id = $request->type_id;
         }
-        if ($request->has('priority_id')) {
+        if ($request->has('priority_id') && $canSeeConfig) {
             $this->_requestModel->priority_id = $request->priority_id;
         }
-        if ($request->has('status_id')) {
+        if ($request->has('status_id') && $canSeeConfig) {
             $this->_requestModel->status_id = $request->status_id;
         }
 
@@ -207,6 +208,8 @@ class RequestController extends Controller
         if ($request->file_delete) {
             // TODO
         }
+
+        // Destroy comments
 
         if (! $this->_requestModel->delete()) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
