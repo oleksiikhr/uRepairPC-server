@@ -9,6 +9,9 @@ use App\RequestPriority;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Request as RequestModel;
+use App\Http\Helpers\FileHelper;
+use App\Events\Requests\EDelete;
+use App\Events\Requests\EUpdate;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\RequestRequest;
 
@@ -48,7 +51,7 @@ class RequestController extends Controller
         $this->_currentUser = Auth::user();
 
         if ($requestId) {
-            $this->_requestModel = RequestModel::querySelectJoins()->findOrFail($requestId);
+            $this->_requestModel = RequestModel::findOrFail($requestId);
 
             // If user created this request
             if ($this->_requestModel->user_id === $this->_currentUser->id) {
@@ -120,7 +123,7 @@ class RequestController extends Controller
     public function store(RequestRequest $request)
     {
         $requestModel = new RequestModel;
-        $requestModel->user_id = Auth::id();
+        $requestModel->user_id = $this->_currentUser->id;
         $requestModel->type_id = RequestType::getDefaultValue()->id;
         $requestModel->priority_id = RequestPriority::getDefaultValue()->id;
         $requestModel->status_id = RequestStatus::getDefaultValue()->id;
@@ -144,9 +147,75 @@ class RequestController extends Controller
      */
     public function show(int $id)
     {
+        $request = RequestModel::querySelectJoins()->findOrFail($id);
+
         return response()->json([
             'message' => __('app.requests.show'),
-            'request' => $this->_requestModel,
+            'request' => $request,
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  RequestRequest  $request
+     * @param  int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(RequestRequest $request, int $id)
+    {
+        $this->_requestModel->fill($request->all());
+
+        // Only user, who can edit every request - can assign user to request
+        if ($request->has('assign_id') && $this->_currentUser->can(Permissions::REQUESTS_EDIT)) {
+            $this->_requestModel->assign_id = $request->assign_id;
+        }
+        if ($request->has('type_id')) {
+            $this->_requestModel->type_id = $request->type_id;
+        }
+        if ($request->has('priority_id')) {
+            $this->_requestModel->priority_id = $request->priority_id;
+        }
+        if ($request->has('status_id')) {
+            $this->_requestModel->status_id = $request->status_id;
+        }
+
+        if (! $this->_requestModel->save()) {
+            return response()->json(['message' => __('app.database.save_error')], 422);
+        }
+
+        $request = RequestModel::querySelectJoins()->findOrFail($id);
+        event(new EUpdate($id, $request->toArray()));
+
+        return response()->json([
+            'message' => __('app.requests.update'),
+            'request' => $request,
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  RequestRequest  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function destroy(RequestRequest $request, int $id)
+    {
+        // Destroy files
+        if ($request->file_delete) {
+            // TODO
+        }
+
+        if (! $this->_requestModel->delete()) {
+            return response()->json(['message' => __('app.database.destroy_error')], 422);
+        }
+
+        event(new EDelete($id));
+
+        return response()->json([
+            'message' => __('app.requests.destroy'),
         ]);
     }
 }

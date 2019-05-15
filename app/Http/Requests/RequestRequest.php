@@ -28,7 +28,7 @@ class RequestRequest extends FormRequest
      */
     public function rules(Request $request)
     {
-        $me = Auth::user();
+        $method = $request->method;
 
         // List of all users
         if ($request->route()->getName() === 'requests.index') {
@@ -44,18 +44,25 @@ class RequestRequest extends FormRequest
             ];
         }
 
-        $rules = [
-            'title' => 'string|between:1,191',
-            'location' => 'string|between:1,191',
-            'description' => 'nullable|string|max:1200',
-        ];
-
-        if ($me->can(Permissions::EQUIPMENTS_VIEW)) {
-            $rules['equipment_id'] = 'integer|exists:equipments,id,deleted_at,NULL';
+        if ($method === Request::METHOD_DELETE) {
+            return [
+                'file_delete' => 'boolean',
+            ];
         }
 
+        $rules = [
+            'title' => 'string|between:1,191',
+            'location' => 'nullable|string|between:1,191',
+            'description' => 'nullable|string|max:1200',
+            'assign_id' => 'nullable|integer|exists:users,id,deleted_at,NULL',
+            'type_id' => 'integer|exists:request_types,id,deleted_at,NULL',
+            'priority_id' => 'integer|exists:request_priorities,id,deleted_at,NULL',
+            'status_id' => 'integer|exists:request_statuses,id,deleted_at,NULL',
+            'equipment_id' => 'nullable|integer|exists:equipments,id,deleted_at,NULL',
+        ];
+
         // Store
-        if ($request->method === Request::METHOD_POST) {
+        if ($method === Request::METHOD_POST) {
             $rules['title'] = 'required|' . $rules['title'];
         }
 
