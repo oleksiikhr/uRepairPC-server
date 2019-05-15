@@ -100,4 +100,46 @@ class Request extends Model
             ->leftJoin('equipments', 'requests.equipment_id', '=', 'equipments.id')
             ->leftJoin('equipment_models', 'equipments.model_id', '=', 'equipment_models.id');
     }
+
+    /* | -----------------------------------------------------------------------------------
+     * | Relationships
+     * | -----------------------------------------------------------------------------------
+     */
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function equipment()
+    {
+        return $this->belongsTo(Equipment::class);
+    }
+
+    public function priority()
+    {
+        return $this->belongsTo(RequestPriority::class);
+    }
+
+    public function status()
+    {
+        return $this->belongsTo(RequestStatus::class);
+    }
+
+    public function type()
+    {
+        return $this->belongsTo(RequestType::class);
+    }
+
+    public function files()
+    {
+        return $this->belongsToMany(File::class)
+            ->select(
+                'files.*',
+                'users.first_name',
+                'users.last_name'
+            )
+            ->leftJoin('users', 'users.id', '=', 'files.user_id')
+            ->orderByDesc('id');
+    }
 }

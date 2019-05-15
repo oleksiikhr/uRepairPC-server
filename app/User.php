@@ -111,4 +111,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return str_random(self::RANDOM_PASSWORD_LEN);
     }
+
+    /* | -----------------------------------------------------------------------------------
+     * | Relationships
+     * | -----------------------------------------------------------------------------------
+     */
+
+    public function request()
+    {
+        return $this->hasMany(Request::class);
+    }
 }

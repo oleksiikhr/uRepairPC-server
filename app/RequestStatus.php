@@ -30,4 +30,14 @@ class RequestStatus extends Model
     protected $casts = [
         'default' => 'boolean',
     ];
+
+    /* | -----------------------------------------------------------------------------------
+     * | Relationships
+     * | -----------------------------------------------------------------------------------
+     */
+
+    public function requests()
+    {
+        return $this->hasMany(Request::class);
+    }
 }
