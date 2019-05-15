@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use App\RequestType;
 use App\RequestStatus;
 use App\RequestPriority;
@@ -19,6 +20,11 @@ class RequestController extends Controller
     private $_requestModel;
 
     /**
+     * @var User
+     */
+    private $_currentUser;
+
+    /**
      * Add middleware depends on user permissions.
      *
      * @param  Request  $request
@@ -26,19 +32,37 @@ class RequestController extends Controller
      */
     public function permissions(Request $request): array
     {
-        $requestId = (int)$request->route('request');
-        if ($requestId) {
-            $this->_requestModel = RequestModel::findOrFail($requestId);
-//            TODO user_assign
+        if (! Auth::check()) {
+            $this->middleware('jwt.auth');
+            return [];
         }
 
-        return [
-            'index' => Permissions::REQUESTS_VIEW,
+        $permissions = [
             'show' => Permissions::REQUESTS_VIEW,
             'store' => Permissions::REQUESTS_CREATE,
             'update' => Permissions::REQUESTS_EDIT,
             'destroy' => Permissions::REQUESTS_DELETE,
         ];
+
+        $requestId = (int)$request->route('request');
+        $this->_currentUser = Auth::user();
+
+        if ($requestId) {
+            $this->_requestModel = RequestModel::querySelectJoins()->findOrFail($requestId);
+
+            // If user created this request
+            if ($this->_requestModel->user_id === $this->_currentUser->id) {
+                unset($permissions['show']);
+            }
+
+            // If user assign to request, disable some permissions for access
+            if ($this->_requestModel->assign_id === $this->_currentUser->id) {
+                unset($permissions['show']);
+                unset($permissions['update']);
+            }
+        }
+
+        return $permissions;
     }
 
     /**
@@ -50,6 +74,11 @@ class RequestController extends Controller
     public function index(RequestRequest $request)
     {
         $query = RequestModel::querySelectJoins();
+
+        // Without REQUESTS_VIEW permission - can see only own requests
+        if (! $this->_currentUser->can(Permissions::REQUESTS_VIEW)) {
+            $query->where('user_id', $this->_currentUser->id);
+        }
 
         // Search
         if ($request->has('search') && $request->has('columns') && ! empty($request->columns)) {
@@ -104,6 +133,20 @@ class RequestController extends Controller
         return response()->json([
             'message' => __('app.requests.store'),
             'request' => $requestModel,
+        ]);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show(int $id)
+    {
+        return response()->json([
+            'message' => __('app.requests.show'),
+            'request' => $this->_requestModel,
         ]);
     }
 }
