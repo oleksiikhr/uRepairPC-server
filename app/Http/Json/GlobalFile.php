@@ -18,7 +18,8 @@ class GlobalFile extends JsonFile
      * @example
      *  ['attr' => 'string']
      */
-    public function getAttributes() {
+    public function getAttributes()
+    {
         return [
             'meta_title' => 'string',
             'app_name' => 'string',

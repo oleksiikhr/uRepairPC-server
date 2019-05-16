@@ -86,7 +86,7 @@ class FilesHelper
      */
     public function hasErrors()
     {
-        return !empty($this->_errors);
+        return ! empty($this->_errors);
     }
 
     /**

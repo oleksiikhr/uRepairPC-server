@@ -37,7 +37,7 @@ class EDelete extends EDeleteBroadcast
      */
     public function rooms()
     {
-        return 'request_files.' . $this->_requestId;
+        return 'request_files.'.$this->_requestId;
     }
 
     /**

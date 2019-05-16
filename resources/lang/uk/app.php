@@ -4,7 +4,7 @@ return [
 
 //    TODO Translate to en, ru
 
-    /**
+    /*
      * Middleware.
      */
     'middleware' => [
@@ -12,7 +12,7 @@ return [
         'no_auth' => 'Необхідно увійти в систему',
     ],
 
-    /**
+    /*
      * Stat Controllers.
      */
     'settings' => [
@@ -20,7 +20,7 @@ return [
         'manifest' => 'Маніфест оновлений',
     ],
 
-    /**
+    /*
      * AuthController.
      */
     'auth' => [
@@ -31,7 +31,7 @@ return [
         'logout' => 'Ви вийшли з системи',
     ],
 
-    /**
+    /*
      * RequestController.
      */
     'requests' => [

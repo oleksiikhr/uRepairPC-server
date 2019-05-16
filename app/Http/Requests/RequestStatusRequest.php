@@ -33,11 +33,11 @@ class RequestStatusRequest extends FormRequest
         ];
 
         if ($request->status) {
-            $rules['name'] = $rules['name'] . ',' . $request->status;
+            $rules['name'] = $rules['name'].','.$request->status;
         }
 
         if ($request->method === Request::METHOD_POST) {
-            $rules['name'] = 'required|' . $rules['name'];
+            $rules['name'] = 'required|'.$rules['name'];
         }
 
         return $rules;

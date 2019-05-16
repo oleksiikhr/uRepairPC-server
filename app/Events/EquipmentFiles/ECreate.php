@@ -37,7 +37,7 @@ class ECreate extends ECreateBroadcast
      */
     public function rooms()
     {
-        return 'equipment_files.' . $this->_equipmentId;
+        return 'equipment_files.'.$this->_equipmentId;
     }
 
     /**

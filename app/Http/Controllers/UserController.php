@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Role;
 use App\User;
-use App\Mail\UserCreated;
 use App\Mail\EmailChange;
+use App\Mail\UserCreated;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Events\Users\EDelete;
@@ -29,7 +29,7 @@ class UserController extends Controller
      */
     public function permissions(Request $request): array
     {
-        $requestId = (int)$request->user;
+        $requestId = (int) $request->user;
         $isOwnProfile = $requestId === Auth::id();
 
         return [
@@ -69,7 +69,7 @@ class UserController extends Controller
         // Search
         if ($request->has('search') && $request->has('columns') && ! empty($request->columns)) {
             foreach ($request->columns as $column) {
-                $query->orWhere($column, 'LIKE', '%' . $request->search . '%');
+                $query->orWhere($column, 'LIKE', '%'.$request->search.'%');
             }
         }
 
@@ -209,7 +209,7 @@ class UserController extends Controller
      */
     public function showImage(string $path)
     {
-        if (! starts_with($path, self::FOLDER_AVATARS . '/')) {
+        if (! starts_with($path, self::FOLDER_AVATARS.'/')) {
             return response(null);
         }
 
@@ -328,6 +328,7 @@ class UserController extends Controller
 
         if (! $user->save()) {
             FileHelper::delete($uploadedUri);
+
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 

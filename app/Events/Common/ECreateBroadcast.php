@@ -27,6 +27,7 @@ abstract class ECreateBroadcast extends EBroadcast
     {
         return self::TYPE_CREATE;
     }
+
     /**
      * @return array|null
      */

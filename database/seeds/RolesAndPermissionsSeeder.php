@@ -70,7 +70,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
             // Global
             ['name' => Permissions::GLOBAL_SETTINGS, 'section_key' => 'global'],
-            ['name' => Permissions::GLOBAL_MANIFEST, 'section_key' => 'global']
+            ['name' => Permissions::GLOBAL_MANIFEST, 'section_key' => 'global'],
         ];
 
         foreach ($permissions as $permission) {
@@ -78,8 +78,8 @@ class RolesAndPermissionsSeeder extends Seeder
 
             Permission::create([
                 'name' => $permission['name'],
-                'display_name' => __('roles_and_permissions.actions.' . end($arrName)),
-                'section_name' => __('roles_and_permissions.sections.' . $permission['section_key']),
+                'display_name' => __('roles_and_permissions.actions.'.end($arrName)),
+                'section_name' => __('roles_and_permissions.sections.'.$permission['section_key']),
             ]);
         }
 
@@ -93,7 +93,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'name' => __('roles_and_permissions.roles.admins'),
             'color' => '#f56c6c',
         ])
-            ->givePermissionTo(collect($permissions)->pluck('name'));;
+            ->givePermissionTo(collect($permissions)->pluck('name'));
 
         Role::create([
             'name' => __('roles_and_permissions.roles.workers'),

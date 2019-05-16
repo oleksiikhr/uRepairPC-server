@@ -31,11 +31,11 @@ class EquipmentTypeRequest extends FormRequest
         ];
 
         if ($request->type) {
-            $rules['name'] = $rules['name'] . ',' . $request->type;
+            $rules['name'] = $rules['name'].','.$request->type;
         }
 
         if ($request->method === Request::METHOD_POST) {
-            $rules['name'] = 'required|' . $rules['name'];
+            $rules['name'] = 'required|'.$rules['name'];
         }
 
         return $rules;

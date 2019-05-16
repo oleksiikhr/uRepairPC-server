@@ -66,6 +66,5 @@ class JoinRooms extends EBroadcast
      */
     public function data()
     {
-        return null;
     }
 }

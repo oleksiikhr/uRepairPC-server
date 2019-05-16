@@ -66,8 +66,8 @@ class FileHelper
         $s = substr($md5, 3, 3);
 
         return $this->_file->storeAs(
-            $folder . '/' . $f . '/' . $s,
-            str_replace('.', '_', uniqid('', true)) . '.' . $this->_ext,
+            $folder.'/'.$f.'/'.$s,
+            str_replace('.', '_', uniqid('', true)).'.'.$this->_ext,
             $disk
         );
     }
@@ -93,7 +93,7 @@ class FileHelper
             return true;
         }
 
-        Log::warning($file . ' - not deleted');
+        Log::warning($file.' - not deleted');
 
         return false;
     }

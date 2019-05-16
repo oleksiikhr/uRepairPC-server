@@ -45,7 +45,7 @@ class ListenerController extends Controller
     public function sync(ListenerRequest $request)
     {
         $rooms = $this->filterRoomsByPermissions($request->rooms ?? []);
-        array_push($rooms, 'users.' . $this->_user->id);
+        array_push($rooms, 'users.'.$this->_user->id);
 
         if ($this->_user->can(Permissions::EQUIPMENTS_CONFIG_VIEW)) {
             array_push($rooms, 'equipment_types', 'equipment_manufacturers', 'equipment_models');
@@ -79,7 +79,7 @@ class ListenerController extends Controller
     }
 
     /**
-     * TODO Optimize
+     * TODO Optimize.
      *
      * @param  array  $rooms
      * @return array

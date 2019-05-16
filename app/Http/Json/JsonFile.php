@@ -45,6 +45,7 @@ abstract class JsonFile implements IJsonFile
 
         if ($json) {
             $this->isFromFile = true;
+
             return $json;
         }
 
@@ -63,7 +64,7 @@ abstract class JsonFile implements IJsonFile
             if (array_key_exists($key, $data)) {
                 switch ($type) {
                     case 'bool': {
-                        $data[$key] = (bool)$data[$key];
+                        $data[$key] = (bool) $data[$key];
                         break;
                     }
                     case 'file': {
@@ -120,13 +121,10 @@ abstract class JsonFile implements IJsonFile
                     throw new \Exception('Json data is incorrect');
                 }
 
-                return (array)$json;
-
+                return (array) $json;
             } catch (\Exception $e) {
-                return null;
+                return;
             }
         }
-
-        return null;
     }
 }

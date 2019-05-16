@@ -31,7 +31,7 @@ class ListenerRequest extends FormRequest
         ];
 
         if ($request->route()->getName() === 'roles.index') {
-            $rules['rooms'] = 'required|' . $rules['rooms'];
+            $rules['rooms'] = 'required|'.$rules['rooms'];
         }
 
         return $rules;

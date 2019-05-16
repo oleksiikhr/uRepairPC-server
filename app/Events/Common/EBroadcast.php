@@ -25,7 +25,7 @@ abstract class EBroadcast implements ShouldBroadcast, IBroadcastWebsocket
      */
     public function broadcastOn(): array
     {
-        return ['server.' . $this->event()];
+        return ['server.'.$this->event()];
     }
 
     /**

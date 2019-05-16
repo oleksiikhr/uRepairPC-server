@@ -5,7 +5,6 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class EmailChange extends Mailable
 {
@@ -34,7 +33,7 @@ class EmailChange extends Mailable
     public function build()
     {
         return $this->markdown('emails.users.email')
-            ->subject(config('app.name') . " - змінився email")
+            ->subject(config('app.name').' - змінився email')
             ->with([
                 'email' => $this->_email,
             ]);
