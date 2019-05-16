@@ -129,18 +129,12 @@ class UserController extends Controller
     public function show(int $id)
     {
         $user = User::findOrFail($id);
-        $me = Auth::user();
+        $user->permission_names = $user->getAllPermissions()->pluck('name');
 
-        $output = [
+        return response()->json([
             'message' => __('app.users.show'),
             'user' => $user,
-        ];
-
-        if ($me->can(Permissions::ROLES_VIEW) || $me->id === $user->id) {
-            $output['permissions'] = $user->getAllPermissions()->pluck('name');
-        }
-
-        return response()->json($output);
+        ]);
     }
 
     /**
@@ -238,9 +232,11 @@ class UserController extends Controller
 
         $user = User::findOrFail($id);
         $user->syncRoles($request->roles);
+        $user->permission_names = $user->getAllPermissions()->pluck('name');
 
         event(new EUpdateRoles($id, [
             'roles' => $user->roles,
+            'permission_names' => $user->permission_names,
             'updated_at' => $user->updated_at->toDateTimeString(),
         ]));
 

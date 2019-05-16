@@ -99,6 +99,8 @@ class User extends Authenticatable implements JWTSubject
         // Only with Permissions::ROLES_VIEW can see roles or for profile
         if (! $user->can(Permissions::ROLES_VIEW) && $user->id !== $this->id) {
             $this->makeHidden('roles');
+            $this->makeHidden('permissions');
+            $this->makeHidden('permission_names');
         }
 
         return parent::toArray();
