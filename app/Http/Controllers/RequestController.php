@@ -8,9 +8,9 @@ use App\RequestStatus;
 use App\RequestPriority;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
-use App\Request as RequestModel;
 use App\Events\Requests\EDelete;
 use App\Events\Requests\EUpdate;
+use App\Request as RequestModel;
 use App\Http\Helpers\FilesHelper;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\RequestRequest;
@@ -37,6 +37,7 @@ class RequestController extends Controller
     {
         if (! Auth::check()) {
             $this->middleware('jwt.auth');
+
             return [];
         }
 
@@ -47,7 +48,7 @@ class RequestController extends Controller
             'destroy' => Permissions::REQUESTS_DELETE,
         ];
 
-        $requestId = (int)$request->route('request');
+        $requestId = (int) $request->route('request');
         $this->_currentUser = Auth::user();
 
         if ($requestId) {
@@ -86,7 +87,7 @@ class RequestController extends Controller
         // Search
         if ($request->has('search') && $request->has('columns') && ! empty($request->columns)) {
             foreach ($request->columns as $column) {
-                $query->orWhere(RequestModel::SEARCH_RELATIONSHIP[$column] ?? $column, 'LIKE', '%' . $request->search . '%');
+                $query->orWhere(RequestModel::SEARCH_RELATIONSHIP[$column] ?? $column, 'LIKE', '%'.$request->search.'%');
             }
         }
 

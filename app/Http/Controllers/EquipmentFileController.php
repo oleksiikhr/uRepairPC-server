@@ -61,7 +61,7 @@ class EquipmentFileController extends Controller
         $requestFiles = $request->file('files');
 
         $filesHelper = new FilesHelper($requestFiles);
-        $filesHelper->upload('equipments/' . $equipmentId);
+        $filesHelper->upload('equipments/'.$equipmentId);
 
         $uploadedIds = $filesHelper->getUploadedIds();
         $equipment->files()->attach($uploadedIds);
@@ -102,7 +102,7 @@ class EquipmentFileController extends Controller
             return response()->json(['message' => __('app.files.file_not_found')], 422);
         }
 
-        return Storage::download($equipmentFile->file, $equipmentFile->name . '.' . $equipmentFile->ext);
+        return Storage::download($equipmentFile->file, $equipmentFile->name.'.'.$equipmentFile->ext);
     }
 
     /**

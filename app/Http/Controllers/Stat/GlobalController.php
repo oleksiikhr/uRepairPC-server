@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Stat;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Http\Json\GlobalFile;
-use App\Http\Requests\GlobalRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GlobalRequest;
 use App\Events\Settings\EGlobalUpdate;
 use App\Http\Resources\GlobalJsonResource;
 

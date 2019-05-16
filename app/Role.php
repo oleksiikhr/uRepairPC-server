@@ -57,7 +57,7 @@ class Role extends SpatieRole
             if (count($this->permissions) > 0) {
                 $this->setAttribute('permissions_grouped', $this->permissions->groupBy('section_name'));
             } else {
-                $this->setAttribute('permissions_grouped', (object)[]);
+                $this->setAttribute('permissions_grouped', (object) []);
             }
         }
 

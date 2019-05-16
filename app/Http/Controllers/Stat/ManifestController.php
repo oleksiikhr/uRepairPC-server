@@ -65,10 +65,10 @@ class ManifestController extends Controller
             foreach ($icons as $key => $value) {
                 $file = new FileHelper($value);
                 if ($url = $file->store('global', 'public')) {
-                    $size = getimagesize(storage_path('app/public/' . $url));
-                    array_push($data['icons'], (object)[
+                    $size = getimagesize(storage_path('app/public/'.$url));
+                    array_push($data['icons'], (object) [
                         'src' => $url,
-                        'sizes' => $size[0] . 'x' . $size[1],
+                        'sizes' => $size[0].'x'.$size[1],
                         'type' => $value->getMimeType(),
                     ]);
                 }

@@ -38,7 +38,7 @@ class EUpdate extends EUpdateBroadcast
      */
     public function rooms()
     {
-        return 'request_files.' . $this->_requestId;
+        return 'request_files.'.$this->_requestId;
     }
 
     /**

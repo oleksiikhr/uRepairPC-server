@@ -18,7 +18,8 @@ class ManifestFile extends JsonFile
      * @example
      *  ['attr' => 'string']
      */
-    public function getAttributes() {
+    public function getAttributes()
+    {
         return [
             'name' => 'string',
             'short_name' => 'string',
@@ -45,35 +46,35 @@ class ManifestFile extends JsonFile
             'background_color' => '#ffffff',
             'theme_color' => '#409eff',
             'icons' => [
-                (object)[
+                (object) [
                     'src' => 'images/icon_96x96.png',
                     'sizes' => '96x96',
-                    'type' => 'image/png'
+                    'type' => 'image/png',
                 ],
-                (object)[
+                (object) [
                     'src' => 'images/icon_128x128.png',
                     'sizes' => '128x128',
-                    'type' => 'image/png'
+                    'type' => 'image/png',
                 ],
-                (object)[
+                (object) [
                     'src' => 'images/icon_192x192.png',
                     'sizes' => '192x192',
-                    'type' => 'image/png'
+                    'type' => 'image/png',
                 ],
-                (object)[
+                (object) [
                     'src' => 'images/icon_256x256.png',
                     'sizes' => '256x256',
-                    'type' => 'image/png'
+                    'type' => 'image/png',
                 ],
-                (object)[
+                (object) [
                     'src' => 'images/icon_384x384.png',
                     'sizes' => '384x384',
-                    'type' => 'image/png'
+                    'type' => 'image/png',
                 ],
-                (object)[
+                (object) [
                     'src' => 'images/icon_512x512.png',
                     'sizes' => '512x512',
-                    'type' => 'image/png'
+                    'type' => 'image/png',
                 ],
             ],
         ];

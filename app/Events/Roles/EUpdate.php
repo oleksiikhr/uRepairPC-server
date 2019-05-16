@@ -19,6 +19,6 @@ class EUpdate extends EUpdateBroadcast
      */
     public function rooms()
     {
-        return 'roles.' . $this->id;
+        return 'roles.'.$this->id;
     }
 }

@@ -42,7 +42,7 @@ class EquipmentController extends Controller
         // Search
         if ($request->has('search') && $request->has('columns') && ! empty($request->columns)) {
             foreach ($request->columns as $column) {
-                $query->orWhere(Equipment::SEARCH_RELATIONSHIP[$column] ?? $column, 'LIKE', '%' . $request->search . '%');
+                $query->orWhere(Equipment::SEARCH_RELATIONSHIP[$column] ?? $column, 'LIKE', '%'.$request->search.'%');
             }
         }
 

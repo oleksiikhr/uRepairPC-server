@@ -43,6 +43,5 @@ abstract class EDeleteBroadcast extends EBroadcast
      */
     public function data()
     {
-        return null;
     }
 }

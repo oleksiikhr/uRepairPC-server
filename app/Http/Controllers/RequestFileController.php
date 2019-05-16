@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\User;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
-use App\Request as RequestModel;
 use App\Http\Helpers\FileHelper;
+use App\Request as RequestModel;
 use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\FileRequest;
 use App\Events\RequestFiles\ECreate;
-use App\Events\RequestFiles\EUpdate;
 use App\Events\RequestFiles\EDelete;
+use App\Events\RequestFiles\EUpdate;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -37,10 +37,11 @@ class RequestFileController extends Controller
     {
         if (! Auth::check()) {
             $this->middleware('jwt.auth');
+
             return [];
         }
 
-        $requestId = (int)$request->route('request');
+        $requestId = (int) $request->route('request');
         $this->_currentUser = Auth::user();
 
         if ($requestId) {
@@ -89,7 +90,7 @@ class RequestFileController extends Controller
         $requestFiles = $request->file('files');
 
         $filesHelper = new FilesHelper($requestFiles);
-        $filesHelper->upload('requests/' . $requestId);
+        $filesHelper->upload('requests/'.$requestId);
 
         $uploadedIds = $filesHelper->getUploadedIds();
         $this->_requestModel->files()->attach($uploadedIds);
@@ -128,7 +129,7 @@ class RequestFileController extends Controller
             return response()->json(['message' => __('app.files.file_not_found')], 422);
         }
 
-        return Storage::download($requestFile->file, $requestFile->name . '.' . $requestFile->ext);
+        return Storage::download($requestFile->file, $requestFile->name.'.'.$requestFile->ext);
     }
 
     /**
@@ -190,7 +191,7 @@ class RequestFileController extends Controller
     }
 
     /**
-     * Only author of file or with REQUESTS_EDIT permission can update/delete
+     * Only author of file or with REQUESTS_EDIT permission can update/delete.
      *
      * @param  int  $fileUserId
      * @return bool

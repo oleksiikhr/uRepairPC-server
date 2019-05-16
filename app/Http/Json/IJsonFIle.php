@@ -2,7 +2,7 @@
 
 namespace App\Http\Json;
 
-interface IJsonFile
+interface IJsonFIle
 {
     /**
      * Get data from file or uses default.

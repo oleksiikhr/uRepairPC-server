@@ -34,11 +34,11 @@ class RequestPriorityRequest extends FormRequest
         ];
 
         if ($request->priority) {
-            $rules['name'] = $rules['name'] . ',' . $request->priority;
+            $rules['name'] = $rules['name'].','.$request->priority;
         }
 
         if ($request->method === Request::METHOD_POST) {
-            $rules['name'] = 'required|' . $rules['name'];
+            $rules['name'] = 'required|'.$rules['name'];
         }
 
         return $rules;

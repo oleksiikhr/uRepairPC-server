@@ -5,8 +5,8 @@ namespace App;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Collection;
 
 class Settings extends Model
@@ -55,9 +55,9 @@ class Settings extends Model
      */
     public static function getFrontendRecords(): array
     {
-        return Cache::rememberForever(self::CACHE_KEY . '_' . self::SECTION_FRONTEND, function () {
+        return Cache::rememberForever(self::CACHE_KEY.'_'.self::SECTION_FRONTEND, function () {
             $list = self::select('name', 'value', 'type')
-                ->where('name', 'LIKE', self::SECTION_FRONTEND . '_%')
+                ->where('name', 'LIKE', self::SECTION_FRONTEND.'_%')
                 ->get();
 
             // Refresh timestamp for response header
@@ -73,13 +73,13 @@ class Settings extends Model
      */
     public static function updateFrontendRecords(array $array): void
     {
-        $settings = Settings::getFrontendRecords();
+        $settings = self::getFrontendRecords();
         $clearCache = false;
 
         foreach ($array as $key => $value) {
             if (array_key_exists($key, $settings) && $value !== $settings[$key]) {
                 DB::table('settings')
-                    ->where('name', self::SECTION_FRONTEND . '_' . $key)
+                    ->where('name', self::SECTION_FRONTEND.'_'.$key)
                     ->update([
                         'value' => $value,
                     ]);
@@ -89,7 +89,7 @@ class Settings extends Model
         }
 
         if ($clearCache) {
-            Cache::forget(self::CACHE_KEY . '_' . self::SECTION_FRONTEND);
+            Cache::forget(self::CACHE_KEY.'_'.self::SECTION_FRONTEND);
         }
     }
 
@@ -99,7 +99,7 @@ class Settings extends Model
      */
     private static function updateSectionModified(string $section): void
     {
-        $key = self::CACHE_KEY . '_' . $section . '_modified';
+        $key = self::CACHE_KEY.'_'.$section.'_modified';
 
         Cache::forget($key);
         Cache::rememberForever($key, function () {
@@ -120,7 +120,8 @@ class Settings extends Model
     private static function mapWithKeysSubstrSection(Collection $list, string $section): array
     {
         return $list->mapWithKeys(function ($item) use ($section) {
-            $name = Str::after($item['name'], $section . '_');
+            $name = Str::after($item['name'], $section.'_');
+
             return [$name => self::normalizeValue($item['value'], $item['type'])];
         })->all();
     }
@@ -131,7 +132,7 @@ class Settings extends Model
      */
     private static function getSectionModified(string $section): int
     {
-        return Cache::get(self::CACHE_KEY . '_' . $section . '_modified', -1);
+        return Cache::get(self::CACHE_KEY.'_'.$section.'_modified', -1);
     }
 
     /**
@@ -142,7 +143,7 @@ class Settings extends Model
     private static function normalizeValue($value, $type)
     {
         if (! $value) {
-            return null;
+            return;
         }
 
         switch ($type) {

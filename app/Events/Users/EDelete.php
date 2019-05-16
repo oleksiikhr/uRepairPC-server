@@ -19,6 +19,6 @@ class EDelete extends EDeleteBroadcast
      */
     public function rooms()
     {
-        return 'users.' . $this->id;
+        return 'users.'.$this->id;
     }
 }

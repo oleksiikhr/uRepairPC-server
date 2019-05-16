@@ -43,8 +43,8 @@ class ManifestRequest extends FormRequest
         return [
             'name' => 'required|string',
             'short_name' => 'required|string',
-            'orientation' => 'required|string|in:' . join(',', self::ORIENTATION),
-            'display' => 'required|string|in:' . join(',', self::DISPLAY),
+            'orientation' => 'required|string|in:'.implode(',', self::ORIENTATION),
+            'display' => 'required|string|in:'.implode(',', self::DISPLAY),
             'background_color' => 'required|string|regex:/^#([a-zA-Z0-9]{6})$/i',
             'theme_color' => 'required|string|regex:/^#([a-zA-Z0-9]{6})$/i',
             'upload_icons' => 'array',

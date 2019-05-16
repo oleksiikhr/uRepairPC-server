@@ -19,7 +19,7 @@ class RoleController extends Controller
      */
     public function permissions(Request $request): array
     {
-        $requestId = (int)$request->role;
+        $requestId = (int) $request->role;
 
         return [
             'index' => Permissions::ROLES_VIEW,
@@ -48,7 +48,7 @@ class RoleController extends Controller
         // Search
         if ($request->has('search') && $request->has('columns') && ! empty($request->columns)) {
             foreach ($request->columns as $column) {
-                $query->orWhere($column, 'LIKE', '%' . $request->search . '%');
+                $query->orWhere($column, 'LIKE', '%'.$request->search.'%');
             }
         }
 
@@ -134,7 +134,7 @@ class RoleController extends Controller
     {
         $request->validate([
             'permissions' => 'array',
-            'permissions.*' => 'string'
+            'permissions.*' => 'string',
         ]);
 
         $role = Role::findOrFail($id);
