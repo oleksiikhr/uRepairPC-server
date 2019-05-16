@@ -18,6 +18,23 @@
 ## Docs
 See [here](https://urepairpc.github.io/docs/)
 
+## Quick Start
+```bash
+# Copy .env.example to .env and config this (Database, etc)
+$ php artisan key:generate
+$ php artisan jwt:secret
+
+# Install dependencies
+$ composer install --optimize-autoloader --no-dev
+
+# Migration
+$ php artisan migrate
+$ php artisan db:seed
+
+# Optimization
+$ php artisan config:cache
+```
+
 ## Database
 <img src="https://raw.githubusercontent.com/uRepairPC/docs/master/public/database.png" alt="Database">
 
