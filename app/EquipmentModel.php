@@ -47,7 +47,7 @@ class EquipmentModel extends Model
 
     public function type()
     {
-        return $this->belongsTo(EquipmentModel::class);
+        return $this->belongsTo(EquipmentType::class);
     }
 
     public function manufacturer()
