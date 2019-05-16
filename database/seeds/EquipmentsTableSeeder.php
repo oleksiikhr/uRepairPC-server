@@ -13,7 +13,7 @@ class EquipmentsTableSeeder extends Seeder
     public function run()
     {
         $arr = [
-            ['serial_number' => '11111', 'inventory_number' => '22222', 'manufacturer_id' => 1, 'type_id' => 1, 'model_id' => 1]
+            ['serial_number' => '11111', 'inventory_number' => '22222', 'manufacturer_id' => 1, 'type_id' => 1, 'model_id' => 1],
         ];
 
         foreach ($arr as $item) {

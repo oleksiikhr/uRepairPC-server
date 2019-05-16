@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use JWTAuth;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\AuthRequest;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +19,21 @@ class AuthController extends Controller
     public function permissions(Request $request): array
     {
         return [];
+    }
+
+    /**
+     * Get a current user with permissions.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function profile()
+    {
+        $user = Auth::user();
+
+        return response()->json([
+            'user' => $user,
+            'permissions' => $user->getAllPermissions()->pluck('name'),
+        ]);
     }
 
     /**
@@ -55,9 +71,19 @@ class AuthController extends Controller
             return response()->json(['message' => __('app.auth.token_invalid')], 422);
         }
 
+        $newToken = JWTAuth::refresh($token);
+
+        // deleted_at has value - user is empty
+        $userId = JWTAuth::setToken($newToken)->getPayload()->get('sub');
+        $user = User::find($userId);
+
+        if (! $user) {
+            return response()->json(['message' => __('app.auth.token_invalid')], 422);
+        }
+
         return response()->json([
             'message' => __('app.auth.token_refresh'),
-            'token' => JWTAuth::refresh($token),
+            'token' => $newToken,
         ]);
     }
 
@@ -68,10 +94,11 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        JWTAuth::invalidate(JWTAuth::getToken());
+//        JWTAuth::invalidate(JWTAuth::getToken());
 
         return response()->json([
             'message' => __('app.auth.logout'),
+            'asd' => JWTAuth::getPayload(),
         ]);
     }
 }

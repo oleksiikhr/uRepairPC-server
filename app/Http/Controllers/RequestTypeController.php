@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\RequestType;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
+use App\Events\RequestTypes\ECreate;
+use App\Events\RequestTypes\EDelete;
+use App\Events\RequestTypes\EUpdate;
 use App\Http\Requests\RequestTypeRequest;
 
 class RequestTypeController extends Controller
@@ -29,7 +32,7 @@ class RequestTypeController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
@@ -42,7 +45,7 @@ class RequestTypeController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  RequestTypeRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(RequestTypeRequest $request)
     {
@@ -57,6 +60,8 @@ class RequestTypeController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        event(new ECreate($requestType));
+
         return response()->json([
             'message' => __('app.request_type.store'),
             'request_type' => $requestType,
@@ -67,7 +72,7 @@ class RequestTypeController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(int $id)
     {
@@ -84,7 +89,7 @@ class RequestTypeController extends Controller
      *
      * @param  RequestTypeRequest  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(RequestTypeRequest $request, int $id)
     {
@@ -104,6 +109,8 @@ class RequestTypeController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        event(new EUpdate($id, $requestType));
+
         return response()->json([
             'message' => __('app.request_type.update'),
             'request_type' => $requestType,
@@ -114,7 +121,7 @@ class RequestTypeController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(int $id)
     {
@@ -127,6 +134,8 @@ class RequestTypeController extends Controller
         if (! RequestType::destroy($id)) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
+
+        event(new EDelete($id));
 
         return response()->json([
             'message' => __('app.request_type.destroy'),

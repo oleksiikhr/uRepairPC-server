@@ -31,11 +31,11 @@ class EquipmentManufacturerRequest extends FormRequest
         ];
 
         if ($request->manufacturer) {
-            $rules['name'] = $rules['name'] . ',' . $request->manufacturer;
+            $rules['name'] = $rules['name'].','.$request->manufacturer;
         }
 
         if ($request->method === Request::METHOD_POST) {
-            $rules['name'] = 'required|' . $rules['name'];
+            $rules['name'] = 'required|'.$rules['name'];
         }
 
         return $rules;

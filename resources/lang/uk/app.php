@@ -4,7 +4,7 @@ return [
 
 //    TODO Translate to en, ru
 
-    /**
+    /*
      * Middleware.
      */
     'middleware' => [
@@ -12,14 +12,15 @@ return [
         'no_auth' => 'Необхідно увійти в систему',
     ],
 
-    /**
-     * Settings controllers
+    /*
+     * Stat Controllers.
      */
     'settings' => [
-        'store' => 'Налаштування оновлені',
+        'global' => 'Налаштування оновлені',
+        'manifest' => 'Маніфест оновлений',
     ],
 
-    /**
+    /*
      * AuthController.
      */
     'auth' => [
@@ -28,6 +29,16 @@ return [
         'token_invalid' => 'Токен не дійсний',
         'token_refresh' => 'Токен оновлено',
         'logout' => 'Ви вийшли з системи',
+    ],
+
+    /*
+     * RequestController.
+     */
+    'requests' => [
+        'show' => 'Заявка отримана',
+        'store' => 'Заявка створена',
+        'update' => 'Заявка оновлена',
+        'destroy' => 'Заявка видалена',
     ],
 
     /*
@@ -143,6 +154,7 @@ return [
         'file_destroyed' => 'Файл видалений',
         'file_updated' => 'Файл оновлено',
         'file_saved' => 'Файл збережено',
+        'files_get' => 'Файли отримані',
         'upload_success' => 'Файли збережені',
         'upload_error' => 'З\'явилася помилка при завантаженні деяких файлів',
     ],

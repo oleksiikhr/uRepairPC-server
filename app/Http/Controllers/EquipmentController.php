@@ -6,6 +6,8 @@ use App\Equipment;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Http\Helpers\FilesHelper;
+use App\Events\Equipments\EDelete;
+use App\Events\Equipments\EUpdate;
 use App\Http\Requests\EquipmentRequest;
 
 class EquipmentController extends Controller
@@ -31,7 +33,7 @@ class EquipmentController extends Controller
      * Display a listing of the resource.
      *
      * @param  EquipmentRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(EquipmentRequest $request)
     {
@@ -40,7 +42,7 @@ class EquipmentController extends Controller
         // Search
         if ($request->has('search') && $request->has('columns') && ! empty($request->columns)) {
             foreach ($request->columns as $column) {
-                $query->orWhere(Equipment::SEARCH_RELATIONSHIP[$column] ?? $column, 'LIKE', '%' . $request->search . '%');
+                $query->orWhere(Equipment::SEARCH_RELATIONSHIP[$column] ?? $column, 'LIKE', '%'.$request->search.'%');
             }
         }
 
@@ -58,7 +60,7 @@ class EquipmentController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  EquipmentRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(EquipmentRequest $request)
     {
@@ -79,7 +81,7 @@ class EquipmentController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(int $id)
     {
@@ -96,7 +98,7 @@ class EquipmentController extends Controller
      *
      * @param  EquipmentRequest  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(EquipmentRequest $request, int $id)
     {
@@ -107,25 +109,24 @@ class EquipmentController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        $equipment = Equipment::querySelectJoins()->find($equipment->id);
+        event(new EUpdate($id, $equipment->toArray()));
+
         return response()->json([
             'message' => __('app.equipments.update'),
-            'equipment' => Equipment::querySelectJoins()->find($equipment->id),
+            'equipment' => $equipment,
         ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  Request  $request
+     * @param  EquipmentRequest  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request, int $id)
+    public function destroy(EquipmentRequest $request, int $id)
     {
-        $request->validate([
-            'files_delete' => 'boolean',
-        ]);
-
         $equipment = Equipment::findOrFail($id);
 
         if ($request->files_delete) {
@@ -139,6 +140,8 @@ class EquipmentController extends Controller
         if (! $equipment->delete()) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
+
+        event(new EDelete($id));
 
         return response()->json([
             'message' => __('app.equipments.destroy'),

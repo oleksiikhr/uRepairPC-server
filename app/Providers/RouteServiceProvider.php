@@ -23,7 +23,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $types = ['id', 'equipment', 'file', 'type', 'model', 'manufacturer'];
+        $types = ['id', 'equipment', 'file', 'type', 'model', 'manufacturer', 'request'];
 
         foreach ($types as $type) {
             Route::pattern($type, '[0-9]+');
@@ -41,7 +41,22 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->mapApiRoutes();
 
+        $this->mapWebRoutes();
+
         //
+    }
+
+    /**
+     * Define the "web" routes for the application.
+     *
+     * These routes all receive session state, CSRF protection, etc.
+     *
+     * @return void
+     */
+    protected function mapWebRoutes()
+    {
+        Route::namespace($this->namespace)
+            ->group(base_path('routes/web.php'));
     }
 
     /**
@@ -53,8 +68,9 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes()
     {
-        Route::middleware('api')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/api.php'));
+        Route::prefix('api')
+            ->middleware('api')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api.php'));
     }
 }

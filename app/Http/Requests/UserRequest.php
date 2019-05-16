@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserRequest extends FormRequest
@@ -30,12 +29,12 @@ class UserRequest extends FormRequest
         $method = $request->method;
 
         // List of all users
-        if ($method === Request::METHOD_GET && $request->route()->getName() === 'users.index') {
+        if ($request->route()->getName() === 'users.index') {
             return [
                 'search' => 'string',
                 'columns' => 'array',
-                'columns.*' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SEARCH),
-                'sortColumn' => 'string|in:' . join(',', User::ALLOW_COLUMNS_SORT),
+                'columns.*' => 'string|in:'.implode(',', User::ALLOW_COLUMNS_SEARCH),
+                'sortColumn' => 'string|in:'.implode(',', User::ALLOW_COLUMNS_SORT),
                 'sortOrder' => 'string|in:ascending,descending',
                 'filterRoleById' => 'integer',
             ];
@@ -58,8 +57,8 @@ class UserRequest extends FormRequest
         // Store
         if ($method === Request::METHOD_POST) {
             $rules['email'] = 'required|email|unique:users,email';
-            $rules['first_name'] = 'required|' . $rules['first_name'];
-            $rules['last_name'] = 'required|' . $rules['last_name'];
+            $rules['first_name'] = 'required|'.$rules['first_name'];
+            $rules['last_name'] = 'required|'.$rules['last_name'];
         }
 
         return $rules;

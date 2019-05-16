@@ -35,9 +35,9 @@ class EquipmentModel extends Model
             ->join('equipment_manufacturers', 'equipment_models.manufacturer_id', '=', 'equipment_manufacturers.id');
     }
 
-    /* | ---------------------------------------------------------------
+    /* | -----------------------------------------------------------------------------------
      * | Relationships
-     * | ---------------------------------------------------------------
+     * | -----------------------------------------------------------------------------------
      */
 
     public function equipments()
@@ -47,7 +47,7 @@ class EquipmentModel extends Model
 
     public function type()
     {
-        return $this->belongsTo(EquipmentModel::class);
+        return $this->belongsTo(EquipmentType::class);
     }
 
     public function manufacturer()

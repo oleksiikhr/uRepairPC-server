@@ -4,6 +4,7 @@ namespace App\Http\Helpers;
 
 use App\File;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -65,14 +66,14 @@ class FileHelper
         $s = substr($md5, 3, 3);
 
         return $this->_file->storeAs(
-            $folder . '/' . $f . '/' . $s,
-            str_replace('.', '_', uniqid('', true)) . '.' . $this->_ext,
+            $folder.'/'.$f.'/'.$s,
+            str_replace('.', '_', uniqid('', true)).'.'.$this->_ext,
             $disk
         );
     }
 
     /**
-     * Delete file from storage.
+     * Delete file from storage if exists.
      *
      * @param  string  $file
      * @param  string  $disk
@@ -88,10 +89,12 @@ class FileHelper
             return true;
         }
 
-        $isDeleted = Storage::disk($disk)->delete($file);
+        if (Storage::disk($disk)->delete($file)) {
+            return true;
+        }
 
-//        TODO Notify on errors
+        Log::warning($file.' - not deleted');
 
-        return $isDeleted;
+        return false;
     }
 }

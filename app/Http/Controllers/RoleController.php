@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Role;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
+use App\Events\Roles\EDelete;
+use App\Events\Roles\EUpdate;
 use App\Http\Requests\RoleRequest;
 
 class RoleController extends Controller
@@ -17,7 +19,7 @@ class RoleController extends Controller
      */
     public function permissions(Request $request): array
     {
-        $requestId = (int)$request->role;
+        $requestId = (int) $request->role;
 
         return [
             'index' => Permissions::ROLES_VIEW,
@@ -33,7 +35,7 @@ class RoleController extends Controller
      * Display a listing of the resource.
      *
      * @param  RoleRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(RoleRequest $request)
     {
@@ -46,7 +48,7 @@ class RoleController extends Controller
         // Search
         if ($request->has('search') && $request->has('columns') && ! empty($request->columns)) {
             foreach ($request->columns as $column) {
-                $query->orWhere($column, 'LIKE', '%' . $request->search . '%');
+                $query->orWhere($column, 'LIKE', '%'.$request->search.'%');
             }
         }
 
@@ -64,7 +66,7 @@ class RoleController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  RoleRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(RoleRequest $request)
     {
@@ -85,7 +87,7 @@ class RoleController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(int $id)
     {
@@ -102,7 +104,7 @@ class RoleController extends Controller
      *
      * @param  RoleRequest  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(RoleRequest $request, int $id)
     {
@@ -112,6 +114,8 @@ class RoleController extends Controller
         if (! $role->save()) {
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
+
+        event(new EUpdate($id, $role));
 
         return response()->json([
             'message' => __('app.roles.update'),
@@ -124,17 +128,19 @@ class RoleController extends Controller
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function updatePermissions(Request $request, int $id)
     {
         $request->validate([
             'permissions' => 'array',
-            'permissions.*' => 'string'
+            'permissions.*' => 'string',
         ]);
 
         $role = Role::findOrFail($id);
         $role->syncPermissions($request->permissions);
+
+        event(new EUpdate($id, $role));
 
         return response()->json([
             'message' => __('app.roles.update_permissions'),
@@ -146,7 +152,7 @@ class RoleController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(int $id)
     {
@@ -155,6 +161,8 @@ class RoleController extends Controller
         if (! $role->delete()) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
+
+        event(new EDelete($id));
 
         return response()->json([
             'message' => __('app.roles.destroy'),

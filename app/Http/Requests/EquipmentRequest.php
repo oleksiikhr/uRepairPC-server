@@ -29,13 +29,19 @@ class EquipmentRequest extends FormRequest
         $method = $request->method;
 
         // List of all equipments
-        if ($method === Request::METHOD_GET && $request->route()->getName() === 'equipments.index') {
+        if ($request->route()->getName() === 'equipments.index') {
             return [
                 'search' => 'string',
                 'columns' => 'array',
-                'columns.*' => 'string|in:' . join(',', Equipment::ALLOW_COLUMNS_SEARCH),
-                'sortColumn' => 'string|in:' . join(',', Equipment::ALLOW_COLUMNS_SORT),
+                'columns.*' => 'string|in:'.implode(',', Equipment::ALLOW_COLUMNS_SEARCH),
+                'sortColumn' => 'string|in:'.implode(',', Equipment::ALLOW_COLUMNS_SORT),
                 'sortOrder' => 'string|in:ascending,descending',
+            ];
+        }
+
+        if ($method === Request::METHOD_DELETE) {
+            return [
+                'files_delete' => 'boolean',
             ];
         }
 
@@ -50,7 +56,7 @@ class EquipmentRequest extends FormRequest
 
         // Store
         if ($method === Request::METHOD_POST) {
-            $rules['type_id'] = 'required|' . $rules['type_id'];
+            $rules['type_id'] = 'required|'.$rules['type_id'];
         }
 
         return $rules;

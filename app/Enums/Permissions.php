@@ -67,7 +67,8 @@ abstract class Permissions
     /*
      * Other
      */
-    const OTHER_GLOBAL_SETTINGS = 'other.global_settings';
+    const GLOBAL_SETTINGS = 'global.settings';
+    const GLOBAL_MANIFEST = 'global.manifest';
 
     // Permission not created - blocks all requests
     const DISABLE = 'disable';

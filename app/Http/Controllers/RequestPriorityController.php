@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\RequestPriority;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
+use App\Events\RequestPriorities\ECreate;
+use App\Events\RequestPriorities\EDelete;
+use App\Events\RequestPriorities\EUpdate;
 use App\Http\Requests\RequestPriorityRequest;
 
 class RequestPriorityController extends Controller
@@ -29,7 +32,7 @@ class RequestPriorityController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
@@ -42,7 +45,7 @@ class RequestPriorityController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  RequestPriorityRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(RequestPriorityRequest $request)
     {
@@ -57,6 +60,8 @@ class RequestPriorityController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        event(new ECreate($requestPriority));
+
         return response()->json([
             'message' => __('app.request_priority.store'),
             'request_priority' => $requestPriority,
@@ -67,7 +72,7 @@ class RequestPriorityController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(int $id)
     {
@@ -84,7 +89,7 @@ class RequestPriorityController extends Controller
      *
      * @param  RequestPriorityRequest  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(RequestPriorityRequest $request, int $id)
     {
@@ -104,6 +109,8 @@ class RequestPriorityController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        event(new EUpdate($id, $requestPriority));
+
         return response()->json([
             'message' => __('app.request_priority.update'),
             'request_priority' => $requestPriority,
@@ -114,7 +121,7 @@ class RequestPriorityController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(int $id)
     {
@@ -127,6 +134,8 @@ class RequestPriorityController extends Controller
         if (! RequestPriority::destroy($id)) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
+
+        event(new EDelete($id));
 
         return response()->json([
             'message' => __('app.request_priority.destroy'),

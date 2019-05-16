@@ -4,10 +4,11 @@ namespace App;
 
 use App\Traits\ModelHasDefaultTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RequestStatus extends Model
 {
-    use ModelHasDefaultTrait;
+    use ModelHasDefaultTrait, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -29,4 +30,14 @@ class RequestStatus extends Model
     protected $casts = [
         'default' => 'boolean',
     ];
+
+    /* | -----------------------------------------------------------------------------------
+     * | Relationships
+     * | -----------------------------------------------------------------------------------
+     */
+
+    public function requests()
+    {
+        return $this->hasMany(Request::class);
+    }
 }

@@ -26,15 +26,13 @@ class RoleRequest extends FormRequest
      */
     public function rules(Request $request)
     {
-        $method = $request->method;
-
         // List of all users
-        if ($method === Request::METHOD_GET && $request->route()->getName() === 'roles.index') {
+        if ($request->route()->getName() === 'roles.index') {
             return [
                 'search' => 'string',
                 'columns' => 'array',
-                'columns.*' => 'string|in:' . join(',', Role::ALLOW_COLUMNS_SEARCH),
-                'sortColumn' => 'string|in:' . join(',', Role::ALLOW_COLUMNS_SORT),
+                'columns.*' => 'string|in:'.implode(',', Role::ALLOW_COLUMNS_SEARCH),
+                'sortColumn' => 'string|in:'.implode(',', Role::ALLOW_COLUMNS_SORT),
                 'sortOrder' => 'string|in:ascending,descending',
                 'permissions' => 'boolean',
                 'count' => 'int',
@@ -48,8 +46,8 @@ class RoleRequest extends FormRequest
         ];
 
         // Store
-        if ($method === Request::METHOD_POST) {
-            $rules['name'] = 'required|' . $rules['name'];
+        if ($request->method === Request::METHOD_POST) {
+            $rules['name'] = 'required|'.$rules['name'];
         }
 
         return $rules;

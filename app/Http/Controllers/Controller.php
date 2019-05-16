@@ -15,7 +15,7 @@ abstract class Controller extends BaseController implements IPermissions
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /** @var int */
-    const PAGINATE_DEFAULT = 50;
+    const PAGINATE_DEFAULT = 30;
 
     public function __construct(Request $request)
     {
@@ -25,7 +25,7 @@ abstract class Controller extends BaseController implements IPermissions
     /**
      * Register middleware on depends key-value array.
      *  key - method
-     *  value - list of permissions
+     *  value - list of permissions.
      *
      * @param array $roles
      */
@@ -41,9 +41,9 @@ abstract class Controller extends BaseController implements IPermissions
 
         if (array_key_exists($activeMethod, $roles)) {
             $role = $roles[$activeMethod];
-            $permissions = is_array($role) ? join('|', $role) : $role;
+            $permissions = is_array($role) ? implode('|', $role) : $role;
             if (! empty($permissions)) {
-                $this->middleware('permission:' . $permissions);
+                $this->middleware('permission:'.$permissions);
             }
         }
     }

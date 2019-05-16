@@ -4,22 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Role;
 use App\User;
-use App\Mail\UserCreated;
 use App\Mail\EmailChange;
+use App\Mail\UserCreated;
 use App\Enums\Permissions;
-use App\Traits\ImageTrait;
 use Illuminate\Http\Request;
+use App\Events\Users\EDelete;
+use App\Events\Users\EUpdate;
 use App\Http\Helpers\FileHelper;
 use App\Http\Requests\UserRequest;
+use App\Http\Requests\ImageRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-    use ImageTrait;
-
-    /** @var string */
-    private $_model = User::class;
+    private const FOLDER_AVATARS = 'users/avatars';
 
     /**
      * Add middleware depends on user permissions.
@@ -29,20 +29,25 @@ class UserController extends Controller
      */
     public function permissions(Request $request): array
     {
-        $requestId = (int)$request->user;
+        $requestId = (int) $request->user;
         $isOwnProfile = $requestId === Auth::id();
 
         return [
+            // Basic CRUD
             'index' => Permissions::USERS_VIEW,
             'show' => $isOwnProfile ? null : Permissions::USERS_VIEW,
-            'getImage' => $isOwnProfile ? null : Permissions::USERS_VIEW,
             'update' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
-            'updateEmail' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
-            'setImage' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
-            'deleteImage' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
-            'updatePassword' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
             'store' => Permissions::USERS_CREATE,
             'delete' => $requestId === 1 || $isOwnProfile ? Permissions::DISABLE : Permissions::USERS_DELETE,
+
+            // Image
+            'showImage' => $isOwnProfile ? null : Permissions::USERS_VIEW,
+            'updateImage' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
+            'deleteImage' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
+
+            // Other
+            'updateEmail' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
+            'updatePassword' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
             'updateRoles' => $requestId === 1 ? Permissions::DISABLE : Permissions::ROLES_MANAGE,
         ];
     }
@@ -64,7 +69,7 @@ class UserController extends Controller
         // Search
         if ($request->has('search') && $request->has('columns') && ! empty($request->columns)) {
             foreach ($request->columns as $column) {
-                $query->orWhere($column, 'LIKE', '%' . $request->search . '%');
+                $query->orWhere($column, 'LIKE', '%'.$request->search.'%');
             }
         }
 
@@ -153,6 +158,9 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        $eventData = array_add($request->all(), 'updated_at', $user->updated_at->toDateTimeString());
+        event(new EUpdate($id, $eventData));
+
         return response()->json([
             'message' => __('app.users.update'),
             'user' => $user,
@@ -186,9 +194,32 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
 
+        event(new EDelete($id));
+
         return response()->json([
             'message' => __('app.users.destroy'),
         ]);
+    }
+
+    /**
+     * Get avatar from user.
+     *
+     * @param  string  $path
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\JsonResponse
+     */
+    public function showImage(string $path)
+    {
+        if (! starts_with($path, self::FOLDER_AVATARS.'/')) {
+            return response(null);
+        }
+
+        if (! Storage::exists($path)) {
+            return response(null);
+        }
+
+        $file = Storage::path($path);
+
+        return response()->file($file);
     }
 
     /**
@@ -206,6 +237,11 @@ class UserController extends Controller
 
         $user = User::findOrFail($id);
         $user->syncRoles($request->roles);
+
+        event(new EUpdate($id, [
+            'roles' => $user->roles,
+            'updated_at' => $user->updated_at->toDateTimeString(),
+        ]));
 
         return response()->json([
             'message' => __('app.users.roles_changed'),
@@ -234,6 +270,9 @@ class UserController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        $eventData = array_add($request->all(), 'updated_at', $user->updated_at->toDateTimeString());
+        event(new EUpdate($id, $eventData));
+
         return response()->json([
             'message' => __('app.users.email_changed'),
             'user' => $user,
@@ -260,6 +299,79 @@ class UserController extends Controller
         }
 
         return $this->setPasswordEmail($user);
+    }
+
+    /**
+     * Upload avatar for user.
+     *
+     * @param  ImageRequest  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateImage(ImageRequest $request, int $id)
+    {
+        $user = User::findOrFail($id);
+
+        // Delete old image if exists
+        if ($user->image) {
+            FileHelper::delete($user->image);
+        }
+
+        $file = new FileHelper($request->file('image'));
+        $uploadedUri = $file->store(self::FOLDER_AVATARS);
+
+        if (! $uploadedUri) {
+            return response()->json(['message' => __('app.files.file_not_saved')], 422);
+        }
+
+        $user->image = $uploadedUri;
+
+        if (! $user->save()) {
+            FileHelper::delete($uploadedUri);
+
+            return response()->json(['message' => __('app.database.save_error')], 422);
+        }
+
+        event(new EUpdate($id, [
+            'image' => $uploadedUri,
+            'updated_at' => $user->updated_at->toDateTimeString(),
+        ]));
+
+        return response()->json([
+            'message' => __('app.files.file_saved'),
+            'user' => $user,
+        ]);
+    }
+
+    /**
+     * Delete avatar for user.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroyImage(int $id)
+    {
+        $user = User::findOrFail($id);
+
+        if (! FileHelper::delete($user->image)) {
+            return response()->json(['message' => __('app.files.file_not_deleted')], 422);
+        }
+
+        $user->image = null;
+
+        if (! $user->save()) {
+            return response()->json(['message' => __('app.database.save_error')], 422);
+        }
+
+        event(new EUpdate($id, [
+            'image' => null,
+            'updated_at' => $user->updated_at->toDateTimeString(),
+        ]));
+
+        return response()->json([
+            'message' => __('app.files.file_destroyed'),
+            'user' => $user,
+        ]);
     }
 
     /**

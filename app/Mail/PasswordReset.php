@@ -5,7 +5,6 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class PasswordReset extends Mailable
 {
@@ -34,7 +33,7 @@ class PasswordReset extends Mailable
     public function build()
     {
         return $this->markdown('emails.users.password')
-            ->subject(config('app.name') . " - змінився пароль")
+            ->subject(config('app.name').' - змінився пароль')
             ->with([
                 'password' => $this->_password,
             ]);

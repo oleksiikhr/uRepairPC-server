@@ -20,6 +20,7 @@ class CreateRequestPrioritiesTable extends Migration
             $table->unsignedTinyInteger('value')->default(1);
             $table->text('description')->nullable();
             $table->boolean('default')->default(false);
+            $table->softDeletes();
             $table->timestamps();
         });
     }
