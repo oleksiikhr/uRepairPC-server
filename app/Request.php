@@ -133,7 +133,7 @@ class Request extends Model
 
     public function files()
     {
-        return $this->belongsToMany(File::class)
+        return $this->belongsToMany(File::class, 'request_file')
             ->select(
                 'files.*',
                 'users.first_name',

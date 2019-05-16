@@ -121,16 +121,12 @@ class EquipmentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  Request  $request
+     * @param  EquipmentRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request, int $id)
+    public function destroy(EquipmentRequest $request, int $id)
     {
-        $request->validate([
-            'files_delete' => 'boolean',
-        ]);
-
         $equipment = Equipment::findOrFail($id);
 
         if ($request->files_delete) {

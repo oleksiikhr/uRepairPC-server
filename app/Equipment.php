@@ -112,7 +112,7 @@ class Equipment extends Model
 
     public function files()
     {
-        return $this->belongsToMany(File::class)
+        return $this->belongsToMany(File::class, 'equipment_file')
             ->select(
                 'files.*',
                 'users.first_name',

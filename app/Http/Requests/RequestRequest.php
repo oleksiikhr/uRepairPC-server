@@ -46,7 +46,7 @@ class RequestRequest extends FormRequest
 
         if ($method === Request::METHOD_DELETE) {
             return [
-                'file_delete' => 'boolean',
+                'files_delete' => 'boolean',
             ];
         }
 

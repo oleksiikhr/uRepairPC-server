@@ -43,7 +43,7 @@ class EquipmentFileController extends Controller
         $equipment = Equipment::findOrFail($equipmentId);
 
         return response()->json([
-            'message' => 'Файли отримані',
+            'message' => __('app.files.files_get'),
             'files' => $equipment->files,
         ]);
     }

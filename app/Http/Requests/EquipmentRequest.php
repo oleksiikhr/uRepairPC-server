@@ -26,6 +26,8 @@ class EquipmentRequest extends FormRequest
      */
     public function rules(Request $request)
     {
+        $method = $request->method;
+
         // List of all equipments
         if ($request->route()->getName() === 'equipments.index') {
             return [
@@ -34,6 +36,12 @@ class EquipmentRequest extends FormRequest
                 'columns.*' => 'string|in:' . join(',', Equipment::ALLOW_COLUMNS_SEARCH),
                 'sortColumn' => 'string|in:' . join(',', Equipment::ALLOW_COLUMNS_SORT),
                 'sortOrder' => 'string|in:ascending,descending',
+            ];
+        }
+
+        if ($method === Request::METHOD_DELETE) {
+            return [
+                'files_delete' => 'boolean',
             ];
         }
 
@@ -47,7 +55,7 @@ class EquipmentRequest extends FormRequest
         ];
 
         // Store
-        if ($request->method === Request::METHOD_POST) {
+        if ($method === Request::METHOD_POST) {
             $rules['type_id'] = 'required|' . $rules['type_id'];
         }
 

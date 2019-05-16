@@ -9,9 +9,9 @@ use App\RequestPriority;
 use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Request as RequestModel;
-use App\Http\Helpers\FileHelper;
 use App\Events\Requests\EDelete;
 use App\Events\Requests\EUpdate;
+use App\Http\Helpers\FilesHelper;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\RequestRequest;
 
@@ -205,11 +205,13 @@ class RequestController extends Controller
     public function destroy(RequestRequest $request, int $id)
     {
         // Destroy files
-        if ($request->file_delete) {
-            // TODO
-        }
+        if ($request->files_delete) {
+            $isSuccess = FilesHelper::delete($this->_requestModel->files);
 
-        // Destroy comments
+            if (! $isSuccess) {
+                return response()->json(['message' => __('app.files.files_not_deleted')]);
+            }
+        }
 
         if (! $this->_requestModel->delete()) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
