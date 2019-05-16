@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Events\Users\EDelete;
 use App\Events\Users\EUpdate;
 use App\Http\Helpers\FileHelper;
+use App\Events\Users\EUpdateRoles;
 use App\Http\Requests\UserRequest;
 use App\Http\Requests\ImageRequest;
 use Illuminate\Support\Facades\Auth;
@@ -238,7 +239,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->syncRoles($request->roles);
 
-        event(new EUpdate($id, [
+        event(new EUpdateRoles($id, [
             'roles' => $user->roles,
             'updated_at' => $user->updated_at->toDateTimeString(),
         ]));

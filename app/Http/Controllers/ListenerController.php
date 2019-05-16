@@ -45,12 +45,16 @@ class ListenerController extends Controller
     public function sync(ListenerRequest $request)
     {
         $rooms = $this->filterRoomsByPermissions($request->rooms ?? []);
-        array_push($rooms, 'users.'.$this->_user->id);
 
+        // Listen events for own profile
+        array_push($rooms, 'users.'.$this->_user->id, 'users.'.$this->_user->id.'.roles');
+
+        // Listen settings
         if ($this->_user->can(Permissions::EQUIPMENTS_CONFIG_VIEW)) {
             array_push($rooms, 'equipment_types', 'equipment_manufacturers', 'equipment_models');
         }
 
+        // Listen settings
         if ($this->_user->can(Permissions::REQUESTS_CONFIG_VIEW)) {
             array_push($rooms, 'request_statuses', 'request_priorities', 'request_types');
         }
@@ -90,9 +94,9 @@ class ListenerController extends Controller
 
         foreach ($rooms as $room) {
             $explode = explode('.', $room);
-            $section = $explode[0];
 
-            switch ($section) {
+            // section
+            switch ($explode[0]) {
                 case 'equipments':
                     if ($this->_user->can(Permissions::EQUIPMENTS_VIEW)) {
                         $filterRooms[] = $room;
@@ -106,6 +110,9 @@ class ListenerController extends Controller
                 case 'users':
                     if ($this->_user->can(Permissions::USERS_VIEW)) {
                         $filterRooms[] = $room;
+                    }
+                    if ($this->_user->can(Permissions::ROLES_VIEW)) {
+                        $filterRooms[] = $room.'.roles';
                     }
                     break;
                 case 'roles':
