@@ -44,7 +44,7 @@ class EquipmentFileController extends Controller
 
         return response()->json([
             'message' => __('app.files.files_get'),
-            'files' => $equipment->files,
+            'equipment_files' => $equipment->files,
         ]);
     }
 
@@ -75,13 +75,13 @@ class EquipmentFileController extends Controller
             return response()->json([
                 'message' => __('app.files.upload_error'),
                 'errors' => $filesHelper->getErrors(),
-                'files' => $uploadedFiles,
+                'equipment_files' => $uploadedFiles,
             ], 422);
         }
 
         return response()->json([
             'message' => __('app.files.upload_success'),
-            'files' => $uploadedFiles,
+            'equipment_files' => $uploadedFiles,
         ]);
     }
 
@@ -94,15 +94,15 @@ class EquipmentFileController extends Controller
      */
     public function show(int $equipmentId, int $fileId)
     {
-        $file = Equipment::findOrFail($equipmentId)
+        $equipmentFile = Equipment::findOrFail($equipmentId)
             ->files()
             ->findOrFail($fileId);
 
-        if (! Storage::exists($file->file)) {
+        if (! Storage::exists($equipmentFile->file)) {
             return response()->json(['message' => __('app.files.file_not_found')], 422);
         }
 
-        return Storage::download($file->file, $file->name . '.' . $file->ext);
+        return Storage::download($equipmentFile->file, $equipmentFile->name . '.' . $equipmentFile->ext);
     }
 
     /**
@@ -115,21 +115,21 @@ class EquipmentFileController extends Controller
      */
     public function update(FileRequest $request, int $equipmentId, int $fileId)
     {
-        $file = Equipment::findOrFail($equipmentId)
+        $equipmentFile = Equipment::findOrFail($equipmentId)
             ->files()
             ->findOrFail($fileId);
 
-        $file->name = $request->name;
+        $equipmentFile->name = $request->name;
 
-        if (! $file->save()) {
+        if (! $equipmentFile->save()) {
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
-        event(new EUpdate($equipmentId, $fileId, $file));
+        event(new EUpdate($equipmentId, $fileId, $equipmentFile));
 
         return response()->json([
             'message' => __('app.files.file_updated'),
-            'file' => $file,
+            'equipment_file' => $equipmentFile,
         ]);
     }
 
@@ -142,13 +142,13 @@ class EquipmentFileController extends Controller
      */
     public function destroy(int $equipmentId, int $fileId)
     {
-        $file = Equipment::findOrFail($equipmentId)
+        $equipmentFile = Equipment::findOrFail($equipmentId)
             ->files()
             ->findOrFail($fileId);
 
-        FileHelper::delete($file->file);
+        FileHelper::delete($equipmentFile->file);
 
-        if (! $file->delete()) {
+        if (! $equipmentFile->delete()) {
             return response()->json(['message' => __('app.database.destroy_error')], 422);
         }
 
