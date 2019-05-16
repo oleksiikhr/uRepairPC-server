@@ -98,7 +98,6 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => __('app.auth.logout'),
-            'asd' => JWTAuth::getPayload(),
         ]);
     }
 }
