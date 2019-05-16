@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-	<a href="https://github.com/uRepairPC/server" rel="nofollow"><img src="https://img.shields.io/github/tag/urepairpc/server.svg" alt="Tag"></a>
+	<a href="https://github.com/uRepairPC/server" rel="nofollow"><img src="https://img.shields.io/github/package-json/v/urepairpc/server.svg" alt="Tag"></a>
 	<a href="https://styleci.io/repos/152962669" rel="nofollow"><img src="https://styleci.io/repos/152962669/shield?branch=master" alt="StyleCI"></a>
 	<a href="https://github.com/uRepairPC/server" rel="nofollow"><img src="https://img.shields.io/github/license/urepairpc/server.svg" alt="License"></a>
 </p>
@@ -46,7 +46,7 @@ $ php artisan config:cache
 | [urepairpc-websocket] | ![urepairpc-websocket-status] | WebSocket Backend |
 
 [urepairpc-server]: https://github.com/uRepairPC/server
-[urepairpc-server-status]: https://img.shields.io/github/tag/urepairpc/server.svg
+[urepairpc-server-status]: https://img.shields.io/github/package-json/v/urepairpc/server.svg
 
 [urepairpc-web]: https://github.com/uRepairPC/web
 [urepairpc-web-status]: https://img.shields.io/github/package-json/v/urepairpc/web.svg
