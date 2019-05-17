@@ -8,9 +8,9 @@ use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Request as RequestModel;
 use Illuminate\Support\Facades\Auth;
-use App\Events\RequestComments\EUpdate;
 use App\Events\RequestComments\ECreate;
 use App\Events\RequestComments\EDelete;
+use App\Events\RequestComments\EUpdate;
 use App\Http\Requests\RequestCommentRequest;
 
 class RequestCommentController extends Controller
