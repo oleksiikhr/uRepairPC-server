@@ -94,5 +94,6 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         Route::apiResource('priorities', 'RequestPriorityController');
         Route::apiResource('types', 'RequestTypeController');
         Route::apiResource('{request}/files', 'RequestFileController');
+        Route::apiResource('{request}/comments', 'RequestCommentController');
     });
 });
