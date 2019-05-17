@@ -106,6 +106,11 @@ class Request extends Model
      * | -----------------------------------------------------------------------------------
      */
 
+    public function comments()
+    {
+        return $this->hasMany(RequestComment::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
