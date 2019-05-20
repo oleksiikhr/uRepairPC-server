@@ -185,6 +185,6 @@ class RequestCommentController extends Controller
      */
     private function hasPermissionForAction($commentUserId)
     {
-        return $this->_currentUser->can(Permissions::REQUESTS_EDIT) || $commentUserId !== $this->_currentUser->id;
+        return $this->_currentUser->can(Permissions::REQUESTS_EDIT) || $commentUserId === $this->_currentUser->id;
     }
 }
