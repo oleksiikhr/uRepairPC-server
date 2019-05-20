@@ -154,7 +154,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 Permissions::EQUIPMENTS_VIEW,
 
                 // Requests
-                Permissions::REQUESTS_VIEW,
+                Permissions::REQUESTS_CREATE,
             ]);
     }
 }
