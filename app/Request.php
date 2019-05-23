@@ -139,8 +139,7 @@ class Request extends Model
                 'users.first_name',
                 'users.last_name'
             )
-            ->leftJoin('users', 'users.id', '=', 'request_comments.user_id')
-            ->orderByDesc('id');
+            ->leftJoin('users', 'users.id', '=', 'request_comments.user_id');
     }
 
     public function files()

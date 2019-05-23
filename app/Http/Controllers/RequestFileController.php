@@ -198,6 +198,6 @@ class RequestFileController extends Controller
      */
     private function hasPermissionForAction($fileUserId)
     {
-        return $this->_currentUser->can(Permissions::REQUESTS_EDIT) || $fileUserId !== $this->_currentUser->id;
+        return $this->_currentUser->can(Permissions::REQUESTS_EDIT) || $fileUserId === $this->_currentUser->id;
     }
 }
