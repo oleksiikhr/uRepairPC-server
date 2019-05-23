@@ -37,7 +37,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Auth the user by login and email.
+     * Auth the user by login and password.
      *
      * @param  AuthRequest  $request
      * @return \Illuminate\Http\JsonResponse
