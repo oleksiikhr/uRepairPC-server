@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/uRepairPC/server/compare/v2.0.0...v2.1.0) (2019-05-26)
+
+
+### Bug Fixes
+
+* check permission for comment/file action ([11a1171](https://github.com/uRepairPC/server/commit/11a1171))
+* logout (invalidate token uncomment) ([177ea92](https://github.com/uRepairPC/server/commit/177ea92))
+* send events with roles (user edited), without permission ([fd44596](https://github.com/uRepairPC/server/commit/fd44596))
+* show requests for assign_id user ([1b2e4db](https://github.com/uRepairPC/server/commit/1b2e4db))
+* typo ([e1ffb19](https://github.com/uRepairPC/server/commit/e1ffb19))
+
+
+### Features
+
+* add request comments ([c6c63be](https://github.com/uRepairPC/server/commit/c6c63be))
+
+
+
 ## 2.0.0 (2019-05-16)
 
 
