@@ -37,7 +37,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Auth the user by login and email.
+     * Auth the user by login and password.
      *
      * @param  AuthRequest  $request
      * @return \Illuminate\Http\JsonResponse
@@ -94,11 +94,10 @@ class AuthController extends Controller
      */
     public function logout()
     {
-//        JWTAuth::invalidate(JWTAuth::getToken());
+        JWTAuth::invalidate(JWTAuth::getToken());
 
         return response()->json([
             'message' => __('app.auth.logout'),
-            'asd' => JWTAuth::getPayload(),
         ]);
     }
 }

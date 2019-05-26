@@ -42,6 +42,17 @@ return [
     ],
 
     /*
+     * RequestCommentController.
+     */
+    'request_comments' => [
+        'index' => 'Коментарії отримані',
+        'show' => 'Коментарій отриман',
+        'store' => 'Коментарій створений',
+        'update' => 'Коментарій оновлений',
+        'destroy' => 'Коментарій видалений',
+    ],
+
+    /*
      * UserController.
      */
     'users' => [

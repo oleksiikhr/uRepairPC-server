@@ -131,6 +131,17 @@ class Request extends Model
         return $this->belongsTo(RequestType::class);
     }
 
+    public function comments()
+    {
+        return $this->hasMany(RequestComment::class)
+            ->select(
+                'request_comments.*',
+                'users.first_name',
+                'users.last_name'
+            )
+            ->leftJoin('users', 'users.id', '=', 'request_comments.user_id');
+    }
+
     public function files()
     {
         return $this->belongsToMany(File::class, 'request_file')

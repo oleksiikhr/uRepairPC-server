@@ -81,7 +81,10 @@ class RequestController extends Controller
 
         // Without REQUESTS_VIEW permission - can see only own requests
         if (! $this->_currentUser->can(Permissions::REQUESTS_VIEW)) {
-            $query->where('user_id', $this->_currentUser->id);
+            $query->where(function ($query) {
+                $query->where('user_id', $this->_currentUser->id);
+                $query->orWhere('assign_id', $this->_currentUser->id);
+            });
         }
 
         // Search
