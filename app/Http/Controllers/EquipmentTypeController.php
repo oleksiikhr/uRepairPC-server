@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+use App\Enums\Perm;
 use App\EquipmentType;
-use App\Enums\Permissions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use App\Events\EquipmentTypes\ECreate;
 use App\Events\EquipmentTypes\EDelete;
 use App\Events\EquipmentTypes\EUpdate;
@@ -13,6 +15,11 @@ use App\Http\Requests\EquipmentTypeRequest;
 class EquipmentTypeController extends Controller
 {
     /**
+     * @var User
+     */
+    private $_user;
+
+    /**
      * Add middleware depends on user permissions.
      *
      * @param  Request  $request
@@ -20,12 +27,14 @@ class EquipmentTypeController extends Controller
      */
     public function permissions(Request $request): array
     {
+        $this->_user = auth()->user();
+
         return [
-            'index' => Permissions::EQUIPMENTS_CONFIG_VIEW,
-            'show' => Permissions::EQUIPMENTS_CONFIG_VIEW,
-            'store' => Permissions::EQUIPMENTS_CONFIG_CREATE,
-            'update' => Permissions::EQUIPMENTS_CONFIG_EDIT,
-            'destroy' => Permissions::EQUIPMENTS_CONFIG_DELETE,
+            'index' => Perm::EQUIPMENTS_CONFIG_VIEW,
+            'show' => Perm::EQUIPMENTS_CONFIG_VIEW,
+            'store' => Perm::EQUIPMENTS_CONFIG_CREATE,
+            'update' => [Perm::EQUIPMENTS_CONFIG_EDIT_OWN, Perm::EQUIPMENTS_CONFIG_EDIT_ALL],
+            'destroy' => [Perm::EQUIPMENTS_CONFIG_DELETE_OWN, Perm::EQUIPMENTS_CONFIG_DELETE_ALL],
         ];
     }
 
@@ -51,12 +60,13 @@ class EquipmentTypeController extends Controller
     {
         $equipmentType = new EquipmentType;
         $equipmentType->fill($request->all());
+        $equipmentType->user_id = $this->_user->id;
 
         if (! $equipmentType->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
-        event(new ECreate($equipmentType->toArray()));
+        event(new ECreate($equipmentType));
 
         return response()->json([
             'message' => __('app.equipment_type.store'),
@@ -90,10 +100,18 @@ class EquipmentTypeController extends Controller
     public function update(EquipmentTypeRequest $request, int $id)
     {
         $equipmentType = EquipmentType::findOrFail($id);
+
+        // Edit only own equipments config
+        if (! $this->_user->perm(Perm::EQUIPMENTS_CONFIG_EDIT_ALL) &&
+            Gate::denies('owner', $equipmentType)
+        ) {
+            return $this->responseNoPermission();
+        }
+
         $equipmentType->fill($request->all());
 
         if (! $equipmentType->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
         event(new EUpdate($id, $equipmentType));
@@ -112,8 +130,17 @@ class EquipmentTypeController extends Controller
      */
     public function destroy(int $id)
     {
-        if (! EquipmentType::destroy($id)) {
-            return response()->json(['message' => __('app.database.destroy_error')], 422);
+        $equipmentType = EquipmentType::findOrFail($id);
+
+        // Delete only own equipments config
+        if (! $this->_user->perm(Perm::EQUIPMENTS_CONFIG_DELETE_ALL) &&
+            Gate::denies('owner', $equipmentType)
+        ) {
+            return $this->responseNoPermission();
+        }
+
+        if (! $equipmentType->delete()) {
+            return $this->responseDatabaseDestroyError();
         }
 
         event(new EDelete($id));

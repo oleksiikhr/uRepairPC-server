@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Role;
 use App\User;
+use App\Enums\Perm;
 use App\Mail\EmailChange;
 use App\Mail\UserCreated;
-use App\Enums\Permissions;
+use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use App\Events\Users\EDelete;
 use App\Events\Users\EUpdate;
@@ -23,6 +25,11 @@ class UserController extends Controller
     private const FOLDER_AVATARS = 'users/avatars';
 
     /**
+     * @var User
+     */
+    private $_user;
+
+    /**
      * Add middleware depends on user permissions.
      *
      * @param  Request  $request
@@ -30,26 +37,36 @@ class UserController extends Controller
      */
     public function permissions(Request $request): array
     {
-        $requestId = (int) $request->user;
-        $isOwnProfile = $requestId === Auth::id();
+        $this->_user = auth()->user();
+
+        if (! $this->_user) {
+            $this->middleware('jwt.auth');
+            return [];
+        }
+
+        $requestId = (int) $request->route('user');
+        $isOwnProfile = $requestId === $this->_user->id;
+        $editPermissionProfile = $isOwnProfile
+            ? [Perm::PROFILE_EDIT, Perm::USERS_EDIT_ALL]
+            : Perm::USERS_EDIT_ALL;
 
         return [
-            // Basic CRUD
-            'index' => Permissions::USERS_VIEW,
-            'show' => $isOwnProfile ? null : Permissions::USERS_VIEW,
-            'update' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
-            'store' => Permissions::USERS_CREATE,
-            'delete' => $requestId === 1 || $isOwnProfile ? Permissions::DISABLE : Permissions::USERS_DELETE,
+            // CRUD
+            'index' => Perm::USERS_VIEW_ALL,
+            'show' => [$isOwnProfile, Perm::USERS_VIEW_ALL],
+            'update' => $editPermissionProfile,
+            'store' => Perm::USERS_CREATE,
+            'delete' => $requestId === 1 || $isOwnProfile ? Perm::DISABLE : Perm::USERS_DELETE_ALL,
 
             // Image
-            'showImage' => $isOwnProfile ? null : Permissions::USERS_VIEW,
-            'updateImage' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
-            'deleteImage' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
+            'showImage' => $isOwnProfile ? null : Perm::USERS_VIEW_ALL,
+            'updateImage' => $editPermissionProfile,
+            'deleteImage' => $editPermissionProfile,
 
             // Other
-            'updateEmail' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
-            'updatePassword' => $isOwnProfile ? Permissions::PROFILE_EDIT : Permissions::USERS_EDIT,
-            'updateRoles' => $requestId === 1 ? Permissions::DISABLE : Permissions::ROLES_MANAGE,
+            'updateEmail' => $editPermissionProfile,
+            'updatePassword' => $editPermissionProfile,
+            'updateRoles' => $requestId === 1 ? Perm::DISABLE : Perm::ROLES_EDIT_ALL,
         ];
     }
 
@@ -63,7 +80,7 @@ class UserController extends Controller
     {
         $query = User::query();
 
-        if (Auth::user()->can(Permissions::ROLES_VIEW)) {
+        if ($this->_user->perm(Perm::ROLES_VIEW_ALL)) {
             $query->with('roles');
         }
 
@@ -106,13 +123,13 @@ class UserController extends Controller
         $user->fill($request->all());
         $user->email = $request->email;
         $user->password = bcrypt($password);
-        $user->assignRole($defaultRoles);
+        $user->assignRolesById($defaultRoles->pluck('id'));
 
         if (! $user->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
-        Mail::to($user)->send(new UserCreated($password));
+        Mail::to($user)->send(new UserCreated($password)); // TODO Disable on APP_DEMO
 
         return response()->json([
             'message' => __('app.users.store'),
@@ -129,7 +146,7 @@ class UserController extends Controller
     public function show(int $id)
     {
         $user = User::findOrFail($id);
-        $user->permission_names = $user->getAllPermissions()->pluck('name');
+        $user->permissions = $user->getAllPermNames();
 
         return response()->json([
             'message' => __('app.users.show'),
@@ -150,10 +167,10 @@ class UserController extends Controller
         $user->fill($request->all());
 
         if (! $user->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
-        $eventData = array_add($request->all(), 'updated_at', $user->updated_at->toDateTimeString());
+        $eventData = Arr::add($request->all(), 'updated_at', $user->updated_at->toDateTimeString());
         event(new EUpdate($id, $eventData));
 
         return response()->json([
@@ -186,7 +203,7 @@ class UserController extends Controller
         }
 
         if (! $user->delete()) {
-            return response()->json(['message' => __('app.database.destroy_error')], 422);
+            return $this->responseDatabaseDestroyError();
         }
 
         event(new EDelete($id));
@@ -204,7 +221,7 @@ class UserController extends Controller
      */
     public function showImage(string $path)
     {
-        if (! starts_with($path, self::FOLDER_AVATARS.'/')) {
+        if (! Str::startsWith($path, self::FOLDER_AVATARS.'/')) {
             return response(null);
         }
 
@@ -231,12 +248,12 @@ class UserController extends Controller
         ]);
 
         $user = User::findOrFail($id);
-        $user->syncRoles($request->roles);
-        $user->permission_names = $user->getAllPermissions()->pluck('name');
+        $user->assignRolesById($request->roles);
+        $user->permissions = $user->getAllPermNames();
 
         event(new EUpdateRoles($id, [
             'roles' => $user->roles,
-            'permission_names' => $user->permission_names,
+            'permissions' => $user->permissions,
             'updated_at' => $user->updated_at->toDateTimeString(),
         ]));
 
@@ -260,14 +277,14 @@ class UserController extends Controller
         ]);
 
         $user = User::findOrFail($id);
-        Mail::to($user)->send(new EmailChange($request->email));
+        Mail::to($user)->send(new EmailChange($request->email)); // TODO Disable on APP_DEMO
         $user->email = $request->email;
 
         if (! $user->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
-        $eventData = array_add($request->all(), 'updated_at', $user->updated_at->toDateTimeString());
+        $eventData = Arr::add($request->all(), 'updated_at', $user->updated_at->toDateTimeString());
         event(new EUpdate($id, $eventData));
 
         return response()->json([
@@ -325,8 +342,7 @@ class UserController extends Controller
 
         if (! $user->save()) {
             FileHelper::delete($uploadedUri);
-
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
         event(new EUpdate($id, [
@@ -357,7 +373,7 @@ class UserController extends Controller
         $user->image = null;
 
         if (! $user->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
         event(new EUpdate($id, [
@@ -385,10 +401,10 @@ class UserController extends Controller
         $user->password = bcrypt($password);
 
         if (! $user->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
-        Mail::to($user)->send(new UserCreated($password));
+        Mail::to($user)->send(new UserCreated($password)); // TODO Disable on APP_DEMO
 
         return response()->json([
             'message' => __('app.users.password_email_changed'),
@@ -409,7 +425,7 @@ class UserController extends Controller
         $user->password = bcrypt($request->password);
 
         if (! $user->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
         return response()->json([

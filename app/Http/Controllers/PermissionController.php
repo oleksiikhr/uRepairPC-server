@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Permission;
-use App\Enums\Permissions;
+use App\Enums\Perm;
 use Illuminate\Http\Request;
-use App\Http\Requests\PermissionRequest;
 
 class PermissionController extends Controller
 {
@@ -18,24 +16,17 @@ class PermissionController extends Controller
     public function permissions(Request $request): array
     {
         return [
-            'index' => Permissions::ROLES_VIEW,
+            'index' => Perm::ROLES_VIEW_ALL,
         ];
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @param  PermissionRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(PermissionRequest $request)
+    public function index()
     {
-        $list = Permission::all();
-
-        if ($request->group) {
-            return response()->json($list->groupBy('section_name'));
-        }
-
-        return response()->json($list);
+        return response()->json(Perm::getStructure());
     }
 }

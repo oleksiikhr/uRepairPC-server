@@ -15,8 +15,8 @@ class CreateRequestCommentsTable extends Migration
     {
         Schema::create('request_comments', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('request_id');
-            $table->unsignedInteger('user_id');
+            $table->unsignedBigInteger('request_id');
+            $table->unsignedBigInteger('user_id');
             $table->text('message');
             $table->softDeletes();
             $table->timestamps();

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRequestStatusesTable extends Migration
+class CreateRoleUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,20 +13,16 @@ class CreateRequestStatusesTable extends Migration
      */
     public function up()
     {
-        Schema::create('request_statuses', function (Blueprint $table) {
-            $table->bigIncrements('id');
+        Schema::create('role_user', function (Blueprint $table) {
+            $table->unsignedBigInteger('role_id');
             $table->unsignedBigInteger('user_id');
-            $table->string('name')->unique();
-            $table->string('color', 10)->nullable();
-            $table->text('description')->nullable();
-            $table->boolean('default')->default(false);
-            $table->softDeletes();
-            $table->timestamps();
 
+            $table->foreign('role_id')->references('id')->on('roles')
+                ->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')
                 ->onDelete('cascade');
 
-            $table->index('user_id');
+            $table->primary(['role_id', 'user_id']);
         });
     }
 
@@ -37,6 +33,6 @@ class CreateRequestStatusesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('request_statuses');
+        Schema::dropIfExists('role_user');
     }
 }

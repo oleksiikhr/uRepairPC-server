@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateEquipmentManufacturersTable extends Migration
+class CreateRolePermissionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,16 @@ class CreateEquipmentManufacturersTable extends Migration
      */
     public function up()
     {
-        Schema::create('equipment_manufacturers', function (Blueprint $table) {
+        Schema::create('role_permissions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('user_id');
-            $table->string('name')->unique();
-            $table->text('description')->nullable();
-            $table->softDeletes();
+            $table->unsignedBigInteger('role_id');
+            $table->string('name');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')
+            $table->foreign('role_id')->references('id')->on('roles')
                 ->onDelete('cascade');
 
-            $table->index('user_id');
+            $table->index('role_id');
         });
     }
 
@@ -35,6 +33,6 @@ class CreateEquipmentManufacturersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('equipment_manufacturers');
+        Schema::dropIfExists('role_permissions');
     }
 }

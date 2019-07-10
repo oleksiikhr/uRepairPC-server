@@ -24,7 +24,7 @@ abstract class EUpdateBroadcast extends EBroadcast
     public function __construct(int $id, $data)
     {
         $this->id = $id;
-        $this->data = $data;
+        $this->data = $this->transformData($data);
     }
 
     /**

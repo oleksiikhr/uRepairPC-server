@@ -2,16 +2,16 @@
 
 namespace App;
 
-use App\Enums\Permissions;
-use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\Traits\HasRoles;
+use App\Enums\Perm;
+use Illuminate\Support\Str;
+use App\Traits\ModelHasPermissions;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use SoftDeletes, HasRoles;
+    use SoftDeletes, ModelHasPermissions;
 
     protected $guard_name = 'api';
 
@@ -82,7 +82,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return array
      */
-    public function getJWTCustomClaims()
+    public function getJWTCustomClaims(): array
     {
         return [];
     }
@@ -92,15 +92,21 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
-        $user = Auth::user();
+        $user = auth()->user();
 
-        // Only with Permissions::ROLES_VIEW can see roles or for profile
-        if (! $user->can(Permissions::ROLES_VIEW) && $user->id !== $this->id) {
-            $this->makeHidden('roles');
-            $this->makeHidden('permissions');
-            $this->makeHidden('permission_names');
+        if ($this->id !== $user->id) {
+            if (! $user->perm(Perm::ROLES_VIEW_ALL)) {
+                $this->makeHidden('roles');
+                $this->makeHidden('permissions');
+            }
+            if (! $user->perm(Perm::USERS_HIDE_EMAIL)) {
+                $this->makeHidden('email');
+            }
+            if (! $user->perm(Perm::USERS_HIDE_PHONE)) {
+                $this->makeHidden('phone');
+            }
         }
 
         return parent::toArray();
@@ -109,9 +115,9 @@ class User extends Authenticatable implements JWTSubject
     /**
      * @return string
      */
-    public static function generateRandomStrPassword()
+    public static function generateRandomStrPassword(): string
     {
-        return str_random(self::RANDOM_PASSWORD_LEN);
+        return Str::random(self::RANDOM_PASSWORD_LEN);
     }
 
     /* | -----------------------------------------------------------------------------------
@@ -127,5 +133,10 @@ class User extends Authenticatable implements JWTSubject
     public function requestComments()
     {
         return $this->hasMany(RequestComment::class);
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
     }
 }

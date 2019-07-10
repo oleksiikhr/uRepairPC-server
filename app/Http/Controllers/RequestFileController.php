@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
-use App\Enums\Permissions;
+use App\Enums\Perm;
 use Illuminate\Http\Request;
 use App\Http\Helpers\FileHelper;
 use App\Request as RequestModel;
@@ -12,7 +12,7 @@ use App\Http\Requests\FileRequest;
 use App\Events\RequestFiles\ECreate;
 use App\Events\RequestFiles\EDelete;
 use App\Events\RequestFiles\EUpdate;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class RequestFileController extends Controller
@@ -20,12 +20,12 @@ class RequestFileController extends Controller
     /**
      * @var RequestModel
      */
-    private $_requestModel;
+    private $_request;
 
     /**
      * @var User
      */
-    private $_currentUser;
+    private $_user;
 
     /**
      * Add middleware depends on user permissions.
@@ -35,32 +35,28 @@ class RequestFileController extends Controller
      */
     public function permissions(Request $request): array
     {
-        if (! Auth::check()) {
-            $this->middleware('jwt.auth');
+        $this->_user = auth()->user();
 
+        if (! $this->_user) {
+            $this->middleware('jwt.auth');
             return [];
         }
 
         $requestId = (int) $request->route('request');
-        $this->_currentUser = Auth::user();
+        $this->_request = RequestModel::findOrFail($requestId);
 
-        if ($requestId) {
-            $this->_requestModel = RequestModel::findOrFail($requestId);
-
-            // If user created this request or assign
-            if ($this->_requestModel->user_id === $this->_currentUser->id ||
-                $this->_requestModel->assign_id === $this->_currentUser->id
-            ) {
-                return [];
-            }
+        // Permissions on request before get a files
+        if (! RequestModel::hasAccessByPerm($this->_request, $this->_user)) {
+            $this->middleware('permission:disable');
+            return [];
         }
 
         return [
-            'index' => Permissions::REQUESTS_VIEW,
-            'show' => Permissions::REQUESTS_VIEW,
-            'store' => Permissions::REQUESTS_EDIT,
-            'update' => Permissions::REQUESTS_EDIT,
-            'destroy' => Permissions::REQUESTS_EDIT,
+            'index' => [Perm::REQUESTS_FILES_VIEW_OWN, Perm::REQUESTS_FILES_VIEW_ALL],
+            'show' => [Perm::REQUESTS_FILES_VIEW_OWN, Perm::REQUESTS_FILES_VIEW_ALL],
+            'store' => Perm::REQUESTS_FILES_CREATE,
+            'update' => [Perm::REQUESTS_FILES_EDIT_OWN, Perm::REQUESTS_FILES_EDIT_ALL],
+            'destroy' => [Perm::REQUESTS_FILES_DELETE_OWN, Perm::REQUESTS_FILES_DELETE_ALL],
         ];
     }
 
@@ -72,9 +68,15 @@ class RequestFileController extends Controller
      */
     public function index(int $requestId)
     {
+        $requestFiles = $this->_request->files();
+
+        if (! $this->_user->perm(Perm::REQUESTS_FILES_VIEW_ALL)) {
+            $requestFiles->where('user_id', $this->_user->id);
+        }
+
         return response()->json([
             'message' => __('app.files.files_get'),
-            'request_files' => $this->_requestModel->files,
+            'request_files' => $requestFiles->get(),
         ]);
     }
 
@@ -93,11 +95,11 @@ class RequestFileController extends Controller
         $filesHelper->upload('requests/'.$requestId);
 
         $uploadedIds = $filesHelper->getUploadedIds();
-        $this->_requestModel->files()->attach($uploadedIds);
-        $uploadedFiles = $this->_requestModel->files()->whereIn('files.id', $uploadedIds)->get();
+        $this->_request->files()->attach($uploadedIds);
+        $uploadedFiles = $this->_request->files()->whereIn('files.id', $uploadedIds)->get();
 
         if (count($uploadedFiles)) {
-            event(new ECreate($requestId, $uploadedFiles->toArray()));
+            event(new ECreate($requestId, $uploadedFiles));
         }
 
         if ($filesHelper->hasErrors()) {
@@ -123,7 +125,14 @@ class RequestFileController extends Controller
      */
     public function show(int $requestId, int $fileId)
     {
-        $requestFile = $this->_requestModel->files()->findOrFail($fileId);
+        $requestFile = $this->_request->files()->findOrFail($fileId);
+
+        // Show only own file
+        if (! $this->_user->perm(Perm::REQUESTS_FILES_VIEW_ALL) &&
+            Gate::denies('owner', $requestFile)
+        ) {
+            return $this->responseNoPermission();
+        }
 
         if (! Storage::exists($requestFile->file)) {
             return response()->json(['message' => __('app.files.file_not_found')], 422);
@@ -142,15 +151,19 @@ class RequestFileController extends Controller
      */
     public function update(FileRequest $request, int $requestId, int $fileId)
     {
-        $requestFile = $this->_requestModel->files()->findOrFail($fileId);
-        $requestFile->name = $request->name;
+        $requestFile = $this->_request->files()->findOrFail($fileId);
 
-        if (! $this->hasPermissionForAction($requestFile->user_id)) {
-            return response()->json(['message' => __('app.middleware.no_permission')], 422);
+        // Edit only own file
+        if (! $this->_user->perm(Perm::REQUESTS_FILES_EDIT_ALL) &&
+            Gate::denies('owner', $requestFile)
+        ) {
+            return $this->responseNoPermission();
         }
 
+        $requestFile->name = $request->name;
+
         if (! $requestFile->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
         event(new EUpdate($requestId, $fileId, $requestFile));
@@ -171,16 +184,19 @@ class RequestFileController extends Controller
      */
     public function destroy(int $requestId, int $fileId)
     {
-        $requestFile = $this->_requestModel->files()->findOrFail($fileId);
+        $requestFile = $this->_request->files()->findOrFail($fileId);
 
-        if (! $this->hasPermissionForAction($requestFile->user_id)) {
-            return response()->json(['message' => __('app.middleware.no_permission')], 422);
+        // Delete only own file
+        if (! $this->_user->perm(Perm::REQUESTS_FILES_DELETE_ALL) &&
+            Gate::denies('owner', $requestFile)
+        ) {
+            return $this->responseNoPermission();
         }
 
         FileHelper::delete($requestFile->file);
 
         if (! $requestFile->delete()) {
-            return response()->json(['message' => __('app.database.destroy_error')], 422);
+            return $this->responseDatabaseDestroyError();
         }
 
         event(new EDelete($requestId, $fileId));
@@ -188,16 +204,5 @@ class RequestFileController extends Controller
         return response()->json([
             'message' => __('app.files.file_destroyed'),
         ]);
-    }
-
-    /**
-     * Only author of file or with REQUESTS_EDIT permission can update/delete.
-     *
-     * @param  int  $fileUserId
-     * @return bool
-     */
-    private function hasPermissionForAction($fileUserId)
-    {
-        return $this->_currentUser->can(Permissions::REQUESTS_EDIT) || $fileUserId === $this->_currentUser->id;
     }
 }

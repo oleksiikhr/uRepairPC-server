@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\Stat;
 
-use App\Enums\Permissions;
+use App\Enums\Perm;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Json\ManifestFile;
 use App\Http\Helpers\FileHelper;
@@ -27,7 +28,7 @@ class ManifestController extends Controller
     public function permissions(Request $request): array
     {
         return [
-            'store' => Permissions::GLOBAL_MANIFEST,
+            'store' => Perm::GLOBAL_MANIFEST_EDIT,
         ];
     }
 
@@ -79,7 +80,7 @@ class ManifestController extends Controller
         // Remove files
         if ($existsIcons && $existsRemoveIcons) {
             foreach ($data['remove_icons'] as $key => $value) {
-                $srcCut = str_after($value, 'storage/');
+                $srcCut = Str::after($value, 'storage/');
                 $findIndexBySrc = collect($data['icons'])
                     ->search(function ($item, $key) use ($srcCut) {
                         return $item->src === $srcCut;

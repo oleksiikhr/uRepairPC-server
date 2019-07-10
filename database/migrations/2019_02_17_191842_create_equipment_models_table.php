@@ -14,20 +14,23 @@ class CreateEquipmentModelsTable extends Migration
     public function up()
     {
         Schema::create('equipment_models', function (Blueprint $table) {
-            $table->increments('id');
-            $table->unsignedInteger('type_id');
-            $table->unsignedInteger('manufacturer_id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('type_id');
+            $table->unsignedBigInteger('manufacturer_id');
             $table->string('name');
             $table->text('description')->nullable();
             $table->softDeletes();
             $table->timestamps();
 
+            $table->foreign('user_id')->references('id')->on('users')
+                ->onDelete('cascade');
             $table->foreign('type_id')->references('id')->on('equipment_types')
                 ->onDelete('cascade');
             $table->foreign('manufacturer_id')->references('id')->on('equipment_manufacturers')
                 ->onDelete('cascade');
 
-            $table->index(['type_id', 'manufacturer_id']);
+            $table->index('user_id');
         });
     }
 

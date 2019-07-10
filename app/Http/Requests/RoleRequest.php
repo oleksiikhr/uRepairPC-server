@@ -47,7 +47,7 @@ class RoleRequest extends FormRequest
 
         // Store
         if ($request->method === Request::METHOD_POST) {
-            $rules['name'] = 'required|'.$rules['name'];
+            $rules['name'] = 'required|'.$rules['name'].'|unique:roles,name';
         }
 
         return $rules;

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+use App\Enums\Perm;
 use App\RequestPriority;
-use App\Enums\Permissions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use App\Events\RequestPriorities\ECreate;
 use App\Events\RequestPriorities\EDelete;
 use App\Events\RequestPriorities\EUpdate;
@@ -13,6 +15,11 @@ use App\Http\Requests\RequestPriorityRequest;
 class RequestPriorityController extends Controller
 {
     /**
+     * @var User
+     */
+    private $_user;
+
+    /**
      * Add middleware depends on user permissions.
      *
      * @param  Request  $request
@@ -20,12 +27,14 @@ class RequestPriorityController extends Controller
      */
     public function permissions(Request $request): array
     {
+        $this->_user = auth()->user();
+
         return [
-            'index' => Permissions::REQUESTS_CONFIG_VIEW,
-            'show' => Permissions::REQUESTS_CONFIG_VIEW,
-            'store' => Permissions::REQUESTS_CONFIG_CREATE,
-            'update' => Permissions::REQUESTS_CONFIG_EDIT,
-            'destroy' => Permissions::REQUESTS_CONFIG_DELETE,
+            'index' => Perm::REQUESTS_CONFIG_VIEW,
+            'show' => Perm::REQUESTS_CONFIG_VIEW,
+            'store' => Perm::REQUESTS_CONFIG_CREATE,
+            'update' => [Perm::REQUESTS_CONFIG_EDIT_OWN, Perm::REQUESTS_CONFIG_EDIT_ALL],
+            'destroy' => [Perm::REQUESTS_CONFIG_DELETE_OWN, Perm::REQUESTS_CONFIG_DELETE_ALL],
         ];
     }
 
@@ -51,13 +60,14 @@ class RequestPriorityController extends Controller
     {
         $requestPriority = new RequestPriority;
         $requestPriority->fill($request->all());
+        $requestPriority->user_id = $this->_user->id;
 
-        if ($request->has('default') && $request->default) {
+        if ($request->default) {
             RequestPriority::clearDefaultValues();
         }
 
         if (! $requestPriority->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
         event(new ECreate($requestPriority));
@@ -95,6 +105,13 @@ class RequestPriorityController extends Controller
     {
         $requestPriority = RequestPriority::findOrFail($id);
 
+        // Edit only own requests config
+        if (! $this->_user->perm(Perm::REQUESTS_CONFIG_EDIT_ALL) &&
+            Gate::denies('owner', $requestPriority)
+        ) {
+            return $this->responseNoPermission();
+        }
+
         if ($request->has('default') && $request->default !== $requestPriority->default) {
             if (! $request->default) {
                 return response()->json(['message' => __('app.request_priority.update_default')], 422);
@@ -106,7 +123,7 @@ class RequestPriorityController extends Controller
         $requestPriority->fill($request->all());
 
         if (! $requestPriority->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
         event(new EUpdate($id, $requestPriority));
@@ -127,12 +144,19 @@ class RequestPriorityController extends Controller
     {
         $requestPriority = RequestPriority::findOrFail($id);
 
+        // Delete only own requests config
+        if (! $this->_user->perm(Perm::REQUESTS_CONFIG_DELETE_ALL) &&
+            Gate::denies('owner', $requestPriority)
+        ) {
+            return $this->responseNoPermission();
+        }
+
         if ($requestPriority->default) {
             return response()->json(['message' => __('app.request_priority.destroy_default')], 422);
         }
 
         if (! RequestPriority::destroy($id)) {
-            return response()->json(['message' => __('app.database.destroy_error')], 422);
+            return $this->responseDatabaseDestroyError();
         }
 
         event(new EDelete($id));

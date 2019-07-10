@@ -4,7 +4,6 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Validation\ValidationException;
-use Spatie\Permission\Exceptions\UnauthorizedException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
@@ -62,12 +61,6 @@ class Handler extends ExceptionHandler
             return response()->json([
                 'message' => __('exception.unauthorized_http'),
             ], 401);
-        }
-
-        if ($exception instanceof UnauthorizedException) {
-            return response()->json([
-                'message' => __('exception.unauthorized'),
-            ], 403);
         }
 
         return parent::render($request, $exception);

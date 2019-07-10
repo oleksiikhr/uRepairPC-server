@@ -14,8 +14,8 @@ class CreateEquipmentFileTable extends Migration
     public function up()
     {
         Schema::create('equipment_file', function (Blueprint $table) {
-            $table->unsignedInteger('equipment_id');
-            $table->unsignedInteger('file_id');
+            $table->unsignedBigInteger('equipment_id');
+            $table->unsignedBigInteger('file_id');
 
             $table->foreign('equipment_id')->references('id')->on('equipments')
                 ->onDelete('cascade');

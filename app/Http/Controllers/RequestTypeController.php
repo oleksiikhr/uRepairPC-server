@@ -2,16 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+use App\Enums\Perm;
 use App\RequestType;
-use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Events\RequestTypes\ECreate;
 use App\Events\RequestTypes\EDelete;
 use App\Events\RequestTypes\EUpdate;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\RequestTypeRequest;
 
 class RequestTypeController extends Controller
 {
+    /**
+     * @var User
+     */
+    private $_user;
+
     /**
      * Add middleware depends on user permissions.
      *
@@ -20,12 +27,14 @@ class RequestTypeController extends Controller
      */
     public function permissions(Request $request): array
     {
+        $this->_user = auth()->user();
+
         return [
-            'index' => Permissions::REQUESTS_CONFIG_VIEW,
-            'show' => Permissions::REQUESTS_CONFIG_VIEW,
-            'store' => Permissions::REQUESTS_CONFIG_CREATE,
-            'update' => Permissions::REQUESTS_CONFIG_EDIT,
-            'destroy' => Permissions::REQUESTS_CONFIG_DELETE,
+            'index' => Perm::REQUESTS_CONFIG_VIEW,
+            'show' => Perm::REQUESTS_CONFIG_VIEW,
+            'store' => Perm::REQUESTS_CONFIG_CREATE,
+            'update' => [Perm::REQUESTS_CONFIG_EDIT_OWN, Perm::REQUESTS_CONFIG_EDIT_ALL],
+            'destroy' => [Perm::REQUESTS_CONFIG_DELETE_OWN, Perm::REQUESTS_CONFIG_DELETE_ALL],
         ];
     }
 
@@ -51,13 +60,14 @@ class RequestTypeController extends Controller
     {
         $requestType = new RequestType;
         $requestType->fill($request->all());
+        $requestType->user_id = $this->_user->id;
 
-        if ($request->has('default') && $request->default) {
+        if ($request->default) {
             RequestType::clearDefaultValues();
         }
 
         if (! $requestType->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
         event(new ECreate($requestType));
@@ -95,6 +105,13 @@ class RequestTypeController extends Controller
     {
         $requestType = RequestType::findOrFail($id);
 
+        // Edit only own requests config
+        if (! $this->_user->perm(Perm::REQUESTS_CONFIG_EDIT_ALL) &&
+            Gate::denies('owner', $requestType)
+        ) {
+            return $this->responseNoPermission();
+        }
+
         if ($request->has('default') && $request->default !== $requestType->default) {
             if (! $request->default) {
                 return response()->json(['message' => __('app.request_type.update_default')], 422);
@@ -106,7 +123,7 @@ class RequestTypeController extends Controller
         $requestType->fill($request->all());
 
         if (! $requestType->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
         event(new EUpdate($id, $requestType));
@@ -127,12 +144,19 @@ class RequestTypeController extends Controller
     {
         $requestType = RequestType::findOrFail($id);
 
+        // Delete only own requests config
+        if (! $this->_user->perm(Perm::REQUESTS_CONFIG_DELETE_ALL) &&
+            Gate::denies('owner', $requestType)
+        ) {
+            return $this->responseNoPermission();
+        }
+
         if ($requestType->default) {
             return response()->json(['message' => __('app.request_type.destroy_default')], 422);
         }
 
         if (! RequestType::destroy($id)) {
-            return response()->json(['message' => __('app.database.destroy_error')], 422);
+            return $this->responseDatabaseDestroyError();
         }
 
         event(new EDelete($id));

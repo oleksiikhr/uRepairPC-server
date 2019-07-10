@@ -2,15 +2,15 @@
 
 namespace App;
 
-use Spatie\Permission\Models\Role as SpatieRole;
+use App\Enums\Perm;
+use Illuminate\Database\Eloquent\Model;
 
-class Role extends SpatieRole
+class Role extends Model
 {
     /** @var array */
     const ALLOW_COLUMNS_SEARCH = [
         'id',
         'name',
-        'guard_name',
         'default',
         'updated_at',
         'created_at',
@@ -20,7 +20,6 @@ class Role extends SpatieRole
     const ALLOW_COLUMNS_SORT = [
         'id',
         'name',
-        'guard_name',
         'default',
         'updated_at',
         'created_at',
@@ -53,14 +52,50 @@ class Role extends SpatieRole
      */
     public function toArray()
     {
+        $permissionsList = (object) [];
+        $permissionsActive = [];
+
         if (! empty($this->permissions)) {
-            if (count($this->permissions) > 0) {
-                $this->setAttribute('permissions_grouped', $this->permissions->groupBy('section_name'));
-            } else {
-                $this->setAttribute('permissions_grouped', (object) []);
+            $permissions = $this->permissions->pluck('name')->toArray();
+
+            foreach (Perm::getStructure() as $key => $arr) {
+                $temp = [];
+                foreach ($arr as $permission => $action) {
+                    $active = in_array($permission, $permissions);
+
+                     $temp[] = (object) [
+                         'name' => $permission,
+                         'action' => $action,
+                         'active' => $active,
+                     ];
+
+                     if ($active) {
+                         $permissionsActive[] = $permission;
+                     }
+                }
+                $permissionsList->{$key} = $temp;
             }
         }
 
+        $this->setAttribute('permissions_list', $permissionsList);
+        $this->setAttribute('permissions_active', $permissionsActive);
+        $this->makeHidden('permissions');
+
         return parent::toArray();
+    }
+
+    /* | -----------------------------------------------------------------------------------
+     * | Relationships
+     * | -----------------------------------------------------------------------------------
+     */
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
+
+    public function permissions()
+    {
+        return $this->hasMany(RolePermission::class);
     }
 }

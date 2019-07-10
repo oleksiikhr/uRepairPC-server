@@ -19,13 +19,13 @@ class UsersTableSeeder extends Seeder
             'password' => '$2y$10$wUVz4ckveO.3O4Qvbuik/.fleI13a/VxQmeSEbPwaqZ8GbdLedmNC', // admin123
         ]);
 
-        $user->assignRole(__('roles_and_permissions.roles.admins'));
+        $user->assignRolesById(1); // Admin
 
         if (config('app.env') === 'local') {
             factory(App\User::class, 70)
                 ->create()
                 ->each(function ($user) {
-                    $user->assignRole(__('roles_and_permissions.roles.users'));
+                    $user->assignRolesById(2); // User
                 });
         }
     }

@@ -3,29 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Enums\Perm;
 use App\RequestType;
 use App\RequestStatus;
 use App\RequestPriority;
-use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Events\Requests\EDelete;
 use App\Events\Requests\EUpdate;
 use App\Request as RequestModel;
 use App\Http\Helpers\FilesHelper;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\RequestRequest;
 
 class RequestController extends Controller
 {
     /**
-     * @var RequestModel
-     */
-    private $_requestModel;
-
-    /**
      * @var User
      */
-    private $_currentUser;
+    private $_user;
 
     /**
      * Add middleware depends on user permissions.
@@ -35,38 +29,15 @@ class RequestController extends Controller
      */
     public function permissions(Request $request): array
     {
-        if (! Auth::check()) {
-            $this->middleware('jwt.auth');
+        $this->_user = auth()->user();
 
-            return [];
-        }
-
-        $permissions = [
-            'show' => Permissions::REQUESTS_VIEW,
-            'store' => Permissions::REQUESTS_CREATE,
-            'update' => Permissions::REQUESTS_EDIT,
-            'destroy' => Permissions::REQUESTS_DELETE,
+        return [
+            'index' => [Perm::REQUESTS_VIEW_OWN, Perm::REQUESTS_VIEW_ALL, Perm::REQUESTS_VIEW_ASSIGN],
+            'show' => [Perm::REQUESTS_VIEW_OWN, Perm::REQUESTS_VIEW_ALL, Perm::REQUESTS_VIEW_ASSIGN],
+            'store' => Perm::REQUESTS_CREATE,
+            'update' => [Perm::REQUESTS_EDIT_OWN, Perm::REQUESTS_EDIT_ALL, Perm::REQUESTS_EDIT_ASSIGN],
+            'destroy' => [Perm::REQUESTS_DELETE_OWN, Perm::REQUESTS_DELETE_ALL, Perm::REQUESTS_DELETE_ASSIGN],
         ];
-
-        $requestId = (int) $request->route('request');
-        $this->_currentUser = Auth::user();
-
-        if ($requestId) {
-            $this->_requestModel = RequestModel::findOrFail($requestId);
-
-            // If user created this request
-            if ($this->_requestModel->user_id === $this->_currentUser->id) {
-                unset($permissions['show']);
-            }
-
-            // If user assign to request, disable some permissions for access
-            if ($this->_requestModel->assign_id === $this->_currentUser->id) {
-                unset($permissions['show']);
-                unset($permissions['update']);
-            }
-        }
-
-        return $permissions;
     }
 
     /**
@@ -78,14 +49,6 @@ class RequestController extends Controller
     public function index(RequestRequest $request)
     {
         $query = RequestModel::querySelectJoins();
-
-        // Without REQUESTS_VIEW permission - can see only own requests
-        if (! $this->_currentUser->can(Permissions::REQUESTS_VIEW)) {
-            $query->where(function ($query) {
-                $query->where('user_id', $this->_currentUser->id);
-                $query->orWhere('assign_id', $this->_currentUser->id);
-            });
-        }
 
         // Search
         if ($request->has('search') && $request->has('columns') && ! empty($request->columns)) {
@@ -113,6 +76,9 @@ class RequestController extends Controller
             $query->where('requests.type_id', $request->type_id);
         }
 
+        // Check permissions
+        RequestModel::buildQueryByPerm($query, $this->_user);
+
         $list = $query->paginate(self::PAGINATE_DEFAULT);
 
         return response()->json($list);
@@ -127,14 +93,14 @@ class RequestController extends Controller
     public function store(RequestRequest $request)
     {
         $requestModel = new RequestModel;
-        $requestModel->user_id = $this->_currentUser->id;
+        $requestModel->fill($request->all());
+        $requestModel->user_id = $this->_user->id;
         $requestModel->type_id = RequestType::getDefaultValue()->id;
         $requestModel->priority_id = RequestPriority::getDefaultValue()->id;
         $requestModel->status_id = RequestStatus::getDefaultValue()->id;
-        $requestModel->fill($request->all());
 
         if (! $requestModel->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
         return response()->json([
@@ -151,11 +117,15 @@ class RequestController extends Controller
      */
     public function show(int $id)
     {
-        $request = RequestModel::querySelectJoins()->findOrFail($id);
+        $requestModel = RequestModel::querySelectJoins()->findOrFail($id);
+
+        if (! RequestModel::hasAccessByPerm($requestModel, $this->_user)) {
+            return $this->responseNoPermission();
+        }
 
         return response()->json([
             'message' => __('app.requests.show'),
-            'request' => $request,
+            'request' => $requestModel,
         ]);
     }
 
@@ -168,29 +138,38 @@ class RequestController extends Controller
      */
     public function update(RequestRequest $request, int $id)
     {
-        $this->_requestModel->fill($request->all());
-        $canSeeConfig = $this->_currentUser->can(Permissions::REQUESTS_CONFIG_VIEW);
+        $requestModel = RequestModel::findOrFail($id);
+
+        if (! RequestModel::hasAccessByPerm($requestModel, $this->_user)) {
+            return $this->responseNoPermission();
+        }
+
+        $requestModel->fill($request->all());
 
         // Only user, who can edit every request - can assign user to request
-        if ($request->has('assign_id') && $this->_currentUser->can(Permissions::REQUESTS_EDIT)) {
-            $this->_requestModel->assign_id = $request->assign_id;
-        }
-        if ($request->has('type_id') && $canSeeConfig) {
-            $this->_requestModel->type_id = $request->type_id;
-        }
-        if ($request->has('priority_id') && $canSeeConfig) {
-            $this->_requestModel->priority_id = $request->priority_id;
-        }
-        if ($request->has('status_id') && $canSeeConfig) {
-            $this->_requestModel->status_id = $request->status_id;
+        if ($request->has('assign_id') && $this->_user->perm(Perm::REQUESTS_EDIT_ALL)) {
+            $requestModel->assign_id = $request->assign_id;
         }
 
-        if (! $this->_requestModel->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+        // Config attributes
+        if ($this->_user->perm(Perm::REQUESTS_CONFIG_VIEW)) {
+            if ($request->has('type_id')) {
+                $requestModel->type_id = $request->type_id;
+            }
+            if ($request->has('priority_id')) {
+                $requestModel->priority_id = $request->priority_id;
+            }
+            if ($request->has('status_id')) {
+                $requestModel->status_id = $request->status_id;
+            }
+        }
+
+        if (! $requestModel->save()) {
+            return $this->responseDatabaseSaveError();
         }
 
         $request = RequestModel::querySelectJoins()->findOrFail($id);
-        event(new EUpdate($id, $request->toArray()));
+        event(new EUpdate($id, $request));
 
         return response()->json([
             'message' => __('app.requests.update'),
@@ -208,17 +187,23 @@ class RequestController extends Controller
      */
     public function destroy(RequestRequest $request, int $id)
     {
+        $requestModel = RequestModel::findOrFail($id);
+
+        if (! RequestModel::hasAccessByPerm($requestModel, $this->_user)) {
+            return $this->responseNoPermission();
+        }
+
         // Destroy files
         if ($request->files_delete) {
-            $isSuccess = FilesHelper::delete($this->_requestModel->files);
+            $isSuccess = FilesHelper::delete($requestModel->files);
 
             if (! $isSuccess) {
-                return response()->json(['message' => __('app.files.files_not_deleted')]);
+                return response()->json(['message' => __('app.files.files_not_deleted')], 422);
             }
         }
 
-        if (! $this->_requestModel->delete()) {
-            return response()->json(['message' => __('app.database.destroy_error')], 422);
+        if (! $requestModel->delete()) {
+            return $this->responseDatabaseDestroyError();
         }
 
         event(new EDelete($id));

@@ -2,16 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use App\Equipment;
-use App\Enums\Permissions;
+use App\Enums\Perm;
 use Illuminate\Http\Request;
 use App\Http\Helpers\FilesHelper;
 use App\Events\Equipments\EDelete;
 use App\Events\Equipments\EUpdate;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\EquipmentRequest;
 
 class EquipmentController extends Controller
 {
+    /**
+     * @var User
+     */
+    private $_user;
+
     /**
      * Add middleware depends on user permissions.
      *
@@ -20,12 +27,14 @@ class EquipmentController extends Controller
      */
     public function permissions(Request $request): array
     {
+        $this->_user = auth()->user();
+
         return [
-            'index' => Permissions::EQUIPMENTS_VIEW,
-            'show' => Permissions::EQUIPMENTS_VIEW,
-            'store' => Permissions::EQUIPMENTS_CREATE,
-            'update' => Permissions::EQUIPMENTS_EDIT,
-            'destroy' => Permissions::EQUIPMENTS_DELETE,
+            'index' => [Perm::EQUIPMENTS_VIEW_ALL, Perm::EQUIPMENTS_VIEW_OWN],
+            'show' => [Perm::EQUIPMENTS_VIEW_ALL, Perm::EQUIPMENTS_VIEW_OWN],
+            'store' => Perm::EQUIPMENTS_CREATE,
+            'update' => [Perm::EQUIPMENTS_EDIT_ALL, Perm::EQUIPMENTS_EDIT_OWN],
+            'destroy' => [Perm::EQUIPMENTS_DELETE_ALL, Perm::EQUIPMENTS_DELETE_OWN],
         ];
     }
 
@@ -51,6 +60,11 @@ class EquipmentController extends Controller
             $query->orderBy($request->sortColumn, $request->sortOrder === 'descending' ? 'desc' : 'asc');
         }
 
+        // Show only own equipments
+        if (! $this->_user->perm(Perm::EQUIPMENTS_VIEW_ALL)) {
+            $query->where('user_id', $this->_user->id);
+        }
+
         $list = $query->paginate(self::PAGINATE_DEFAULT);
 
         return response()->json($list);
@@ -66,6 +80,7 @@ class EquipmentController extends Controller
     {
         $equipment = new Equipment;
         $equipment->fill($request->all());
+        $equipment->user_id = auth()->id();
 
         if (! $equipment->save()) {
             return response()->json(['message' => __('app.database.save_error')], 422);
@@ -87,6 +102,11 @@ class EquipmentController extends Controller
     {
         $equipment = Equipment::querySelectJoins()->findOrFail($id);
 
+        // Show only own equipments
+        if (! $this->_user->perm(Perm::EQUIPMENTS_VIEW_ALL) && Gate::denies('owner', $equipment)) {
+            return $this->responseNoPermission();
+        }
+
         return response()->json([
             'message' => __('app.equipments.show'),
             'equipment' => $equipment,
@@ -103,14 +123,21 @@ class EquipmentController extends Controller
     public function update(EquipmentRequest $request, int $id)
     {
         $equipment = Equipment::findOrFail($id);
+
+        // Edit only own equipments
+        if (! $this->_user->perm(Perm::EQUIPMENTS_EDIT_ALL) && Gate::denies('owner', $equipment)) {
+            return $this->responseNoPermission();
+        }
+
         $equipment->fill($request->all());
 
         if (! $equipment->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
+        // Update model new data from relationship
         $equipment = Equipment::querySelectJoins()->find($equipment->id);
-        event(new EUpdate($id, $equipment->toArray()));
+        event(new EUpdate($id, $equipment));
 
         return response()->json([
             'message' => __('app.equipments.update'),
@@ -129,16 +156,21 @@ class EquipmentController extends Controller
     {
         $equipment = Equipment::findOrFail($id);
 
+        // Delete only own equipments
+        if (! $this->_user->perm(Perm::EQUIPMENTS_DELETE_ALL) && Gate::denies('owner', $equipment)) {
+            return $this->responseNoPermission();
+        }
+
         if ($request->files_delete) {
             $isSuccess = FilesHelper::delete($equipment->files);
 
             if (! $isSuccess) {
-                return response()->json(['message' => __('app.files.files_not_deleted')]);
+                return response()->json(['message' => __('app.files.files_not_deleted')], 422);
             }
         }
 
         if (! $equipment->delete()) {
-            return response()->json(['message' => __('app.database.destroy_error')], 422);
+            return $this->responseDatabaseDestroyError();
         }
 
         event(new EDelete($id));

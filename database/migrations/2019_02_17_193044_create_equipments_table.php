@@ -14,16 +14,19 @@ class CreateEquipmentsTable extends Migration
     public function up()
     {
         Schema::create('equipments', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('user_id');
             $table->string('serial_number')->nullable();
             $table->string('inventory_number')->nullable();
-            $table->unsignedInteger('type_id');
-            $table->unsignedInteger('manufacturer_id')->nullable();
-            $table->unsignedInteger('model_id')->nullable();
+            $table->unsignedBigInteger('type_id');
+            $table->unsignedBigInteger('manufacturer_id')->nullable();
+            $table->unsignedBigInteger('model_id')->nullable();
             $table->text('description')->nullable();
             $table->softDeletes();
             $table->timestamps();
 
+            $table->foreign('user_id')->references('id')->on('users')
+                ->onDelete('cascade');
             $table->foreign('type_id')->references('id')->on('equipment_types')
                 ->onDelete('cascade');
             $table->foreign('manufacturer_id')->references('id')->on('equipment_manufacturers')
@@ -31,7 +34,10 @@ class CreateEquipmentsTable extends Migration
             $table->foreign('model_id')->references('id')->on('equipment_models')
                 ->onDelete('set null');
 
-            $table->index('manufacturer_id');
+            $table->index('user_id');
+            $table->index('type_id'); // filter
+            $table->index('manufacturer_id'); // filter
+            $table->index('model_id'); // filter
         });
     }
 

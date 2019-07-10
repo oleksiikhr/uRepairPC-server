@@ -17,11 +17,13 @@ class RequestTypesTableSeeder extends Seeder
                 'name' => 'Інцидент',
                 'description' => 'Заявки, пов\'язані з поломкою або несправністю',
                 'default' => true,
+                'user_id' => 1,
             ],
             [
                 'name' => 'Обслуговування',
                 'description' => 'Заявки, пов\'язані з плановим обслуговуванням',
                 'default' => false,
+                'user_id' => 1,
             ],
         ];
 
