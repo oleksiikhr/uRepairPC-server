@@ -123,7 +123,7 @@ abstract class JsonFile implements IJsonFIle
 
                 return (array) $json;
             } catch (\Exception $e) {
-                return null;
+                return;
             }
         }
     }
