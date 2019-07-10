@@ -39,6 +39,7 @@ class RequestFileController extends Controller
 
         if (! $this->_user) {
             $this->middleware('jwt.auth');
+
             return [];
         }
 
@@ -48,6 +49,7 @@ class RequestFileController extends Controller
         // Permissions on request before get a files
         if (! RequestModel::hasAccessByPerm($this->_request, $this->_user)) {
             $this->middleware('permission:disable');
+
             return [];
         }
 

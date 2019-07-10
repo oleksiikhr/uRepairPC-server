@@ -7,8 +7,8 @@ use App\User;
 use App\Enums\Perm;
 use App\Mail\EmailChange;
 use App\Mail\UserCreated;
-use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Events\Users\EDelete;
 use App\Events\Users\EUpdate;
@@ -41,6 +41,7 @@ class UserController extends Controller
 
         if (! $this->_user) {
             $this->middleware('jwt.auth');
+
             return [];
         }
 
@@ -342,6 +343,7 @@ class UserController extends Controller
 
         if (! $user->save()) {
             FileHelper::delete($uploadedUri);
+
             return $this->responseDatabaseSaveError();
         }
 

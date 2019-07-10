@@ -95,7 +95,7 @@ class ListenerController extends Controller
         foreach ($rooms as $room) {
             // users.1, roles.51, etc.
             $explode = explode('.', $room);
-            $method = 'logic_' . $explode[0]; // section
+            $method = 'logic_'.$explode[0]; // section
 
             if (count($explode) > 2 && method_exists(self::class, $method)) {
                 array_push($filteredRooms, ...$this->$method(...$explode));

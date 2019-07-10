@@ -63,15 +63,15 @@ class Role extends Model
                 foreach ($arr as $permission => $action) {
                     $active = in_array($permission, $permissions);
 
-                     $temp[] = (object) [
+                    $temp[] = (object) [
                          'name' => $permission,
                          'action' => $action,
                          'active' => $active,
                      ];
 
-                     if ($active) {
-                         $permissionsActive[] = $permission;
-                     }
+                    if ($active) {
+                        $permissionsActive[] = $permission;
+                    }
                 }
                 $permissionsList->{$key} = $temp;
             }
