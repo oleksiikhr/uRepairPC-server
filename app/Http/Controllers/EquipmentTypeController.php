@@ -7,6 +7,8 @@ use App\Enums\Perm;
 use App\EquipmentType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use App\Events\EquipmentTypes\EShow;
+use App\Events\EquipmentTypes\EIndex;
 use App\Events\EquipmentTypes\ECreate;
 use App\Events\EquipmentTypes\EDelete;
 use App\Events\EquipmentTypes\EUpdate;
@@ -47,6 +49,8 @@ class EquipmentTypeController extends Controller
     {
         $list = EquipmentType::all();
 
+        event(new EIndex);
+
         return response()->json($list);
     }
 
@@ -83,6 +87,8 @@ class EquipmentTypeController extends Controller
     public function show(int $id)
     {
         $equipmentType = EquipmentType::findOrFail($id);
+
+        event(new EShow);
 
         return response()->json([
             'message' => __('app.equipment_type.show'),
@@ -143,7 +149,7 @@ class EquipmentTypeController extends Controller
             return $this->responseDatabaseDestroyError();
         }
 
-        event(new EDelete($id));
+        event(new EDelete($equipmentType));
 
         return response()->json([
             'message' => __('app.equipment_type.destroy'),

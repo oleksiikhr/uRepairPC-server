@@ -42,16 +42,18 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $userPermissions = [
             Perm::PROFILE_EDIT, // profile
-            Perm::USERS_VIEW_SECTION, // users
-            Perm::USERS_VIEW_ALL,
-            Perm::USERS_HIDE_EMAIL,
-            Perm::USERS_HIDE_PHONE,
-            Perm::EQUIPMENTS_VIEW_ALL, // equipments
+            Perm::EQUIPMENTS_VIEW_OWN, // equipments
             Perm::EQUIPMENTS_CONFIG_VIEW,
             Perm::REQUESTS_VIEW_SECTION, // requests
             Perm::REQUESTS_VIEW_OWN,
             Perm::REQUESTS_EDIT_OWN,
             Perm::REQUESTS_CREATE,
+            Perm::REQUESTS_FILES_VIEW_OWN,
+            Perm::REQUESTS_FILES_EDIT_OWN,
+            Perm::REQUESTS_FILES_CREATE,
+            Perm::REQUESTS_COMMENTS_VIEW,
+            Perm::REQUESTS_COMMENTS_CREATE,
+            Perm::REQUESTS_COMMENTS_EDIT_OWN,
             Perm::REQUESTS_CONFIG_VIEW,
         ];
 

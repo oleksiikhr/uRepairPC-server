@@ -42,10 +42,6 @@ return [
         'view_assign' => 'Бачити присвоєні',
         'edit_assign' => 'Редагувати присвоєні',
         'delete_assign' => 'Видаляти присвоєні',
-
-        // Users
-        'hide_email' => 'Приховати email',
-        'hide_phone' => 'Приховати телефон',
     ],
 
 ];

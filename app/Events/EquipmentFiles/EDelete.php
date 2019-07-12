@@ -3,9 +3,12 @@
 namespace App\Events\EquipmentFiles;
 
 use App\Events\Common\EDeleteBroadcast;
+use Illuminate\Database\Eloquent\Model;
 
 class EDelete extends EDeleteBroadcast
 {
+    use EModel;
+
     /**
      * @var int
      */
@@ -15,21 +18,13 @@ class EDelete extends EDeleteBroadcast
      * Create a new event instance.
      *
      * @param  int  $equipmentId
-     * @param  int  $id
+     * @param  Model  $model
      * @return void
      */
-    public function __construct(int $equipmentId, int $id)
+    public function __construct(int $equipmentId, Model $model)
     {
-        parent::__construct($id);
+        parent::__construct($model);
         $this->_equipmentId = $equipmentId;
-    }
-
-    /**
-     * @return string
-     */
-    public function event(): string
-    {
-        return 'equipment_files';
     }
 
     /**
@@ -37,7 +32,7 @@ class EDelete extends EDeleteBroadcast
      */
     public function rooms()
     {
-        return 'equipment_files.'.$this->_equipmentId;
+        return "{$this->roomName}.{$this->_equipmentId}";
     }
 
     /**
@@ -46,7 +41,7 @@ class EDelete extends EDeleteBroadcast
     public function params(): ?array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->data['id'],
             'equipment_id' => $this->_equipmentId,
         ];
     }

@@ -67,7 +67,7 @@ class Request extends Model
         'title',
         'location',
         'description',
-        'equipment_id',
+        'equipment_id', // FIXME delete (controller change)
     ];
 
     /**

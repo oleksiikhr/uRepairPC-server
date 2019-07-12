@@ -10,6 +10,7 @@ use App\Http\Helpers\FileHelper;
 use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\FileRequest;
 use Illuminate\Support\Facades\Gate;
+use App\Events\EquipmentFiles\EIndex;
 use App\Events\EquipmentFiles\ECreate;
 use App\Events\EquipmentFiles\EDelete;
 use App\Events\EquipmentFiles\EUpdate;
@@ -75,6 +76,8 @@ class EquipmentFileController extends Controller
         if (! $this->_user->perm(Perm::EQUIPMENTS_FILES_VIEW_ALL)) {
             $equipmentFiles->where('user_id', $this->_user->id);
         }
+
+        event(new EIndex($equipmentId));
 
         return response()->json([
             'message' => __('app.files.files_get'),
@@ -201,7 +204,7 @@ class EquipmentFileController extends Controller
             return $this->responseDatabaseDestroyError();
         }
 
-        event(new EDelete($equipmentId, $fileId));
+        event(new EDelete($equipmentId, $equipmentFile));
 
         return response()->json([
             'message' => __('app.files.file_destroyed'),

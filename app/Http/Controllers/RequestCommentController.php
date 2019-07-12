@@ -90,7 +90,7 @@ class RequestCommentController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        $requestComment = $this->_request->comments()->find($requestComment->id);
+        $requestComment = $this->_request->comments()->findOrFail($requestComment->id);
         event(new ECreate($requestId, $requestComment));
 
         return response()->json([
@@ -141,7 +141,7 @@ class RequestCommentController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        $requestComment = $this->_request->comments()->find($requestComment->id);
+        $requestComment = $this->_request->comments()->findOrFail($requestComment->id);
         event(new EUpdate($requestId, $commentId, $requestComment));
 
         return response()->json([

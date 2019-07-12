@@ -6,19 +6,13 @@ use App\Events\Common\EDeleteBroadcast;
 
 class EDelete extends EDeleteBroadcast
 {
-    /**
-     * @return string
-     */
-    public function event(): string
-    {
-        return 'requests';
-    }
+    use EModel;
 
     /**
      * @return array|string|null
      */
     public function rooms()
     {
-        return 'requests.'.$this->id;
+        return "{$this->roomName}.{$this->data['id']}";
     }
 }

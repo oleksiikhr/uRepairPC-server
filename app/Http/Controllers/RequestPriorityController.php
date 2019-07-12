@@ -7,6 +7,8 @@ use App\Enums\Perm;
 use App\RequestPriority;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use App\Events\RequestPriorities\EShow;
+use App\Events\RequestPriorities\EIndex;
 use App\Events\RequestPriorities\ECreate;
 use App\Events\RequestPriorities\EDelete;
 use App\Events\RequestPriorities\EUpdate;
@@ -46,6 +48,8 @@ class RequestPriorityController extends Controller
     public function index()
     {
         $list = RequestPriority::all();
+
+        event(new EIndex);
 
         return response()->json($list);
     }
@@ -87,6 +91,8 @@ class RequestPriorityController extends Controller
     public function show(int $id)
     {
         $requestPriority = RequestPriority::findOrFail($id);
+
+        event(new EShow);
 
         return response()->json([
             'message' => __('app.request_priority.show'),
@@ -155,11 +161,11 @@ class RequestPriorityController extends Controller
             return response()->json(['message' => __('app.request_priority.destroy_default')], 422);
         }
 
-        if (! RequestPriority::destroy($id)) {
+        if (! $requestPriority->delete($id)) {
             return $this->responseDatabaseDestroyError();
         }
 
-        event(new EDelete($id));
+        event(new EDelete($requestPriority));
 
         return response()->json([
             'message' => __('app.request_priority.destroy'),

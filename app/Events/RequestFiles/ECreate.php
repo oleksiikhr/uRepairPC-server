@@ -2,34 +2,36 @@
 
 namespace App\Events\RequestFiles;
 
+use Illuminate\Support\Collection;
 use App\Events\Common\ECreateBroadcast;
 
 class ECreate extends ECreateBroadcast
 {
+    use EModel;
+
     /**
      * @var int
      */
     private $_requestId;
 
     /**
+     * @var int
+     */
+    private $_userIdUpload;
+
+    /**
      * Create a new event instance.
      *
      * @param  int  $requestId
-     * @param  mixed  $data
+     * @param  Collection  $data
+     * @param  int  $userIdUpload
      * @return void
      */
-    public function __construct(int $requestId, $data)
+    public function __construct(int $requestId, Collection $data, int $userIdUpload)
     {
         parent::__construct($data);
         $this->_requestId = $requestId;
-    }
-
-    /**
-     * @return string
-     */
-    public function event(): string
-    {
-        return 'request_files';
+        $this->_userIdUpload = $userIdUpload;
     }
 
     /**
@@ -37,7 +39,10 @@ class ECreate extends ECreateBroadcast
      */
     public function rooms()
     {
-        return 'request_files.'.$this->_requestId;
+        return [
+            "{$this->roomName}.{$this->_requestId}",
+            "{$this->roomName}.{$this->_requestId} [user_id.{$this->_userIdUpload}]"
+        ];
     }
 
     /**

@@ -6,6 +6,8 @@ use App\Events\Common\EUpdateBroadcast;
 
 class EUpdate extends EUpdateBroadcast
 {
+    use EModel;
+
     /**
      * @var int
      */
@@ -26,19 +28,11 @@ class EUpdate extends EUpdateBroadcast
     }
 
     /**
-     * @return string
-     */
-    public function event(): string
-    {
-        return 'request_files';
-    }
-
-    /**
      * @return array|string|null
      */
     public function rooms()
     {
-        return 'request_files.'.$this->_requestId;
+        return "{$this->roomName}.{$this->_requestId}";
     }
 
     /**

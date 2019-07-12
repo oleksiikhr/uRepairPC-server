@@ -15,8 +15,6 @@ abstract class Perm
     const USERS_EDIT_ALL = 'users.edit_all';
     const USERS_CREATE = 'users.create';
     const USERS_DELETE_ALL = 'users.delete_all';
-    const USERS_HIDE_EMAIL = 'users.hide_email';
-    const USERS_HIDE_PHONE = 'users.hide_phone';
 
     // Roles
     const ROLES_VIEW_SECTION = 'roles.view_section';
@@ -32,8 +30,6 @@ abstract class Perm
     const EQUIPMENTS_CREATE = 'equipments.create';
     const EQUIPMENTS_DELETE_ALL = 'equipments.delete_all';
     const EQUIPMENTS_DELETE_OWN = 'equipments.delete_own';
-
-//    TODO REMOVE CONFIG VIEW OWN !!!!
 
     // Equipment Files
     const EQUIPMENTS_FILES_VIEW_ALL = 'equipments.files.view_all';
@@ -129,8 +125,6 @@ abstract class Perm
                 self::USERS_EDIT_ALL => __('perm.actions.edit_all'),
                 self::USERS_CREATE => __('perm.actions.create'),
                 self::USERS_DELETE_ALL => __('perm.actions.delete_all'),
-                self::USERS_HIDE_EMAIL => __('perm.actions.hide_email'),
-                self::USERS_HIDE_PHONE => __('perm.actions.hide_phone'),
             ],
             __('perm.sections.roles') => [
                 self::ROLES_VIEW_SECTION => __('perm.actions.view_section'),

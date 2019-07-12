@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use App\User;
 use App\Equipment;
 use App\Enums\Perm;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Http\Helpers\FilesHelper;
+use App\Events\Equipments\EShow;
+use App\Events\Equipments\EIndex;
+use App\Events\Equipments\ECreate;
 use App\Events\Equipments\EDelete;
 use App\Events\Equipments\EUpdate;
 use Illuminate\Support\Facades\Gate;
@@ -66,6 +70,7 @@ class EquipmentController extends Controller
         }
 
         $list = $query->paginate(self::PAGINATE_DEFAULT);
+        event(new EIndex);
 
         return response()->json($list);
     }
@@ -86,9 +91,11 @@ class EquipmentController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        event(new ECreate($equipment));
+
         return response()->json([
             'message' => __('app.equipments.store'),
-            'equipment' => Equipment::querySelectJoins()->find($equipment->id),
+            'equipment' => Equipment::querySelectJoins()->findOrFail($equipment->id),
         ]);
     }
 
@@ -106,6 +113,8 @@ class EquipmentController extends Controller
         if (! $this->_user->perm(Perm::EQUIPMENTS_VIEW_ALL) && Gate::denies('owner', $equipment)) {
             return $this->responseNoPermission();
         }
+
+        event(new EShow($equipment));
 
         return response()->json([
             'message' => __('app.equipments.show'),
@@ -136,7 +145,7 @@ class EquipmentController extends Controller
         }
 
         // Update model new data from relationship
-        $equipment = Equipment::querySelectJoins()->find($equipment->id);
+        $equipment = Equipment::querySelectJoins()->findOrFail($equipment->id);
         event(new EUpdate($id, $equipment));
 
         return response()->json([

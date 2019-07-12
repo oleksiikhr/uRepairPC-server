@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\User;
 use App\Enums\Perm;
 use Illuminate\Http\Request;
-use App\Http\Helpers\FileHelper;
 use App\Request as RequestModel;
+use App\Http\Helpers\FileHelper;
 use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\FileRequest;
+use App\Events\RequestFiles\EIndex;
 use App\Events\RequestFiles\ECreate;
 use App\Events\RequestFiles\EDelete;
 use App\Events\RequestFiles\EUpdate;
@@ -74,6 +75,8 @@ class RequestFileController extends Controller
             $requestFiles->where('user_id', $this->_user->id);
         }
 
+        event(new EIndex($requestId));
+
         return response()->json([
             'message' => __('app.files.files_get'),
             'request_files' => $requestFiles->get(),
@@ -99,7 +102,7 @@ class RequestFileController extends Controller
         $uploadedFiles = $this->_request->files()->whereIn('files.id', $uploadedIds)->get();
 
         if (count($uploadedFiles)) {
-            event(new ECreate($requestId, $uploadedFiles));
+            event(new ECreate($requestId, $uploadedFiles, $this->_user->id));
         }
 
         if ($filesHelper->hasErrors()) {
@@ -199,7 +202,7 @@ class RequestFileController extends Controller
             return $this->responseDatabaseDestroyError();
         }
 
-        event(new EDelete($requestId, $fileId));
+        event(new EDelete($requestId, $requestFile));
 
         return response()->json([
             'message' => __('app.files.file_destroyed'),

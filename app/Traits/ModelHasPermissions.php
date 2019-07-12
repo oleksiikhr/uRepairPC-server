@@ -38,16 +38,20 @@ trait ModelHasPermissions
         }
         $roles = $query->get();
 
-        return $this->roles()->sync($roles->pluck('id'));
+        return $this->roles()->sync($roles->pluck('id')->toArray());
     }
 
     /**
-     * @param  {string|array}  $ids
+     * @param  {string|array|Collection}  $ids
      * @return array
      */
     public function assignRolesById($ids): array
     {
-        $ids = is_array($ids) ? $ids : [$ids];
+        if ($ids instanceof Collection) {
+            $ids = $ids->toArray();
+        } else if (! is_array($ids)) {
+            $ids = [$ids];
+        }
 
         return $this->roles()->sync($ids);
     }

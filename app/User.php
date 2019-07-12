@@ -101,12 +101,6 @@ class User extends Authenticatable implements JWTSubject
                 $this->makeHidden('roles');
                 $this->makeHidden('permissions');
             }
-            if (! $user->perm(Perm::USERS_HIDE_EMAIL)) {
-                $this->makeHidden('email');
-            }
-            if (! $user->perm(Perm::USERS_HIDE_PHONE)) {
-                $this->makeHidden('phone');
-            }
         }
 
         return parent::toArray();

@@ -7,6 +7,8 @@ use App\Enums\Perm;
 use App\RequestStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use App\Events\RequestStatuses\EShow;
+use App\Events\RequestStatuses\EIndex;
 use App\Events\RequestStatuses\ECreate;
 use App\Events\RequestStatuses\EDelete;
 use App\Events\RequestStatuses\EUpdate;
@@ -46,6 +48,8 @@ class RequestStatusController extends Controller
     public function index()
     {
         $list = RequestStatus::all();
+
+        event(new EIndex);
 
         return response()->json($list);
     }
@@ -87,6 +91,8 @@ class RequestStatusController extends Controller
     public function show(int $id)
     {
         $requestStatus = RequestStatus::findOrFail($id);
+
+        event(new EShow);
 
         return response()->json([
             'message' => __('app.request_status.show'),
@@ -155,11 +161,11 @@ class RequestStatusController extends Controller
             return response()->json(['message' => __('app.request_status.destroy_default')], 422);
         }
 
-        if (! RequestStatus::destroy($id)) {
+        if (! $requestStatus->delete($id)) {
             return $this->responseDatabaseDestroyError();
         }
 
-        event(new EDelete($id));
+        event(new EDelete($requestStatus));
 
         return response()->json([
             'message' => __('app.request_status.destroy'),

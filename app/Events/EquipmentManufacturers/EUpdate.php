@@ -6,19 +6,13 @@ use App\Events\Common\EUpdateBroadcast;
 
 class EUpdate extends EUpdateBroadcast
 {
-    /**
-     * @return string
-     */
-    public function event(): string
-    {
-        return 'equipment_manufacturers';
-    }
+    use EModel;
 
     /**
      * @return array|string|null
      */
     public function rooms()
     {
-        return 'equipment_manufacturers';
+        return $this->roomName;
     }
 }

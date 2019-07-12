@@ -6,6 +6,8 @@ use App\User;
 use App\Enums\Perm;
 use App\RequestType;
 use Illuminate\Http\Request;
+use App\Events\RequestTypes\EShow;
+use App\Events\RequestTypes\EIndex;
 use App\Events\RequestTypes\ECreate;
 use App\Events\RequestTypes\EDelete;
 use App\Events\RequestTypes\EUpdate;
@@ -47,6 +49,8 @@ class RequestTypeController extends Controller
     {
         $list = RequestType::all();
 
+        event(new EIndex);
+
         return response()->json($list);
     }
 
@@ -87,6 +91,8 @@ class RequestTypeController extends Controller
     public function show(int $id)
     {
         $requestType = RequestType::findOrFail($id);
+
+        event(new EShow);
 
         return response()->json([
             'message' => __('app.request_type.show'),
@@ -155,11 +161,11 @@ class RequestTypeController extends Controller
             return response()->json(['message' => __('app.request_type.destroy_default')], 422);
         }
 
-        if (! RequestType::destroy($id)) {
+        if (! $requestType->delete($id)) {
             return $this->responseDatabaseDestroyError();
         }
 
-        event(new EDelete($id));
+        event(new EDelete($requestType));
 
         return response()->json([
             'message' => __('app.request_type.destroy'),

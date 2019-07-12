@@ -3,10 +3,13 @@
 namespace App;
 
 use App\Enums\Perm;
+use App\Traits\ModelHasDefaultTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class Role extends Model
 {
+    use ModelHasDefaultTrait;
+
     /** @var array */
     const ALLOW_COLUMNS_SEARCH = [
         'id',
@@ -82,6 +85,35 @@ class Role extends Model
         $this->makeHidden('permissions');
 
         return parent::toArray();
+    }
+
+    /**
+     * @param  array  $changePermissionNames
+     * @return void
+     */
+    public function syncPermissions(array $changePermissionNames)
+    {
+        $permissions = $this->permissions()->get();
+        $deleteIds = [];
+
+        // Filter
+        foreach ($permissions as $permission) {
+            $searchKey = array_search($permission->name, $changePermissionNames);
+            if ($searchKey === false) {
+                $deleteIds[] = $permission->id;
+            } else {
+                unset($changePermissionNames[$searchKey]);
+            }
+        }
+
+        // Delete
+        RolePermission::destroy($deleteIds);
+
+        // Insert
+        $insertValues = collect($changePermissionNames)->map(function ($permissionName) {
+            return ['name' => $permissionName];
+        });
+        $this->permissions()->createMany($insertValues->toArray());
     }
 
     /* | -----------------------------------------------------------------------------------

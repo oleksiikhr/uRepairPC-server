@@ -7,10 +7,13 @@ use App\User;
 use App\Enums\Perm;
 use App\Mail\EmailChange;
 use App\Mail\UserCreated;
+use App\Events\Users\EShow;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
+use App\Events\Users\EIndex;
 use Illuminate\Http\Request;
 use App\Events\Users\EDelete;
+use App\Events\Users\ECreate;
 use App\Events\Users\EUpdate;
 use App\Http\Helpers\FileHelper;
 use App\Events\Users\EUpdateRoles;
@@ -104,6 +107,7 @@ class UserController extends Controller
         }
 
         $list = $query->paginate(self::PAGINATE_DEFAULT);
+        event(new EIndex);
 
         return response()->json($list);
     }
@@ -116,19 +120,20 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
-        $defaultRoles = Role::where('default', true)->get();
         $password = User::generateRandomStrPassword();
 
         $user = new User;
         $user->fill($request->all());
         $user->email = $request->email;
         $user->password = bcrypt($password);
-        $user->assignRolesById($defaultRoles->pluck('id'));
 
         if (! $user->save()) {
             return $this->responseDatabaseSaveError();
         }
 
+        $user->assignRolesById(Role::getDefaultValues()->pluck('id'));
+
+        event(new ECreate($user));
         Mail::to($user)->send(new UserCreated($password)); // TODO Disable on APP_DEMO
 
         return response()->json([
@@ -145,8 +150,10 @@ class UserController extends Controller
      */
     public function show(int $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::with('roles')->findOrFail($id);
         $user->permissions = $user->getAllPermNames();
+
+        event(new EShow($user));
 
         return response()->json([
             'message' => __('app.users.show'),
@@ -206,7 +213,7 @@ class UserController extends Controller
             return $this->responseDatabaseDestroyError();
         }
 
-        event(new EDelete($id));
+        event(new EDelete($user));
 
         return response()->json([
             'message' => __('app.users.destroy'),
@@ -294,10 +301,8 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     * If the user edit the same, need password
-     * Another - send email to the user with
-     * new random password.
+     * Update the specified resource in storage. If the user edit the same, need password
+     * Another - send email to the user with new random password.
      *
      * @param   Request  $request
      * @param   int  $id
@@ -421,7 +426,6 @@ class UserController extends Controller
     private function setPasswordProfile(Request $request, User $user)
     {
         $request->validate(['password' => 'required|string']);
-
         $user->password = bcrypt($request->password);
 
         if (! $user->save()) {

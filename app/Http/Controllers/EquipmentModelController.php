@@ -7,6 +7,8 @@ use App\Enums\Perm;
 use App\EquipmentModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use App\Events\EquipmentModels\EShow;
+use App\Events\EquipmentModels\EIndex;
 use App\Events\EquipmentModels\ECreate;
 use App\Events\EquipmentModels\EDelete;
 use App\Events\EquipmentModels\EUpdate;
@@ -47,6 +49,8 @@ class EquipmentModelController extends Controller
     {
         $list = EquipmentModel::querySelectJoins()->get();
 
+        event(new EIndex);
+
         return response()->json($list);
     }
 
@@ -66,7 +70,7 @@ class EquipmentModelController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        $equipmentModel = EquipmentModel::querySelectJoins()->find($equipmentModel->id);
+        $equipmentModel = EquipmentModel::querySelectJoins()->findOrFail($equipmentModel->id);
         event(new ECreate($equipmentModel));
 
         return response()->json([
@@ -84,6 +88,8 @@ class EquipmentModelController extends Controller
     public function show(int $id)
     {
         $equipmentModel = EquipmentModel::querySelectJoins()->findOrFail($id);
+
+        event(new EShow);
 
         return response()->json([
             'message' => __('app.equipment_model.show'),
@@ -115,7 +121,7 @@ class EquipmentModelController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        $equipmentModel = EquipmentModel::querySelectJoins()->find($equipmentModel->id);
+        $equipmentModel = EquipmentModel::querySelectJoins()->findOrFail($equipmentModel->id);
         event(new EUpdate($id, $equipmentModel));
 
         return response()->json([
@@ -145,7 +151,7 @@ class EquipmentModelController extends Controller
             return $this->responseDatabaseDestroyError();
         }
 
-        event(new EDelete($id));
+        event(new EDelete($equipmentModel));
 
         return response()->json([
             'message' => __('app.equipment_model.destroy'),

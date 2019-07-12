@@ -7,6 +7,8 @@ use App\Enums\Perm;
 use Illuminate\Http\Request;
 use App\EquipmentManufacturer;
 use Illuminate\Support\Facades\Gate;
+use App\Events\EquipmentManufacturers\EShow;
+use App\Events\EquipmentManufacturers\EIndex;
 use App\Events\EquipmentManufacturers\ECreate;
 use App\Events\EquipmentManufacturers\EDelete;
 use App\Events\EquipmentManufacturers\EUpdate;
@@ -47,6 +49,8 @@ class EquipmentManufacturerController extends Controller
     {
         $list = EquipmentManufacturer::all();
 
+        event(new EIndex);
+
         return response()->json($list);
     }
 
@@ -83,6 +87,8 @@ class EquipmentManufacturerController extends Controller
     public function show(int $id)
     {
         $equipmentManufacturer = EquipmentManufacturer::findOrFail($id);
+
+        event(new EShow);
 
         return response()->json([
             'message' => __('app.equipment_manufacturers.show'),
@@ -143,7 +149,7 @@ class EquipmentManufacturerController extends Controller
             return $this->responseDatabaseDestroyError();
         }
 
-        event(new EDelete($id));
+        event(new EDelete($equipmentManufacturer));
 
         return response()->json([
             'message' => __('app.equipment_manufacturers.destroy'),
