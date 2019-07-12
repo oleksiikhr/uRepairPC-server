@@ -41,7 +41,7 @@ class ECreate extends ECreateBroadcast
     {
         return [
             "{$this->roomName}.{$this->_requestId}",
-            "{$this->roomName}.{$this->_requestId} [user_id.{$this->_userIdUpload}]"
+            "{$this->roomName}.{$this->_requestId} [user_id.{$this->_userIdUpload}]",
         ];
     }
 

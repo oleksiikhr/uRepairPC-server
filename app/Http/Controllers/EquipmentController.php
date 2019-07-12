@@ -5,16 +5,16 @@ namespace App\Http\Controllers;
 use App\User;
 use App\Equipment;
 use App\Enums\Perm;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use App\Http\Helpers\FilesHelper;
 use App\Events\Equipments\EShow;
 use App\Events\Equipments\EIndex;
+use App\Http\Helpers\FilesHelper;
 use App\Events\Equipments\ECreate;
 use App\Events\Equipments\EDelete;
 use App\Events\Equipments\EUpdate;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\EquipmentRequest;
+use Illuminate\Database\Eloquent\Model;
 
 class EquipmentController extends Controller
 {

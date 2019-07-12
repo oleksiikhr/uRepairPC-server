@@ -30,7 +30,6 @@ class EManifestUpdate extends EUpdateBroadcast
      */
     public function rooms()
     {
-        return null;
     }
 
     /**

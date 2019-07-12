@@ -30,7 +30,6 @@ class EGlobalUpdate extends EUpdateBroadcast
      */
     public function rooms()
     {
-        return null;
     }
 
     /**

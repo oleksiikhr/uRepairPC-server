@@ -56,6 +56,5 @@ abstract class EJoinBroadcast extends EBroadcast
      */
     public function data()
     {
-        return null;
     }
 }
