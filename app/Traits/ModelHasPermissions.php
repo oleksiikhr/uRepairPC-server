@@ -49,7 +49,7 @@ trait ModelHasPermissions
     {
         if ($ids instanceof Collection) {
             $ids = $ids->toArray();
-        } else if (! is_array($ids)) {
+        } elseif (! is_array($ids)) {
             $ids = [$ids];
         }
 

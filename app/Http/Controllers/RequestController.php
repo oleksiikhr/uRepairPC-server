@@ -10,10 +10,10 @@ use App\RequestPriority;
 use Illuminate\Http\Request;
 use App\Events\Requests\EShow;
 use App\Events\Requests\EIndex;
-use App\Request as RequestModel;
 use App\Events\Requests\ECreate;
 use App\Events\Requests\EDelete;
 use App\Events\Requests\EUpdate;
+use App\Request as RequestModel;
 use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\RequestRequest;
 
