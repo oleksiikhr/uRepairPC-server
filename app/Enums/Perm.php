@@ -102,9 +102,11 @@ abstract class Perm
     /**
      * @return array
      */
-    static function getAll(): array {
+    public static function getAll(): array
+    {
         try {
             $constants = (new ReflectionClass(__CLASS__))->getConstants();
+
             return array_values($constants);
         } catch (\Exception $e) {
             return [];
@@ -114,7 +116,8 @@ abstract class Perm
     /**
      * @return object
      */
-    static function getStructure() {
+    public static function getStructure()
+    {
         return (object) [
             __('perm.sections.profile') => [
                 self::PROFILE_EDIT => __('perm.actions.edit'),

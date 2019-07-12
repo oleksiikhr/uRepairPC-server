@@ -57,7 +57,7 @@ trait ModelHasPermissions
     }
 
     /**
-     * Return all the permissions the model has via roles
+     * Return all the permissions the model has via roles.
      *
      * @return Collection
      */
@@ -75,7 +75,7 @@ trait ModelHasPermissions
     }
 
     /**
-     * Get names of permissions
+     * Get names of permissions.
      * @return array
      */
     public function getAllPermNames(): array

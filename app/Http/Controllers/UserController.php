@@ -44,6 +44,7 @@ class UserController extends Controller
 
         if (! $this->_user) {
             $this->middleware('jwt.auth');
+
             return [];
         }
 
@@ -347,6 +348,7 @@ class UserController extends Controller
 
         if (! $user->save()) {
             FileHelper::delete($uploadedUri);
+
             return $this->responseDatabaseSaveError();
         }
 

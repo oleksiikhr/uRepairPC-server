@@ -4,9 +4,9 @@ namespace App;
 
 use App\Enums\Perm;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Gate;
 
 class Request extends Model
 {
@@ -117,6 +117,7 @@ class Request extends Model
             if (! $user->perm(Perm::REQUESTS_VIEW_ASSIGN)) {
                 return Gate::allows('owner', $request);
             }
+
             return Gate::allows('owner', $request) || Gate::allows('assign', $request);
         }
 
@@ -133,7 +134,7 @@ class Request extends Model
         if (! $user->perm(Perm::REQUESTS_VIEW_ALL)) {
             if (! $user->perm(Perm::REQUESTS_VIEW_OWN)) {
                 $query->where('requests.assign_id', $user->id);
-            } else if (! $user->perm(Perm::REQUESTS_VIEW_ASSIGN)) {
+            } elseif (! $user->perm(Perm::REQUESTS_VIEW_ASSIGN)) {
                 $query->where('requests.user_id', $user->id);
             } else {
                 $query->where(function ($query) use ($user) {
