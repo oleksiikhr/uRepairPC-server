@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "315dcead6449c25e1dac43a436ecc3ca",
@@ -3105,12 +3105,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tymondesigns/jwt-auth.git",
-                "reference": "d4d5261826f5529198f0a69354c28b3f77dcad5c"
+                "reference": "6e9457185ef4e4ff52eb54a73a64be58aa46847b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tymondesigns/jwt-auth/zipball/d4d5261826f5529198f0a69354c28b3f77dcad5c",
-                "reference": "d4d5261826f5529198f0a69354c28b3f77dcad5c",
+                "url": "https://api.github.com/repos/tymondesigns/jwt-auth/zipball/6e9457185ef4e4ff52eb54a73a64be58aa46847b",
+                "reference": "6e9457185ef4e4ff52eb54a73a64be58aa46847b",
                 "shasum": ""
             },
             "require": {
@@ -3172,7 +3172,7 @@
                 "jwt",
                 "laravel"
             ],
-            "time": "2019-07-09T22:25:49+00:00"
+            "time": "2019-07-11T18:40:09+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -4252,16 +4252,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "8.2.4",
+            "version": "8.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "25fe0b5031b24722f66a75ad479a074cccc1bb37"
+                "reference": "c1b8534b3730f20f58600124129197bf1183dc92"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/25fe0b5031b24722f66a75ad479a074cccc1bb37",
-                "reference": "25fe0b5031b24722f66a75ad479a074cccc1bb37",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c1b8534b3730f20f58600124129197bf1183dc92",
+                "reference": "c1b8534b3730f20f58600124129197bf1183dc92",
                 "shasum": ""
             },
             "require": {
@@ -4331,7 +4331,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-07-03T08:30:33+00:00"
+            "time": "2019-07-15T06:26:24+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
