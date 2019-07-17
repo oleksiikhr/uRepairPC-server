@@ -21,6 +21,7 @@ class GlobalJsonResource extends JsonResource
             'logo_header' => $this['logo_header'] ? url('storage/'.$this['logo_header']) : null,
             'favicon' => $this['favicon'] ? url('storage/'.$this['favicon']) : null,
             'name_and_logo' => (bool) $this['name_and_logo'],
+            'websocket_url' => config('websocket.url'),
         ];
     }
 }
