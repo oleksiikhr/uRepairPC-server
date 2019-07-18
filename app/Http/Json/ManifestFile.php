@@ -2,7 +2,7 @@
 
 namespace App\Http\Json;
 
-class ManifestFile extends JsonFile
+class ManifestFile extends Json
 {
     const FILE_NAME = 'manifest.json';
 
