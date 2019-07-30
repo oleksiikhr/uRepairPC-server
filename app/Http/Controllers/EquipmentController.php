@@ -6,15 +6,10 @@ use App\User;
 use App\Equipment;
 use App\Enums\Perm;
 use Illuminate\Http\Request;
-use App\Events\Equipments\EShow;
-use App\Events\Equipments\EIndex;
+use App\Events\Equipments\EJoin;
 use App\Http\Helpers\FilesHelper;
-use App\Events\Equipments\ECreate;
-use App\Events\Equipments\EDelete;
-use App\Events\Equipments\EUpdate;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\EquipmentRequest;
-use Illuminate\Database\Eloquent\Model;
 
 class EquipmentController extends Controller
 {
@@ -70,7 +65,7 @@ class EquipmentController extends Controller
         }
 
         $list = $query->paginate(self::PAGINATE_DEFAULT);
-        event(new EIndex);
+        event(new EJoin(...$list->items()));
 
         return response()->json($list);
     }
@@ -90,8 +85,6 @@ class EquipmentController extends Controller
         if (! $equipment->save()) {
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
-
-        event(new ECreate($equipment));
 
         return response()->json([
             'message' => __('app.equipments.store'),
@@ -114,7 +107,7 @@ class EquipmentController extends Controller
             return $this->responseNoPermission();
         }
 
-        event(new EShow($equipment));
+        event(new EJoin($equipment));
 
         return response()->json([
             'message' => __('app.equipments.show'),
@@ -146,7 +139,6 @@ class EquipmentController extends Controller
 
         // Update model new data from relationship
         $equipment = Equipment::querySelectJoins()->findOrFail($equipment->id);
-        event(new EUpdate($id, $equipment));
 
         return response()->json([
             'message' => __('app.equipments.update'),
@@ -171,9 +163,7 @@ class EquipmentController extends Controller
         }
 
         if ($request->files_delete) {
-            $isSuccess = FilesHelper::delete($equipment->files);
-
-            if (! $isSuccess) {
+            if (! FilesHelper::delete($equipment->files)) {
                 return response()->json(['message' => __('app.files.files_not_deleted')], 422);
             }
         }
@@ -181,8 +171,6 @@ class EquipmentController extends Controller
         if (! $equipment->delete()) {
             return $this->responseDatabaseDestroyError();
         }
-
-        event(new EDelete($id));
 
         return response()->json([
             'message' => __('app.equipments.destroy'),

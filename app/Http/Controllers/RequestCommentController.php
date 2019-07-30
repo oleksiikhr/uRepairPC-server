@@ -8,6 +8,7 @@ use App\RequestComment;
 use Illuminate\Http\Request;
 use App\Request as RequestModel;
 use Illuminate\Support\Facades\Gate;
+use App\Events\RequestComments\EJoin;
 use App\Events\RequestComments\ECreate;
 use App\Events\RequestComments\EDelete;
 use App\Events\RequestComments\EUpdate;
@@ -37,7 +38,6 @@ class RequestCommentController extends Controller
 
         if (! $this->_user) {
             $this->middleware('jwt.auth');
-
             return [];
         }
 
@@ -47,13 +47,12 @@ class RequestCommentController extends Controller
         // Permissions on request before get a comments
         if (! RequestModel::hasAccessByPerm($this->_request, $this->_user)) {
             $this->middleware('permission:disable');
-
             return [];
         }
 
         return [
-            'index' => Perm::REQUESTS_COMMENTS_VIEW,
-            'show' => Perm::REQUESTS_COMMENTS_VIEW,
+            'index' => Perm::REQUESTS_COMMENTS_VIEW_ALL,
+            'show' => Perm::REQUESTS_COMMENTS_VIEW_ALL,
             'store' => Perm::REQUESTS_COMMENTS_CREATE,
             'update' => [Perm::REQUESTS_COMMENTS_EDIT_OWN, Perm::REQUESTS_COMMENTS_EDIT_ALL],
             'destroy' => [Perm::REQUESTS_COMMENTS_DELETE_OWN, Perm::REQUESTS_COMMENTS_DELETE_ALL],
@@ -68,9 +67,12 @@ class RequestCommentController extends Controller
      */
     public function index(int $requestId)
     {
+        $requestComments = $this->_request->comments()->get();
+        event(new EJoin($requestId, ...$requestComments));
+
         return response()->json([
             'message' => __('app.request_comments.index'),
-            'request_comments' => $this->_request->comments,
+            'request_comments' => $requestComments,
         ]);
     }
 
@@ -111,6 +113,8 @@ class RequestCommentController extends Controller
     public function show(int $requestId, int $commentId)
     {
         $requestComment = $this->_request->comments()->findOrFail($commentId);
+
+        event(new EJoin($requestId, $requestComment));
 
         return response()->json([
             'message' => __('app.request_comments.show'),
@@ -175,7 +179,7 @@ class RequestCommentController extends Controller
             return $this->responseDatabaseDestroyError();
         }
 
-        event(new EDelete($requestId, $commentId));
+        event(new EDelete($requestId, $requestComment));
 
         return response()->json([
             'message' => __('app.request_comments.destroy'),

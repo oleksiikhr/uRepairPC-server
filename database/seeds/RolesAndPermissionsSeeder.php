@@ -43,7 +43,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $userPermissions = [
             Perm::PROFILE_EDIT, // profile
             Perm::EQUIPMENTS_VIEW_OWN, // equipments
-            Perm::EQUIPMENTS_CONFIG_VIEW,
+            Perm::EQUIPMENTS_CONFIG_VIEW_ALL,
             Perm::REQUESTS_VIEW_SECTION, // requests
             Perm::REQUESTS_VIEW_OWN,
             Perm::REQUESTS_EDIT_OWN,
@@ -51,10 +51,10 @@ class RolesAndPermissionsSeeder extends Seeder
             Perm::REQUESTS_FILES_VIEW_OWN,
             Perm::REQUESTS_FILES_EDIT_OWN,
             Perm::REQUESTS_FILES_CREATE,
-            Perm::REQUESTS_COMMENTS_VIEW,
+            Perm::REQUESTS_COMMENTS_VIEW_ALL,
             Perm::REQUESTS_COMMENTS_CREATE,
             Perm::REQUESTS_COMMENTS_EDIT_OWN,
-            Perm::REQUESTS_CONFIG_VIEW,
+            Perm::REQUESTS_CONFIG_VIEW_ALL,
         ];
 
         foreach ($userPermissions as $permission) {

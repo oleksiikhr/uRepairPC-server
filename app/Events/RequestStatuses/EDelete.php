@@ -13,6 +13,6 @@ class EDelete extends EDeleteBroadcast
      */
     public function rooms()
     {
-        return $this->roomName;
+        return self::$roomName . ".{$this->data['id']}";
     }
 }

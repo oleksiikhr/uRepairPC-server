@@ -44,7 +44,7 @@ abstract class Perm
 
     // Equipments Config
     const EQUIPMENTS_CONFIG_VIEW_SECTION = 'equipments.config.view_section';
-    const EQUIPMENTS_CONFIG_VIEW = 'equipments.config.view';
+    const EQUIPMENTS_CONFIG_VIEW_ALL = 'equipments.config.view_all';
     const EQUIPMENTS_CONFIG_EDIT_ALL = 'equipments.config.edit_all';
     const EQUIPMENTS_CONFIG_EDIT_OWN = 'equipments.config.edit_own';
     const EQUIPMENTS_CONFIG_CREATE = 'equipments.config.create';
@@ -65,7 +65,7 @@ abstract class Perm
     const REQUESTS_DELETE_ASSIGN = 'requests.delete_assign';
 
     // Requests Comments
-    const REQUESTS_COMMENTS_VIEW = 'requests.comments.view';
+    const REQUESTS_COMMENTS_VIEW_ALL = 'requests.comments.view_all';
     const REQUESTS_COMMENTS_EDIT_ALL = 'requests.comments.edit_all';
     const REQUESTS_COMMENTS_EDIT_OWN = 'requests.comments.edit_own';
     const REQUESTS_COMMENTS_CREATE = 'requests.comments.create';
@@ -85,7 +85,7 @@ abstract class Perm
 
     // Requests Config
     const REQUESTS_CONFIG_VIEW_SECTION = 'requests.config.view_section';
-    const REQUESTS_CONFIG_VIEW = 'requests.config.view';
+    const REQUESTS_CONFIG_VIEW_ALL = 'requests.config.view_all';
     const REQUESTS_CONFIG_EDIT_ALL = 'requests.config.edit_all';
     const REQUESTS_CONFIG_EDIT_OWN = 'requests.config.edit_own';
     const REQUESTS_CONFIG_CREATE = 'requests.config.create';
@@ -157,7 +157,7 @@ abstract class Perm
             ],
             __('perm.sections.equipments_config') => [
                 self::EQUIPMENTS_CONFIG_VIEW_SECTION => __('perm.actions.view_section'),
-                self::EQUIPMENTS_CONFIG_VIEW => __('perm.actions.view'),
+                self::EQUIPMENTS_CONFIG_VIEW_ALL => __('perm.actions.view_all'),
                 self::EQUIPMENTS_CONFIG_EDIT_ALL => __('perm.actions.edit_all'),
                 self::EQUIPMENTS_CONFIG_EDIT_OWN => __('perm.actions.edit_own'),
                 self::EQUIPMENTS_CONFIG_CREATE => __('perm.actions.create'),
@@ -178,7 +178,7 @@ abstract class Perm
                 self::REQUESTS_DELETE_ASSIGN => __('perm.actions.delete_assign'),
             ],
             __('perm.sections.requests_comments') => [
-                self::REQUESTS_COMMENTS_VIEW => __('perm.actions.view'),
+                self::REQUESTS_COMMENTS_VIEW_ALL => __('perm.actions.view_all'),
                 self::REQUESTS_COMMENTS_EDIT_ALL => __('perm.actions.edit_all'),
                 self::REQUESTS_COMMENTS_EDIT_OWN => __('perm.actions.edit_own'),
                 self::REQUESTS_COMMENTS_CREATE => __('perm.actions.create'),
@@ -198,7 +198,7 @@ abstract class Perm
             ],
             __('perm.sections.requests_config') => [
                 self::REQUESTS_CONFIG_VIEW_SECTION => __('perm.actions.view_section'),
-                self::REQUESTS_CONFIG_VIEW => __('perm.actions.view'),
+                self::REQUESTS_CONFIG_VIEW_ALL => __('perm.actions.view_all'),
                 self::REQUESTS_CONFIG_EDIT_ALL => __('perm.actions.edit_all'),
                 self::REQUESTS_CONFIG_EDIT_OWN => __('perm.actions.edit_own'),
                 self::REQUESTS_CONFIG_CREATE => __('perm.actions.create'),

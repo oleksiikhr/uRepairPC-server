@@ -6,12 +6,8 @@ use App\User;
 use App\Enums\Perm;
 use App\EquipmentType;
 use Illuminate\Http\Request;
-use App\Events\EquipmentTypes\EShow;
 use Illuminate\Support\Facades\Gate;
-use App\Events\EquipmentTypes\EIndex;
-use App\Events\EquipmentTypes\ECreate;
-use App\Events\EquipmentTypes\EDelete;
-use App\Events\EquipmentTypes\EUpdate;
+use App\Events\EquipmentTypes\EJoin;
 use App\Http\Requests\EquipmentTypeRequest;
 
 class EquipmentTypeController extends Controller
@@ -32,8 +28,8 @@ class EquipmentTypeController extends Controller
         $this->_user = auth()->user();
 
         return [
-            'index' => Perm::EQUIPMENTS_CONFIG_VIEW,
-            'show' => Perm::EQUIPMENTS_CONFIG_VIEW,
+            'index' => Perm::EQUIPMENTS_CONFIG_VIEW_ALL,
+            'show' => Perm::EQUIPMENTS_CONFIG_VIEW_ALL,
             'store' => Perm::EQUIPMENTS_CONFIG_CREATE,
             'update' => [Perm::EQUIPMENTS_CONFIG_EDIT_OWN, Perm::EQUIPMENTS_CONFIG_EDIT_ALL],
             'destroy' => [Perm::EQUIPMENTS_CONFIG_DELETE_OWN, Perm::EQUIPMENTS_CONFIG_DELETE_ALL],
@@ -49,7 +45,7 @@ class EquipmentTypeController extends Controller
     {
         $list = EquipmentType::all();
 
-        event(new EIndex);
+        event(new EJoin(...$list));
 
         return response()->json($list);
     }
@@ -70,8 +66,6 @@ class EquipmentTypeController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        event(new ECreate($equipmentType));
-
         return response()->json([
             'message' => __('app.equipment_type.store'),
             'equipment_type' => $equipmentType,
@@ -88,7 +82,7 @@ class EquipmentTypeController extends Controller
     {
         $equipmentType = EquipmentType::findOrFail($id);
 
-        event(new EShow);
+        event(new EJoin($equipmentType));
 
         return response()->json([
             'message' => __('app.equipment_type.show'),
@@ -120,8 +114,6 @@ class EquipmentTypeController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        event(new EUpdate($id, $equipmentType));
-
         return response()->json([
             'message' => __('app.equipment_type.update'),
             'equipment_type' => $equipmentType,
@@ -148,8 +140,6 @@ class EquipmentTypeController extends Controller
         if (! $equipmentType->delete()) {
             return $this->responseDatabaseDestroyError();
         }
-
-        event(new EDelete($equipmentType));
 
         return response()->json([
             'message' => __('app.equipment_type.destroy'),

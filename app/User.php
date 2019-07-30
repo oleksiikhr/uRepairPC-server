@@ -4,22 +4,20 @@ namespace App;
 
 use App\Enums\Perm;
 use Illuminate\Support\Str;
-use App\Traits\ModelHasPermissions;
+use App\Traits\ModelHelperTrait;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Traits\ModelHasPermissionsTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use SoftDeletes, ModelHasPermissions;
+    use SoftDeletes, ModelHasPermissionsTrait, ModelHelperTrait;
 
     protected $guard_name = 'api';
 
     /** @var int */
     private const RANDOM_PASSWORD_LEN = 10;
-
-    /** @var string - DB */
-    const ROLE_ADMIN = 'admin';
 
     /** @var array */
     const ALLOW_COLUMNS_SEARCH = [
@@ -96,11 +94,9 @@ class User extends Authenticatable implements JWTSubject
     {
         $user = auth()->user();
 
-        if ($this->id !== $user->id) {
-            if (! $user->perm(Perm::ROLES_VIEW_ALL)) {
-                $this->makeHidden('roles');
-                $this->makeHidden('permissions');
-            }
+        if ($user && $this->id !== $user->id && ! $user->perm(Perm::ROLES_VIEW_ALL)) {
+            $this->makeHidden('roles');
+            $this->makeHidden('permissions');
         }
 
         return parent::toArray();
@@ -132,5 +128,10 @@ class User extends Authenticatable implements JWTSubject
     public function roles()
     {
         return $this->belongsToMany(Role::class);
+    }
+
+    public function image()
+    {
+        return $this->hasOne(File::class);
     }
 }

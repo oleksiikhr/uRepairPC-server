@@ -14,14 +14,22 @@ class ECreate extends ECreateBroadcast
     public function rooms()
     {
         $rooms = [
-            $this->roomName,
-            "{$this->roomName} [user_id.{$this->data['user_id']}]",
+            self::$roomName,
+            self::$roomName . " [user_id.{$this->data['user_id']}]",
         ];
 
         if (isset($this->data['assign_id'])) {
-            $rooms[] = "{$this->roomName} [assign_id.{$this->data['assign_id']}]";
+            $rooms[] = self::$roomName . " [assign_id.{$this->data['assign_id']}]";
         }
 
         return $rooms;
+    }
+
+    /**
+     * @return string
+     */
+    protected function join(): string
+    {
+        return self::$roomName . ".{$this->data['id']}";
     }
 }

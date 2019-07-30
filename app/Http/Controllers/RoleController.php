@@ -4,11 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Role;
 use App\Enums\Perm;
-use App\Events\Roles\EShow;
-use App\Events\Roles\EIndex;
+use App\Events\Roles\EJoin;
 use Illuminate\Http\Request;
-use App\Events\Roles\ECreate;
-use App\Events\Roles\EDelete;
 use App\Events\Roles\EUpdate;
 use App\Http\Requests\RoleRequest;
 
@@ -61,7 +58,7 @@ class RoleController extends Controller
         }
 
         $list = $query->paginate($request->count ?? self::PAGINATE_DEFAULT);
-        event(new EIndex);
+        event(new EJoin(...$list->items()));
 
         return response()->json($list);
     }
@@ -81,8 +78,6 @@ class RoleController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        event(new ECreate($role));
-
         return response()->json([
             'message' => __('app.roles.store'),
             'role' => $role,
@@ -99,7 +94,7 @@ class RoleController extends Controller
     {
         $role = Role::with('permissions')->findOrFail($id);
 
-        event(new EShow($role));
+        event(new EJoin($role));
 
         return response()->json([
             'message' => __('app.roles.show'),
@@ -122,8 +117,6 @@ class RoleController extends Controller
         if (! $role->save()) {
             return $this->responseDatabaseSaveError();
         }
-
-        event(new EUpdate($id, $role));
 
         return response()->json([
             'message' => __('app.roles.update'),
@@ -169,8 +162,6 @@ class RoleController extends Controller
         if (! $role->delete()) {
             return $this->responseDatabaseDestroyError();
         }
-
-        event(new EDelete($role));
 
         return response()->json([
             'message' => __('app.roles.destroy'),

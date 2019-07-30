@@ -42,6 +42,7 @@ abstract class EBroadcast implements ShouldBroadcast, IBroadcastWebsocket
             'rooms' => $this->rooms(),
             'params' => $this->params(),
             'data' => $this->transformData($this->data()),
+            'join' => $this->join(), // Only for CREATE event
         ];
     }
 
@@ -56,5 +57,13 @@ abstract class EBroadcast implements ShouldBroadcast, IBroadcastWebsocket
         }
 
         return $data;
+    }
+
+    /**
+     * Join to this room after broadcast.
+     * @return string
+     */
+    protected function join(): string {
+        return '';
     }
 }

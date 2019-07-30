@@ -7,11 +7,7 @@ use App\Enums\Perm;
 use App\RequestStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use App\Events\RequestStatuses\EShow;
-use App\Events\RequestStatuses\EIndex;
-use App\Events\RequestStatuses\ECreate;
-use App\Events\RequestStatuses\EDelete;
-use App\Events\RequestStatuses\EUpdate;
+use App\Events\RequestStatuses\EJoin;
 use App\Http\Requests\RequestStatusRequest;
 
 class RequestStatusController extends Controller
@@ -32,8 +28,8 @@ class RequestStatusController extends Controller
         $this->_user = auth()->user();
 
         return [
-            'index' => Perm::REQUESTS_CONFIG_VIEW,
-            'show' => Perm::REQUESTS_CONFIG_VIEW,
+            'index' => Perm::REQUESTS_CONFIG_VIEW_ALL,
+            'show' => Perm::REQUESTS_CONFIG_VIEW_ALL,
             'store' => Perm::REQUESTS_CONFIG_CREATE,
             'update' => [Perm::REQUESTS_CONFIG_EDIT_OWN, Perm::REQUESTS_CONFIG_EDIT_ALL],
             'destroy' => [Perm::REQUESTS_CONFIG_DELETE_OWN, Perm::REQUESTS_CONFIG_DELETE_ALL],
@@ -49,7 +45,7 @@ class RequestStatusController extends Controller
     {
         $list = RequestStatus::all();
 
-        event(new EIndex);
+        event(new EJoin(...$list));
 
         return response()->json($list);
     }
@@ -74,8 +70,6 @@ class RequestStatusController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        event(new ECreate($requestStatus));
-
         return response()->json([
             'message' => __('app.request_status.store'),
             'request_status' => $requestStatus,
@@ -92,7 +86,7 @@ class RequestStatusController extends Controller
     {
         $requestStatus = RequestStatus::findOrFail($id);
 
-        event(new EShow);
+        event(new EJoin($requestStatus));
 
         return response()->json([
             'message' => __('app.request_status.show'),
@@ -132,8 +126,6 @@ class RequestStatusController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        event(new EUpdate($id, $requestStatus));
-
         return response()->json([
             'message' => __('app.request_status.update'),
             'request_status' => $requestStatus,
@@ -164,8 +156,6 @@ class RequestStatusController extends Controller
         if (! $requestStatus->delete($id)) {
             return $this->responseDatabaseDestroyError();
         }
-
-        event(new EDelete($requestStatus));
 
         return response()->json([
             'message' => __('app.request_status.destroy'),

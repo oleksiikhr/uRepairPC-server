@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Equipment extends Model
@@ -70,7 +71,7 @@ class Equipment extends Model
     ];
 
     /**
-     * @return mixed
+     * @return Builder
      */
     public static function querySelectJoins()
     {

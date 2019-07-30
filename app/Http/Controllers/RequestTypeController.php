@@ -6,11 +6,7 @@ use App\User;
 use App\Enums\Perm;
 use App\RequestType;
 use Illuminate\Http\Request;
-use App\Events\RequestTypes\EShow;
-use App\Events\RequestTypes\EIndex;
-use App\Events\RequestTypes\ECreate;
-use App\Events\RequestTypes\EDelete;
-use App\Events\RequestTypes\EUpdate;
+use App\Events\RequestTypes\EJoin;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\RequestTypeRequest;
 
@@ -32,8 +28,8 @@ class RequestTypeController extends Controller
         $this->_user = auth()->user();
 
         return [
-            'index' => Perm::REQUESTS_CONFIG_VIEW,
-            'show' => Perm::REQUESTS_CONFIG_VIEW,
+            'index' => Perm::REQUESTS_CONFIG_VIEW_ALL,
+            'show' => Perm::REQUESTS_CONFIG_VIEW_ALL,
             'store' => Perm::REQUESTS_CONFIG_CREATE,
             'update' => [Perm::REQUESTS_CONFIG_EDIT_OWN, Perm::REQUESTS_CONFIG_EDIT_ALL],
             'destroy' => [Perm::REQUESTS_CONFIG_DELETE_OWN, Perm::REQUESTS_CONFIG_DELETE_ALL],
@@ -49,7 +45,7 @@ class RequestTypeController extends Controller
     {
         $list = RequestType::all();
 
-        event(new EIndex);
+        event(new EJoin(...$list));
 
         return response()->json($list);
     }
@@ -74,8 +70,6 @@ class RequestTypeController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        event(new ECreate($requestType));
-
         return response()->json([
             'message' => __('app.request_type.store'),
             'request_type' => $requestType,
@@ -92,7 +86,7 @@ class RequestTypeController extends Controller
     {
         $requestType = RequestType::findOrFail($id);
 
-        event(new EShow);
+        event(new EJoin($requestType));
 
         return response()->json([
             'message' => __('app.request_type.show'),
@@ -132,8 +126,6 @@ class RequestTypeController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        event(new EUpdate($id, $requestType));
-
         return response()->json([
             'message' => __('app.request_type.update'),
             'request_type' => $requestType,
@@ -164,8 +156,6 @@ class RequestTypeController extends Controller
         if (! $requestType->delete($id)) {
             return $this->responseDatabaseDestroyError();
         }
-
-        event(new EDelete($requestType));
 
         return response()->json([
             'message' => __('app.request_type.destroy'),

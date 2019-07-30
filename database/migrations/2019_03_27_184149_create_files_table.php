@@ -18,7 +18,8 @@ class CreateFilesTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('name');
             $table->string('ext');
-            $table->string('file');
+            $table->string('path');
+            $table->string('disk')->default('local');
             $table->unsignedInteger('size');
             $table->timestamps();
 

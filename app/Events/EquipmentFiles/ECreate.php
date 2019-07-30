@@ -40,8 +40,8 @@ class ECreate extends ECreateBroadcast
     public function rooms()
     {
         return [
-            "{$this->roomName}.{$this->_equipmentId}",
-            "{$this->roomName}.{$this->_equipmentId} [user_id.{$this->_userIdUpload}]",
+            self::$roomName . ".{$this->_equipmentId}",
+            self::$roomName . ".{$this->_equipmentId} [user_id.{$this->_userIdUpload}]",
         ];
     }
 
@@ -53,5 +53,13 @@ class ECreate extends ECreateBroadcast
         return [
             'equipment_id' => $this->_equipmentId,
         ];
+    }
+
+    /**
+     * @return string
+     */
+    protected function join(): string
+    {
+        return self::$roomName . ".{$this->_equipmentId}.{$this->data['id']}";
     }
 }

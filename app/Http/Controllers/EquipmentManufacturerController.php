@@ -7,11 +7,7 @@ use App\Enums\Perm;
 use Illuminate\Http\Request;
 use App\EquipmentManufacturer;
 use Illuminate\Support\Facades\Gate;
-use App\Events\EquipmentManufacturers\EShow;
-use App\Events\EquipmentManufacturers\EIndex;
-use App\Events\EquipmentManufacturers\ECreate;
-use App\Events\EquipmentManufacturers\EDelete;
-use App\Events\EquipmentManufacturers\EUpdate;
+use App\Events\EquipmentManufacturers\EJoin;
 use App\Http\Requests\EquipmentManufacturerRequest;
 
 class EquipmentManufacturerController extends Controller
@@ -32,8 +28,8 @@ class EquipmentManufacturerController extends Controller
         $this->_user = auth()->user();
 
         return [
-            'index' => Perm::EQUIPMENTS_CONFIG_VIEW,
-            'show' => Perm::EQUIPMENTS_CONFIG_VIEW,
+            'index' => Perm::EQUIPMENTS_CONFIG_VIEW_ALL,
+            'show' => Perm::EQUIPMENTS_CONFIG_VIEW_ALL,
             'store' => Perm::EQUIPMENTS_CONFIG_CREATE,
             'update' => [Perm::EQUIPMENTS_CONFIG_EDIT_OWN, Perm::EQUIPMENTS_CONFIG_EDIT_ALL],
             'destroy' => [Perm::EQUIPMENTS_CONFIG_DELETE_OWN, Perm::EQUIPMENTS_CONFIG_DELETE_ALL],
@@ -49,7 +45,7 @@ class EquipmentManufacturerController extends Controller
     {
         $list = EquipmentManufacturer::all();
 
-        event(new EIndex);
+        event(new EJoin(...$list));
 
         return response()->json($list);
     }
@@ -70,8 +66,6 @@ class EquipmentManufacturerController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        event(new ECreate($equipmentManufacturer));
-
         return response()->json([
             'message' => __('app.equipment_manufacturers.store'),
             'equipment_manufacturer' => $equipmentManufacturer,
@@ -88,7 +82,7 @@ class EquipmentManufacturerController extends Controller
     {
         $equipmentManufacturer = EquipmentManufacturer::findOrFail($id);
 
-        event(new EShow);
+        event(new EJoin($equipmentManufacturer));
 
         return response()->json([
             'message' => __('app.equipment_manufacturers.show'),
@@ -120,8 +114,6 @@ class EquipmentManufacturerController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        event(new EUpdate($id, $equipmentManufacturer));
-
         return response()->json([
             'message' => __('app.equipment_manufacturers.update'),
             'equipment_manufacturer' => $equipmentManufacturer,
@@ -148,8 +140,6 @@ class EquipmentManufacturerController extends Controller
         if (! $equipmentManufacturer->delete()) {
             return $this->responseDatabaseDestroyError();
         }
-
-        event(new EDelete($equipmentManufacturer));
 
         return response()->json([
             'message' => __('app.equipment_manufacturers.destroy'),

@@ -13,6 +13,6 @@ class EUpdate extends EUpdateBroadcast
      */
     public function rooms()
     {
-        return $this->roomName;
+        return self::$roomName . ".{$this->id}";
     }
 }

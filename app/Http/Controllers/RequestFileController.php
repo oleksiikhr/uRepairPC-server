@@ -5,11 +5,10 @@ namespace App\Http\Controllers;
 use App\User;
 use App\Enums\Perm;
 use Illuminate\Http\Request;
-use App\Http\Helpers\FileHelper;
 use App\Request as RequestModel;
 use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\FileRequest;
-use App\Events\RequestFiles\EIndex;
+use App\Events\RequestFiles\EJoin;
 use App\Events\RequestFiles\ECreate;
 use App\Events\RequestFiles\EDelete;
 use App\Events\RequestFiles\EUpdate;
@@ -40,7 +39,6 @@ class RequestFileController extends Controller
 
         if (! $this->_user) {
             $this->middleware('jwt.auth');
-
             return [];
         }
 
@@ -50,7 +48,6 @@ class RequestFileController extends Controller
         // Permissions on request before get a files
         if (! RequestModel::hasAccessByPerm($this->_request, $this->_user)) {
             $this->middleware('permission:disable');
-
             return [];
         }
 
@@ -71,17 +68,18 @@ class RequestFileController extends Controller
      */
     public function index(int $requestId)
     {
-        $requestFiles = $this->_request->files();
+        $query = $this->_request->files();
 
         if (! $this->_user->perm(Perm::REQUESTS_FILES_VIEW_ALL)) {
-            $requestFiles->where('user_id', $this->_user->id);
+            $query->where('user_id', $this->_user->id);
         }
 
-        event(new EIndex($requestId));
+        $requestFiles = $query->get();
+        event(new EJoin($requestId, ...$requestFiles));
 
         return response()->json([
             'message' => __('app.files.files_get'),
-            'request_files' => $requestFiles->get(),
+            'request_files' => $requestFiles,
         ]);
     }
 
@@ -139,11 +137,11 @@ class RequestFileController extends Controller
             return $this->responseNoPermission();
         }
 
-        if (! Storage::exists($requestFile->file)) {
+        if (! Storage::exists($requestFile->path)) {
             return response()->json(['message' => __('app.files.file_not_found')], 422);
         }
 
-        return Storage::download($requestFile->file, $requestFile->name.'.'.$requestFile->ext);
+        return Storage::download($requestFile->path, $requestFile->name.'.'.$requestFile->ext);
     }
 
     /**
@@ -197,8 +195,6 @@ class RequestFileController extends Controller
         ) {
             return $this->responseNoPermission();
         }
-
-        FileHelper::delete($requestFile->file);
 
         if (! $requestFile->delete()) {
             return $this->responseDatabaseDestroyError();

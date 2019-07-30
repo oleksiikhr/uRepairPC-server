@@ -4,7 +4,7 @@ namespace App\Events\Roles;
 
 trait EModel
 {
-    public $roomName = 'roles';
+    public static $roomName = 'roles';
 
     /**
      * @return string

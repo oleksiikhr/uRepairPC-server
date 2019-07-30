@@ -4,7 +4,7 @@ namespace App\Events\Requests;
 
 trait EModel
 {
-    public $roomName = 'requests';
+    public static $roomName = 'requests';
 
     /**
      * @return string

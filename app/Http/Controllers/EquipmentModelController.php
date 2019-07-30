@@ -7,11 +7,7 @@ use App\Enums\Perm;
 use App\EquipmentModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use App\Events\EquipmentModels\EShow;
-use App\Events\EquipmentModels\EIndex;
-use App\Events\EquipmentModels\ECreate;
-use App\Events\EquipmentModels\EDelete;
-use App\Events\EquipmentModels\EUpdate;
+use App\Events\EquipmentModels\EJoin;
 use App\Http\Requests\EquipmentModelRequest;
 
 class EquipmentModelController extends Controller
@@ -32,8 +28,8 @@ class EquipmentModelController extends Controller
         $this->_user = auth()->user();
 
         return [
-            'index' => Perm::EQUIPMENTS_CONFIG_VIEW,
-            'show' => Perm::EQUIPMENTS_CONFIG_VIEW,
+            'index' => Perm::EQUIPMENTS_CONFIG_VIEW_ALL,
+            'show' => Perm::EQUIPMENTS_CONFIG_VIEW_ALL,
             'store' => Perm::EQUIPMENTS_CONFIG_CREATE,
             'update' => [Perm::EQUIPMENTS_CONFIG_EDIT_OWN, Perm::EQUIPMENTS_CONFIG_EDIT_ALL],
             'destroy' => [Perm::EQUIPMENTS_CONFIG_DELETE_OWN, Perm::EQUIPMENTS_CONFIG_DELETE_ALL],
@@ -49,7 +45,7 @@ class EquipmentModelController extends Controller
     {
         $list = EquipmentModel::querySelectJoins()->get();
 
-        event(new EIndex);
+        event(new EJoin(...$list));
 
         return response()->json($list);
     }
@@ -71,7 +67,6 @@ class EquipmentModelController extends Controller
         }
 
         $equipmentModel = EquipmentModel::querySelectJoins()->findOrFail($equipmentModel->id);
-        event(new ECreate($equipmentModel));
 
         return response()->json([
             'message' => __('app.equipment_model.store.store'),
@@ -89,7 +84,7 @@ class EquipmentModelController extends Controller
     {
         $equipmentModel = EquipmentModel::querySelectJoins()->findOrFail($id);
 
-        event(new EShow);
+        event(new EJoin($equipmentModel));
 
         return response()->json([
             'message' => __('app.equipment_model.show'),
@@ -122,7 +117,6 @@ class EquipmentModelController extends Controller
         }
 
         $equipmentModel = EquipmentModel::querySelectJoins()->findOrFail($equipmentModel->id);
-        event(new EUpdate($id, $equipmentModel));
 
         return response()->json([
             'message' => __('app.equipment_model.update'),
@@ -150,8 +144,6 @@ class EquipmentModelController extends Controller
         if (! $equipmentModel->delete()) {
             return $this->responseDatabaseDestroyError();
         }
-
-        event(new EDelete($equipmentModel));
 
         return response()->json([
             'message' => __('app.equipment_model.destroy'),

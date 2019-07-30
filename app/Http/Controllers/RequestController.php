@@ -8,11 +8,7 @@ use App\RequestType;
 use App\RequestStatus;
 use App\RequestPriority;
 use Illuminate\Http\Request;
-use App\Events\Requests\EShow;
-use App\Events\Requests\EIndex;
-use App\Events\Requests\ECreate;
-use App\Events\Requests\EDelete;
-use App\Events\Requests\EUpdate;
+use App\Events\Requests\EJoin;
 use App\Request as RequestModel;
 use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\RequestRequest;
@@ -83,7 +79,7 @@ class RequestController extends Controller
         RequestModel::buildQueryByPerm($query, $this->_user);
 
         $list = $query->paginate(self::PAGINATE_DEFAULT);
-        event(new EIndex);
+        event(new EJoin(...$list->items()));
 
         return response()->json($list);
     }
@@ -107,8 +103,6 @@ class RequestController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        event(new ECreate($requestModel));
-
         return response()->json([
             'message' => __('app.requests.store'),
             'request' => RequestModel::querySelectJoins()->findOrFail($requestModel->id),
@@ -129,7 +123,7 @@ class RequestController extends Controller
             return $this->responseNoPermission();
         }
 
-        event(new EShow($requestModel));
+        event(new EJoin($requestModel));
 
         return response()->json([
             'message' => __('app.requests.show'),
@@ -160,7 +154,7 @@ class RequestController extends Controller
         }
 
         // Config attributes
-        if ($this->_user->perm(Perm::REQUESTS_CONFIG_VIEW)) {
+        if ($this->_user->perm(Perm::REQUESTS_CONFIG_VIEW_ALL)) {
             if ($request->has('type_id')) {
                 $requestModel->type_id = $request->type_id;
             }
@@ -177,7 +171,6 @@ class RequestController extends Controller
         }
 
         $requestModel = RequestModel::querySelectJoins()->findOrFail($id);
-        event(new EUpdate($id, $requestModel));
 
         return response()->json([
             'message' => __('app.requests.update'),
@@ -203,9 +196,7 @@ class RequestController extends Controller
 
         // Destroy files
         if ($request->files_delete) {
-            $isSuccess = FilesHelper::delete($requestModel->files);
-
-            if (! $isSuccess) {
+            if (! FilesHelper::delete($requestModel->files)) {
                 return response()->json(['message' => __('app.files.files_not_deleted')], 422);
             }
         }
@@ -213,8 +204,6 @@ class RequestController extends Controller
         if (! $requestModel->delete()) {
             return $this->responseDatabaseDestroyError();
         }
-
-        event(new EDelete($requestModel));
 
         return response()->json([
             'message' => __('app.requests.destroy'),

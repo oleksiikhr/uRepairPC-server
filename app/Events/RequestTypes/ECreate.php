@@ -13,6 +13,14 @@ class ECreate extends ECreateBroadcast
      */
     public function rooms()
     {
-        return $this->roomName;
+        return self::$roomName;
+    }
+
+    /**
+     * @return string
+     */
+    protected function join(): string
+    {
+        return self::$roomName . ".{$this->data['id']}";
     }
 }

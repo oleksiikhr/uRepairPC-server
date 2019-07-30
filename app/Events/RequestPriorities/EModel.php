@@ -4,7 +4,7 @@ namespace App\Events\RequestPriorities;
 
 trait EModel
 {
-    public $roomName = 'request_priorities';
+    public static $roomName = 'request_priorities';
 
     /**
      * @return string

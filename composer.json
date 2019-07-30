@@ -1,6 +1,6 @@
 {
   "version": "2.1.0",
-  "name": "uRepairPC/server",
+  "name": "urepairpc/server",
   "type": "project",
   "description": "Accounting system for orders for the repair of technical means.",
   "keywords": [

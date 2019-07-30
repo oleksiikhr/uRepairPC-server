@@ -14,8 +14,16 @@ class ECreate extends ECreateBroadcast
     public function rooms()
     {
         return [
-            $this->roomName,
-            "{$this->roomName} [user_id.{$this->data['user_id']}]",
+            self::$roomName,
+            self::$roomName . " [user_id.{$this->data['user_id']}]",
         ];
+    }
+
+    /**
+     * @return string
+     */
+    protected function join(): string
+    {
+        return self::$roomName . ".{$this->data['id']}";
     }
 }

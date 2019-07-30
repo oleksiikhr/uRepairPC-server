@@ -41,9 +41,7 @@ class UserRequest extends FormRequest
         }
 
         if ($method === Request::METHOD_DELETE) {
-            return [
-                'image_delete' => 'boolean',
-            ];
+            return [];
         }
 
         $rules = [

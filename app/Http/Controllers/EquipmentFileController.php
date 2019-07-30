@@ -6,11 +6,10 @@ use App\User;
 use App\Equipment;
 use App\Enums\Perm;
 use Illuminate\Http\Request;
-use App\Http\Helpers\FileHelper;
 use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\FileRequest;
 use Illuminate\Support\Facades\Gate;
-use App\Events\EquipmentFiles\EIndex;
+use App\Events\EquipmentFiles\EJoin;
 use App\Events\EquipmentFiles\ECreate;
 use App\Events\EquipmentFiles\EDelete;
 use App\Events\EquipmentFiles\EUpdate;
@@ -40,7 +39,6 @@ class EquipmentFileController extends Controller
 
         if (! $this->_user) {
             $this->middleware('jwt.auth');
-
             return [];
         }
 
@@ -52,7 +50,6 @@ class EquipmentFileController extends Controller
             Gate::denies('owner', $this->_equipment)
         ) {
             $this->middleware('permission:disable');
-
             return [];
         }
 
@@ -73,17 +70,18 @@ class EquipmentFileController extends Controller
      */
     public function index(int $equipmentId)
     {
-        $equipmentFiles = $this->_equipment->files();
+        $query = $this->_equipment->files();
 
         if (! $this->_user->perm(Perm::EQUIPMENTS_FILES_VIEW_ALL)) {
-            $equipmentFiles->where('user_id', $this->_user->id);
+            $query->where('user_id', $this->_user->id);
         }
 
-        event(new EIndex($equipmentId));
+        $equipmentFiles = $query->get();
+        event(new EJoin($equipmentId, ...$equipmentFiles));
 
         return response()->json([
             'message' => __('app.files.files_get'),
-            'equipment_files' => $equipmentFiles->get(),
+            'equipment_files' => $equipmentFiles,
         ]);
     }
 
@@ -106,7 +104,7 @@ class EquipmentFileController extends Controller
         $uploadedFiles = $this->_equipment->files()->whereIn('files.id', $uploadedIds)->get();
 
         if (count($uploadedFiles)) {
-            event(new ECreate($equipmentId, $uploadedFiles));
+            event(new ECreate($equipmentId, $uploadedFiles, $this->_user->id));
         }
 
         if ($filesHelper->hasErrors()) {
@@ -141,11 +139,11 @@ class EquipmentFileController extends Controller
             return $this->responseNoPermission();
         }
 
-        if (! Storage::exists($equipmentFile->file)) {
+        if (! Storage::exists($equipmentFile->path)) {
             return response()->json(['message' => __('app.files.file_not_found')], 422);
         }
 
-        return Storage::download($equipmentFile->file, $equipmentFile->name.'.'.$equipmentFile->ext);
+        return Storage::download($equipmentFile->path, $equipmentFile->name.'.'.$equipmentFile->ext);
     }
 
     /**
@@ -199,8 +197,6 @@ class EquipmentFileController extends Controller
         ) {
             return $this->responseNoPermission();
         }
-
-        FileHelper::delete($equipmentFile->file);
 
         if (! $equipmentFile->delete()) {
             return $this->responseDatabaseDestroyError();

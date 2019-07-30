@@ -98,12 +98,12 @@ class ManifestController extends Controller
 
         $manifestFile->mergeAndSaveToFile($data);
 
-        $jsonResource = new ManifestJsonResource($data);
-        event(new EManifestUpdate($jsonResource));
+        $response = (new ManifestJsonResource($data))->jsonSerialize();
+        event(new EManifestUpdate($response));
 
         return response()->json([
             'message' => __('app.settings.manifest'),
-            'data' => $jsonResource,
+            'data' => $response,
         ]);
     }
 }

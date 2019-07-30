@@ -4,7 +4,7 @@ namespace App\Events\EquipmentFiles;
 
 trait EModel
 {
-    public $roomName = 'equipment_files';
+    public static $roomName = 'equipment_files';
 
     /**
      * @return string

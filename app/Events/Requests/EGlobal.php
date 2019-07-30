@@ -5,27 +5,35 @@ namespace App\Events\Requests;
 use App\Enums\Perm;
 use App\Events\Common\EJoinBroadcast;
 
-class EIndex extends EJoinBroadcast
+class EGlobal extends EJoinBroadcast
 {
     use EModel;
 
     public function __construct()
     {
+        parent::__construct(self::getRooms(), false);
+    }
+
+    /**
+     * @return array
+     */
+    public static function getRooms(): array
+    {
         $user = auth()->user();
         $rooms = [];
 
         if ($user->perm(Perm::REQUESTS_VIEW_ALL)) {
-            $rooms[] = $this->roomName;
+            $rooms[] = self::$roomName;
         }
 
         if ($user->perm(Perm::REQUESTS_VIEW_OWN)) {
-            $rooms[] = "{$this->roomName} [user_id.{$user->id}]";
+            $rooms[] = self::$roomName . " [user_id.{$user->id}]";
         }
 
         if ($user->perm(Perm::REQUESTS_VIEW_ASSIGN)) {
-            $rooms[] = "{$this->roomName} [assign_id.{$user->id}]";
+            $rooms[] = self::$roomName . " [assign_id.{$user->id}]";
         }
 
-        parent::__construct($rooms, false);
+        return $rooms;
     }
 }

@@ -2,24 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\File;
 use App\Role;
 use App\User;
 use App\Enums\Perm;
 use App\Mail\EmailChange;
 use App\Mail\UserCreated;
-use App\Events\Users\EShow;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use App\Events\Users\EIndex;
+use App\Events\Users\EJoin;
 use Illuminate\Http\Request;
-use App\Events\Users\ECreate;
-use App\Events\Users\EDelete;
 use App\Events\Users\EUpdate;
 use App\Http\Helpers\FileHelper;
 use App\Events\Users\EUpdateRoles;
 use App\Http\Requests\UserRequest;
 use App\Http\Requests\ImageRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
@@ -44,7 +39,6 @@ class UserController extends Controller
 
         if (! $this->_user) {
             $this->middleware('jwt.auth');
-
             return [];
         }
 
@@ -63,7 +57,7 @@ class UserController extends Controller
             'delete' => $requestId === 1 || $isOwnProfile ? Perm::DISABLE : Perm::USERS_DELETE_ALL,
 
             // Image
-            'showImage' => $isOwnProfile ? null : Perm::USERS_VIEW_ALL,
+            'showImage' => $isOwnProfile ? true : Perm::USERS_VIEW_ALL,
             'updateImage' => $editPermissionProfile,
             'deleteImage' => $editPermissionProfile,
 
@@ -108,7 +102,7 @@ class UserController extends Controller
         }
 
         $list = $query->paginate(self::PAGINATE_DEFAULT);
-        event(new EIndex);
+        event(new EJoin(...$list->items()));
 
         return response()->json($list);
     }
@@ -134,8 +128,11 @@ class UserController extends Controller
 
         $user->assignRolesById(Role::getDefaultValues()->pluck('id'));
 
-        event(new ECreate($user));
-        Mail::to($user)->send(new UserCreated($password)); // TODO Disable on APP_DEMO
+        // TODO Disable on APP_DEMO
+        // TODO Move to UserObserver
+        // TODO Make table for temporary tokens?
+        // TODO Queue?
+        Mail::to($user)->send(new UserCreated($password));
 
         return response()->json([
             'message' => __('app.users.store'),
@@ -154,7 +151,7 @@ class UserController extends Controller
         $user = User::with('roles')->findOrFail($id);
         $user->permissions = $user->getAllPermNames();
 
-        event(new EShow($user));
+        event(new EJoin($user));
 
         return response()->json([
             'message' => __('app.users.show'),
@@ -178,9 +175,6 @@ class UserController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        $eventData = Arr::add($request->all(), 'updated_at', $user->updated_at->toDateTimeString());
-        event(new EUpdate($id, $eventData));
-
         return response()->json([
             'message' => __('app.users.update'),
             'user' => $user,
@@ -198,23 +192,9 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Destroy profile image (avatar)
-        if ($request->image_delete && $user->image) {
-            $deleted = FileHelper::delete($user->image);
-
-            if (! $deleted) {
-                return response()->json(['message' => __('app.files.file_not_deleted')]);
-            }
-
-            $user->image = null;
-            $user->save();
-        }
-
         if (! $user->delete()) {
             return $this->responseDatabaseDestroyError();
         }
-
-        event(new EDelete($user));
 
         return response()->json([
             'message' => __('app.users.destroy'),
@@ -224,20 +204,22 @@ class UserController extends Controller
     /**
      * Get avatar from user.
      *
-     * @param  string  $path
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\JsonResponse
+     * @param  int  $id - user id
+     * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public function showImage(string $path)
+    public function showImage(int $id)
     {
-        if (! Str::startsWith($path, self::FOLDER_AVATARS.'/')) {
+        $user = User::with('image')->findOrFail($id);
+
+        if (! $user->image_id) {
             return response(null);
         }
 
-        if (! Storage::exists($path)) {
+        if (! Storage::exists($user->image->path)) {
             return response(null);
         }
 
-        $file = Storage::path($path);
+        $file = Storage::path($user->image->path);
 
         return response()->file($file);
     }
@@ -292,9 +274,6 @@ class UserController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
-        $eventData = Arr::add($request->all(), 'updated_at', $user->updated_at->toDateTimeString());
-        event(new EUpdate($id, $eventData));
-
         return response()->json([
             'message' => __('app.users.email_changed'),
             'user' => $user,
@@ -314,7 +293,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         // We can change only for own profile.
-        if (Auth::id() === $id) {
+        if ($this->_user->id === $id) {
             return $this->setPasswordProfile($request, $user);
         }
 
@@ -327,35 +306,36 @@ class UserController extends Controller
      * @param  ImageRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function updateImage(ImageRequest $request, int $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::with('image')->findOrFail($id);
 
         // Delete old image if exists
-        if ($user->image) {
-            FileHelper::delete($user->image);
+        if ($user->image_id && ! File::destroy($user->image_id)) {
+            return $this->responseDatabaseDestroyError();
         }
 
-        $file = new FileHelper($request->file('image'));
-        $uploadedUri = $file->store(self::FOLDER_AVATARS);
+        // Upload new file
+        $fileHelper = new FileHelper($request->file('image'));
+        $file = $fileHelper->fill();
+        $file->path = $fileHelper->store(self::FOLDER_AVATARS);
 
-        if (! $uploadedUri) {
+        if (! $file->path) {
             return response()->json(['message' => __('app.files.file_not_saved')], 422);
         }
 
-        $user->image = $uploadedUri;
-
-        if (! $user->save()) {
-            FileHelper::delete($uploadedUri);
-
+        if (! $user->image()->save($file)) {
             return $this->responseDatabaseSaveError();
         }
 
-        event(new EUpdate($id, [
-            'image' => $uploadedUri,
-            'updated_at' => $user->updated_at->toDateTimeString(),
-        ]));
+        $user->image_id = $file->id;
+
+        if (! $user->save()) {
+            File::destroy($file->id);
+            return $this->responseDatabaseSaveError();
+        }
 
         return response()->json([
             'message' => __('app.files.file_saved'),
@@ -371,20 +351,21 @@ class UserController extends Controller
      */
     public function destroyImage(int $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::with('image')->findOrFail($id);
 
-        if (! FileHelper::delete($user->image)) {
+        if (! $user->image_id) {
+            return response()->json(['message' => __('app.files.file_not_found')], 422);
+        }
+
+        if (! File::destroy($user->image_id)) {
             return response()->json(['message' => __('app.files.file_not_deleted')], 422);
         }
 
-        $user->image = null;
+        $user->image_id = null;
 
-        if (! $user->save()) {
-            return $this->responseDatabaseSaveError();
-        }
-
+        // image_id destroy by onDelete('set null') on DB, so send the event manually
         event(new EUpdate($id, [
-            'image' => null,
+            'image_id' => null,
             'updated_at' => $user->updated_at->toDateTimeString(),
         ]));
 
