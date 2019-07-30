@@ -4,8 +4,8 @@ namespace App\Observers;
 
 use App\Role;
 use App\Events\Roles\ECreate;
-use App\Events\Roles\EUpdate;
 use App\Events\Roles\EDelete;
+use App\Events\Roles\EUpdate;
 
 class RoleObserver
 {

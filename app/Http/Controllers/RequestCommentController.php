@@ -38,6 +38,7 @@ class RequestCommentController extends Controller
 
         if (! $this->_user) {
             $this->middleware('jwt.auth');
+
             return [];
         }
 
@@ -47,6 +48,7 @@ class RequestCommentController extends Controller
         // Permissions on request before get a comments
         if (! RequestModel::hasAccessByPerm($this->_request, $this->_user)) {
             $this->middleware('permission:disable');
+
             return [];
         }
 

@@ -39,6 +39,7 @@ class UserController extends Controller
 
         if (! $this->_user) {
             $this->middleware('jwt.auth');
+
             return [];
         }
 
@@ -334,6 +335,7 @@ class UserController extends Controller
 
         if (! $user->save()) {
             File::destroy($file->id);
+
             return $this->responseDatabaseSaveError();
         }
 

@@ -21,6 +21,6 @@ class ECreate extends ECreateBroadcast
      */
     protected function join(): string
     {
-        return self::$roomName . ".{$this->data['id']}";
+        return self::$roomName.".{$this->data['id']}";
     }
 }

@@ -30,11 +30,11 @@ class EGlobal extends EJoinBroadcast
         $rooms = [];
 
         if ($user->perm(Perm::EQUIPMENTS_FILES_VIEW_ALL)) {
-            $rooms[] = self::$roomName . ".{$equipmentId}";
+            $rooms[] = self::$roomName.".{$equipmentId}";
         }
 
         if ($user->perm(Perm::EQUIPMENTS_FILES_VIEW_OWN)) {
-            $rooms[] = self::$roomName . ".{$equipmentId} [user_id.{$user->id}]";
+            $rooms[] = self::$roomName.".{$equipmentId} [user_id.{$user->id}]";
         }
 
         return $rooms;

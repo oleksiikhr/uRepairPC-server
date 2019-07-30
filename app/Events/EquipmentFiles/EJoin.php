@@ -13,7 +13,7 @@ class EJoin extends EJoinBroadcast
         $rooms = [];
 
         foreach ($items as $item) {
-            $rooms[] = self::$roomName . ".{$equipmentId}.{$item->id}";
+            $rooms[] = self::$roomName.".{$equipmentId}.{$item->id}";
         }
 
         parent::__construct($rooms, false);
