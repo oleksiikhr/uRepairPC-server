@@ -32,7 +32,7 @@ class EUpdate extends EUpdateBroadcast
      */
     public function rooms()
     {
-        return self::$roomName . ".{$this->_equipmentId}.{$this->id}";
+        return self::$roomName.".{$this->_equipmentId}.{$this->id}";
     }
 
     /**

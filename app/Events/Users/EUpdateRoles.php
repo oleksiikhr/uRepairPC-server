@@ -13,6 +13,6 @@ class EUpdateRoles extends EUpdateBroadcast
      */
     public function rooms()
     {
-        return self::$roomName . ".{$this->id}.roles";
+        return self::$roomName.".{$this->id}.roles";
     }
 }

@@ -31,7 +31,7 @@ class ECreate extends ECreateBroadcast
      */
     public function rooms()
     {
-        return self::$roomName . ".{$this->_requestId}";
+        return self::$roomName.".{$this->_requestId}";
     }
 
     /**
@@ -49,6 +49,6 @@ class ECreate extends ECreateBroadcast
      */
     protected function join(): string
     {
-        return self::$roomName . ".{$this->_requestId}.{$this->data['id']}";
+        return self::$roomName.".{$this->_requestId}.{$this->data['id']}";
     }
 }

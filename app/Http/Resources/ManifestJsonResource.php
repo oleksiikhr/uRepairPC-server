@@ -24,6 +24,7 @@ class ManifestJsonResource extends JsonResource
             'theme_color' => $this['theme_color'],
             'icons' => collect($this['icons'])->map(function ($item) {
                 $item->src = url('storage/'.$item->src);
+
                 return $item;
             }),
         ];

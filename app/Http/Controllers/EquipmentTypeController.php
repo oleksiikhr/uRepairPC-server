@@ -6,8 +6,8 @@ use App\User;
 use App\Enums\Perm;
 use App\EquipmentType;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use App\Events\EquipmentTypes\EJoin;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\EquipmentTypeRequest;
 
 class EquipmentTypeController extends Controller

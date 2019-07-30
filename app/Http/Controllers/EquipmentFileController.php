@@ -8,8 +8,8 @@ use App\Enums\Perm;
 use Illuminate\Http\Request;
 use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\FileRequest;
-use Illuminate\Support\Facades\Gate;
 use App\Events\EquipmentFiles\EJoin;
+use Illuminate\Support\Facades\Gate;
 use App\Events\EquipmentFiles\ECreate;
 use App\Events\EquipmentFiles\EDelete;
 use App\Events\EquipmentFiles\EUpdate;
@@ -39,6 +39,7 @@ class EquipmentFileController extends Controller
 
         if (! $this->_user) {
             $this->middleware('jwt.auth');
+
             return [];
         }
 
@@ -50,6 +51,7 @@ class EquipmentFileController extends Controller
             Gate::denies('owner', $this->_equipment)
         ) {
             $this->middleware('permission:disable');
+
             return [];
         }
 

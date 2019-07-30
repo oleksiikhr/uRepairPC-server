@@ -4,8 +4,8 @@ namespace App\Observers;
 
 use App\Equipment;
 use App\Events\Equipments\ECreate;
-use App\Events\Equipments\EUpdate;
 use App\Events\Equipments\EDelete;
+use App\Events\Equipments\EUpdate;
 
 class EquipmentObserver
 {

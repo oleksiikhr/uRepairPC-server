@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Events\JoinRooms;
 use Illuminate\Http\Request;
-use App\Events\Users\EGlobal as UsersEvent;
 use App\Events\Roles\EGlobal as RolesEvent;
+use App\Events\Users\EGlobal as UsersEvent;
 use App\Events\Requests\EGlobal as RequestsEvent;
 use App\Events\Equipments\EGlobal as EquipmentsEvent;
 use App\Events\RequestTypes\EGlobal as RequestTypesEvent;

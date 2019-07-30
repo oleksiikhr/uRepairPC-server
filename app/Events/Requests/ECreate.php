@@ -15,11 +15,11 @@ class ECreate extends ECreateBroadcast
     {
         $rooms = [
             self::$roomName,
-            self::$roomName . " [user_id.{$this->data['user_id']}]",
+            self::$roomName." [user_id.{$this->data['user_id']}]",
         ];
 
         if (isset($this->data['assign_id'])) {
-            $rooms[] = self::$roomName . " [assign_id.{$this->data['assign_id']}]";
+            $rooms[] = self::$roomName." [assign_id.{$this->data['assign_id']}]";
         }
 
         return $rooms;
@@ -30,6 +30,6 @@ class ECreate extends ECreateBroadcast
      */
     protected function join(): string
     {
-        return self::$roomName . ".{$this->data['id']}";
+        return self::$roomName.".{$this->data['id']}";
     }
 }

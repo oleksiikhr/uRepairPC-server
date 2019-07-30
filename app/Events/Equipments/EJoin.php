@@ -14,7 +14,7 @@ class EJoin extends EJoinBroadcast
         $rooms = [];
 
         foreach ($items as $item) {
-            $rooms[] = self::$roomName . ".{$item->id}";
+            $rooms[] = self::$roomName.".{$item->id}";
             array_push($rooms, ...EquipmentFiles::getRooms($item->id));
         }
 
