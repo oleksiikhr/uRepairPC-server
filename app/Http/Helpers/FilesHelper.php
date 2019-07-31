@@ -99,8 +99,6 @@ class FilesHelper
     {
         $deleteIds = [];
 
-//        TODO Rewrite file delete (events, fireEvents)
-
         foreach ($files as $file) {
             if (FileHelper::delete($file->path)) {
                 $deleteIds[] = $file->id;

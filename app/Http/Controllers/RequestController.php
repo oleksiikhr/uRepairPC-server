@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Equipment;
 use App\Enums\Perm;
 use App\RequestType;
 use App\RequestStatus;
@@ -13,6 +14,7 @@ use App\Request as RequestModel;
 use App\Events\Requests\ECreate;
 use App\Events\Requests\EUpdate;
 use App\Http\Helpers\FilesHelper;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\RequestRequest;
 
 class RequestController extends Controller
@@ -101,6 +103,20 @@ class RequestController extends Controller
         $requestModel->priority_id = RequestPriority::getDefaultValue()->id;
         $requestModel->status_id = RequestStatus::getDefaultValue()->id;
 
+        // FIXME Move to another method + in update method + EquipmentFileController (permissions method)
+        // + EquipmentController (show method)
+        // Add Equipment if has access
+        if ($request->has('equipment_id')) {
+            if ($this->_user->perm(Perm::EQUIPMENTS_VIEW_ALL)) {
+                $requestModel->equipment_id = $request->equipment_id;
+            } else {
+                $equipment = Equipment::findOrFail($request->equipment_id);
+                if (Gate::allows('owner', $equipment)) {
+                    $requestModel->equipment_id = $request->equipment_id;
+                }
+            }
+        }
+
         if (! $requestModel->save()) {
             return $this->responseDatabaseSaveError();
         }
@@ -152,6 +168,18 @@ class RequestController extends Controller
         }
 
         $requestModel->fill($request->all());
+
+        // Change Equipment if has access
+        if ($request->has('equipment_id')) {
+            if ($this->_user->perm(Perm::EQUIPMENTS_VIEW_ALL)) {
+                $requestModel->equipment_id = $request->equipment_id;
+            } else {
+                $equipment = Equipment::findOrFail($request->equipment_id);
+                if (Gate::allows('owner', $equipment)) {
+                    $requestModel->equipment_id = $request->equipment_id;
+                }
+            }
+        }
 
         // Only user, who can edit every request - can assign user to request
         // TODO Move to another method (after web system*)
