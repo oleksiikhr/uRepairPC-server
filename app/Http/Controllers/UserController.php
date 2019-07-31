@@ -130,9 +130,6 @@ class UserController extends Controller
         $user->assignRolesById(Role::getDefaultValues()->pluck('id'));
 
         // TODO Disable on APP_DEMO
-        // TODO Move to UserObserver
-        // TODO Make table for temporary tokens?
-        // TODO Queue?
         Mail::to($user)->send(new UserCreated($password));
 
         return response()->json([

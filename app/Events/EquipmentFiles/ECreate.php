@@ -56,10 +56,20 @@ class ECreate extends ECreateBroadcast
     }
 
     /**
-     * @return string
+     * @return array|string
      */
-    protected function join(): string
+    protected function join()
     {
-        return self::$roomName.".{$this->_equipmentId}.{$this->data['id']}";
+        $rooms = [];
+
+        if (is_array($this->data)) {
+            foreach ($this->data as $file) {
+                $rooms[] = self::$roomName.".{$this->_equipmentId}.{$file['id']}";
+            }
+        } else {
+            $rooms[] = self::$roomName.".{$this->_equipmentId}.{$this->data['id']}";
+        }
+
+        return $rooms;
     }
 }
