@@ -39,6 +39,7 @@ class EquipmentFileController extends Controller
 
         if (! $this->_user) {
             $this->middleware('jwt.auth');
+
             return [];
         }
 
@@ -50,6 +51,7 @@ class EquipmentFileController extends Controller
             Gate::denies('owner', $this->_equipment)
         ) {
             $this->middleware('permission:disable');
+
             return [];
         }
 

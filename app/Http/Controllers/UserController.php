@@ -332,6 +332,7 @@ class UserController extends Controller
 
         if (! $user->save()) {
             File::destroy($file->id);
+
             return $this->responseDatabaseSaveError();
         }
 
