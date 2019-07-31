@@ -8,6 +8,8 @@ use App\Enums\Perm;
 use Illuminate\Http\Request;
 use App\Events\Equipments\EJoin;
 use App\Http\Helpers\FilesHelper;
+use App\Events\Equipments\ECreate;
+use App\Events\Equipments\EUpdate;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\EquipmentRequest;
 
@@ -86,6 +88,8 @@ class EquipmentController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        event(new ECreate($equipment));
+
         return response()->json([
             'message' => __('app.equipments.store'),
             'equipment' => Equipment::querySelectJoins()->findOrFail($equipment->id),
@@ -139,6 +143,7 @@ class EquipmentController extends Controller
 
         // Update model new data from relationship
         $equipment = Equipment::querySelectJoins()->findOrFail($equipment->id);
+        event(new EUpdate($equipment->id, $equipment));
 
         return response()->json([
             'message' => __('app.equipments.update'),

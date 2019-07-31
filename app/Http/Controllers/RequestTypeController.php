@@ -8,6 +8,8 @@ use App\RequestType;
 use Illuminate\Http\Request;
 use App\Events\RequestTypes\EJoin;
 use Illuminate\Support\Facades\Gate;
+use App\Events\RequestTypes\ECreate;
+use App\Events\RequestTypes\EUpdate;
 use App\Http\Requests\RequestTypeRequest;
 
 class RequestTypeController extends Controller
@@ -70,6 +72,8 @@ class RequestTypeController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
+        event(new ECreate($requestType));
+
         return response()->json([
             'message' => __('app.request_type.store'),
             'request_type' => $requestType,
@@ -125,6 +129,8 @@ class RequestTypeController extends Controller
         if (! $requestType->save()) {
             return $this->responseDatabaseSaveError();
         }
+
+        event(new EUpdate($requestType->id, $requestType));
 
         return response()->json([
             'message' => __('app.request_type.update'),

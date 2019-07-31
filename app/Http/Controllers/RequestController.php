@@ -10,6 +10,8 @@ use App\RequestPriority;
 use Illuminate\Http\Request;
 use App\Events\Requests\EJoin;
 use App\Request as RequestModel;
+use App\Events\Requests\ECreate;
+use App\Events\Requests\EUpdate;
 use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\RequestRequest;
 
@@ -103,9 +105,12 @@ class RequestController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
+        $requestModel = RequestModel::querySelectJoins()->findOrFail($requestModel->id);
+        event(new ECreate($requestModel));
+
         return response()->json([
             'message' => __('app.requests.store'),
-            'request' => RequestModel::querySelectJoins()->findOrFail($requestModel->id),
+            'request' => $requestModel,
         ]);
     }
 
@@ -149,6 +154,7 @@ class RequestController extends Controller
         $requestModel->fill($request->all());
 
         // Only user, who can edit every request - can assign user to request
+        // TODO Move to another method (after web system*)
         if ($request->has('assign_id') && $this->_user->perm(Perm::REQUESTS_EDIT_ALL)) {
             $requestModel->assign_id = $request->assign_id;
         }
@@ -171,6 +177,7 @@ class RequestController extends Controller
         }
 
         $requestModel = RequestModel::querySelectJoins()->findOrFail($id);
+        event(new EUpdate($requestModel->id, $requestModel));
 
         return response()->json([
             'message' => __('app.requests.update'),

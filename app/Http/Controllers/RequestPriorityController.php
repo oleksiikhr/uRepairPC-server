@@ -8,6 +8,8 @@ use App\RequestPriority;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use App\Events\RequestPriorities\EJoin;
+use App\Events\RequestPriorities\ECreate;
+use App\Events\RequestPriorities\EUpdate;
 use App\Http\Requests\RequestPriorityRequest;
 
 class RequestPriorityController extends Controller
@@ -70,6 +72,8 @@ class RequestPriorityController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
+        event(new ECreate($requestPriority));
+
         return response()->json([
             'message' => __('app.request_priority.store'),
             'request_priority' => $requestPriority,
@@ -125,6 +129,8 @@ class RequestPriorityController extends Controller
         if (! $requestPriority->save()) {
             return $this->responseDatabaseSaveError();
         }
+
+        event(new EUpdate($requestPriority->id, $requestPriority));
 
         return response()->json([
             'message' => __('app.request_priority.update'),

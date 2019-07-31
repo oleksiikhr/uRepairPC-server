@@ -8,6 +8,8 @@ use App\EquipmentType;
 use Illuminate\Http\Request;
 use App\Events\EquipmentTypes\EJoin;
 use Illuminate\Support\Facades\Gate;
+use App\Events\EquipmentTypes\ECreate;
+use App\Events\EquipmentTypes\EUpdate;
 use App\Http\Requests\EquipmentTypeRequest;
 
 class EquipmentTypeController extends Controller
@@ -66,6 +68,8 @@ class EquipmentTypeController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
+        event(new ECreate($equipmentType));
+
         return response()->json([
             'message' => __('app.equipment_type.store'),
             'equipment_type' => $equipmentType,
@@ -113,6 +117,8 @@ class EquipmentTypeController extends Controller
         if (! $equipmentType->save()) {
             return $this->responseDatabaseSaveError();
         }
+
+        event(new EUpdate($equipmentType->id, $equipmentType));
 
         return response()->json([
             'message' => __('app.equipment_type.update'),

@@ -8,6 +8,8 @@ use App\EquipmentModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use App\Events\EquipmentModels\EJoin;
+use App\Events\EquipmentModels\ECreate;
+use App\Events\EquipmentModels\EUpdate;
 use App\Http\Requests\EquipmentModelRequest;
 
 class EquipmentModelController extends Controller
@@ -67,6 +69,7 @@ class EquipmentModelController extends Controller
         }
 
         $equipmentModel = EquipmentModel::querySelectJoins()->findOrFail($equipmentModel->id);
+        event(new ECreate($equipmentModel));
 
         return response()->json([
             'message' => __('app.equipment_model.store.store'),
@@ -117,6 +120,7 @@ class EquipmentModelController extends Controller
         }
 
         $equipmentModel = EquipmentModel::querySelectJoins()->findOrFail($equipmentModel->id);
+        event(new EUpdate($equipmentModel->id, $equipmentModel));
 
         return response()->json([
             'message' => __('app.equipment_model.update'),

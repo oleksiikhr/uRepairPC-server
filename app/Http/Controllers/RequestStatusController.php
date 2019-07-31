@@ -8,6 +8,8 @@ use App\RequestStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use App\Events\RequestStatuses\EJoin;
+use App\Events\RequestStatuses\ECreate;
+use App\Events\RequestStatuses\EUpdate;
 use App\Http\Requests\RequestStatusRequest;
 
 class RequestStatusController extends Controller
@@ -70,6 +72,8 @@ class RequestStatusController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
+        event(new ECreate($requestStatus));
+
         return response()->json([
             'message' => __('app.request_status.store'),
             'request_status' => $requestStatus,
@@ -125,6 +129,8 @@ class RequestStatusController extends Controller
         if (! $requestStatus->save()) {
             return $this->responseDatabaseSaveError();
         }
+
+        event(new EUpdate($requestStatus->id, $requestStatus));
 
         return response()->json([
             'message' => __('app.request_status.update'),

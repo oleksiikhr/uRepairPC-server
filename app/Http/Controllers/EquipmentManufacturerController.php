@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\EquipmentManufacturer;
 use Illuminate\Support\Facades\Gate;
 use App\Events\EquipmentManufacturers\EJoin;
+use App\Events\EquipmentManufacturers\ECreate;
+use App\Events\EquipmentManufacturers\EUpdate;
 use App\Http\Requests\EquipmentManufacturerRequest;
 
 class EquipmentManufacturerController extends Controller
@@ -66,6 +68,8 @@ class EquipmentManufacturerController extends Controller
             return $this->responseDatabaseSaveError();
         }
 
+        event(new ECreate($equipmentManufacturer));
+
         return response()->json([
             'message' => __('app.equipment_manufacturers.store'),
             'equipment_manufacturer' => $equipmentManufacturer,
@@ -113,6 +117,8 @@ class EquipmentManufacturerController extends Controller
         if (! $equipmentManufacturer->save()) {
             return $this->responseDatabaseSaveError();
         }
+
+        event(new EUpdate($equipmentManufacturer->id, $equipmentManufacturer));
 
         return response()->json([
             'message' => __('app.equipment_manufacturers.update'),
