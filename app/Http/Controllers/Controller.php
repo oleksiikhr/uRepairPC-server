@@ -16,7 +16,7 @@ abstract class Controller extends BaseController implements IPermissions
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /** @var int */
-    const PAGINATE_DEFAULT = 30;
+    const PAGINATE_DEFAULT = 25;
 
     public function __construct(Request $request)
     {

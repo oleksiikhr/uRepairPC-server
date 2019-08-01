@@ -55,7 +55,7 @@ class RequestFileController extends Controller
 
         return [
             'index' => [Perm::REQUESTS_FILES_VIEW_OWN, Perm::REQUESTS_FILES_VIEW_ALL],
-            'show' => [Perm::REQUESTS_FILES_VIEW_OWN, Perm::REQUESTS_FILES_VIEW_ALL],
+            'show' => [Perm::REQUESTS_FILES_DOWNLOAD_OWN, Perm::REQUESTS_FILES_DOWNLOAD_ALL],
             'store' => Perm::REQUESTS_FILES_CREATE,
             'update' => [Perm::REQUESTS_FILES_EDIT_OWN, Perm::REQUESTS_FILES_EDIT_ALL],
             'destroy' => [Perm::REQUESTS_FILES_DELETE_OWN, Perm::REQUESTS_FILES_DELETE_ALL],
@@ -132,8 +132,8 @@ class RequestFileController extends Controller
     {
         $requestFile = $this->_request->files()->findOrFail($fileId);
 
-        // Show only own file
-        if (! $this->_user->perm(Perm::REQUESTS_FILES_VIEW_ALL) &&
+        // Download only own file
+        if (! $this->_user->perm(Perm::REQUESTS_FILES_DOWNLOAD_ALL) &&
             Gate::denies('owner', $requestFile)
         ) {
             return $this->responseNoPermission();

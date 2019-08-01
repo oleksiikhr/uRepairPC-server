@@ -57,7 +57,7 @@ class EquipmentFileController extends Controller
 
         return [
             'index' => [Perm::EQUIPMENTS_FILES_VIEW_OWN, Perm::EQUIPMENTS_FILES_VIEW_ALL],
-            'show' => [Perm::EQUIPMENTS_FILES_VIEW_OWN, Perm::EQUIPMENTS_FILES_VIEW_ALL],
+            'show' => [Perm::EQUIPMENTS_FILES_DOWNLOAD_OWN, Perm::EQUIPMENTS_FILES_DOWNLOAD_ALL],
             'store' => Perm::EQUIPMENTS_FILES_CREATE,
             'update' => [Perm::EQUIPMENTS_FILES_EDIT_OWN, Perm::EQUIPMENTS_FILES_EDIT_ALL],
             'destroy' => [Perm::EQUIPMENTS_FILES_DELETE_OWN, Perm::EQUIPMENTS_FILES_DELETE_ALL],
@@ -134,8 +134,8 @@ class EquipmentFileController extends Controller
     {
         $equipmentFile = $this->_equipment->files()->findOrFail($fileId);
 
-        // Show only own file
-        if (! $this->_user->perm(Perm::EQUIPMENTS_FILES_VIEW_ALL) &&
+        // Download only own file
+        if (! $this->_user->perm(Perm::EQUIPMENTS_FILES_DOWNLOAD_ALL) &&
             Gate::denies('owner', $equipmentFile)
         ) {
             return $this->responseNoPermission();
