@@ -88,11 +88,12 @@ class EquipmentController extends Controller
             return response()->json(['message' => __('app.database.save_error')], 422);
         }
 
+        $equipment = Equipment::querySelectJoins()->findOrFail($equipment->id);
         event(new ECreate($equipment));
 
         return response()->json([
             'message' => __('app.equipments.store'),
-            'equipment' => Equipment::querySelectJoins()->findOrFail($equipment->id),
+            'equipment' => $equipment,
         ]);
     }
 
