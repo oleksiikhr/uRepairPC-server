@@ -38,6 +38,7 @@ trait ModelHasPermissionsTrait
         }
         $roles = $query->get();
 
+        Cache::forget($this->getCacheKey());
         return $this->roles()->sync($roles->pluck('id')->toArray());
     }
 
@@ -53,6 +54,7 @@ trait ModelHasPermissionsTrait
             $ids = [$ids];
         }
 
+        Cache::forget($this->getCacheKey());
         return $this->roles()->sync($ids);
     }
 
@@ -63,9 +65,7 @@ trait ModelHasPermissionsTrait
      */
     public function getAllPerm(): Collection
     {
-        $key = $this->permissionCacheKey.'.'.$this->getTable().'.'.$this->id;
-
-        return Cache::remember($key, $this->permissionCacheTime, function () {
+        return Cache::remember($this->getCacheKey(), $this->permissionCacheTime, function () {
             $this->loadMissing(['roles', 'roles.permissions']);
 
             return $this->roles->flatMap(function ($role) {
@@ -110,5 +110,14 @@ trait ModelHasPermissionsTrait
         }
 
         return false;
+    }
+
+    /**
+     * Get key for Cache permissions
+     * @return string
+     */
+    private function getCacheKey(): string
+    {
+        return $this->permissionCacheKey.'.'.$this->getTable().'.'.$this->id;
     }
 }
