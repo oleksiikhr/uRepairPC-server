@@ -39,6 +39,7 @@ trait ModelHasPermissionsTrait
         $roles = $query->get();
 
         Cache::forget($this->getCacheKey());
+
         return $this->roles()->sync($roles->pluck('id')->toArray());
     }
 
@@ -55,6 +56,7 @@ trait ModelHasPermissionsTrait
         }
 
         Cache::forget($this->getCacheKey());
+
         return $this->roles()->sync($ids);
     }
 
@@ -113,7 +115,7 @@ trait ModelHasPermissionsTrait
     }
 
     /**
-     * Get key for Cache permissions
+     * Get key for Cache permissions.
      * @return string
      */
     private function getCacheKey(): string
