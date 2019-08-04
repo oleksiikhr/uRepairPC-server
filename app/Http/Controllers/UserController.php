@@ -96,9 +96,10 @@ class UserController extends Controller
         }
 
         // Filter
-        if ($request->has('filterRoleById')) {
-            $query->whereHas('roles', function ($q) use ($request) {
-                $q->where('id', $request->filterRoleById);
+        if ($request->request_access && $this->_user->perm(Perm::REQUESTS_EDIT_ALL)) {
+            $query->whereHas('roles.permissions', function ($query) {
+                $query->where('name', Perm::REQUESTS_EDIT_ALL);
+                $query->orWhere('name', Perm::REQUESTS_EDIT_ASSIGN);
             });
         }
 
