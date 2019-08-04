@@ -126,7 +126,7 @@ class RequestController extends Controller
 
         return response()->json([
             'message' => __('app.requests.store'),
-            'request' => $requestModel,
+            'request' => RequestModel::querySelectJoins()->findOrFail($requestModel->id),
         ]);
     }
 
