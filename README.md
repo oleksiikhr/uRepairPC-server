@@ -24,7 +24,7 @@
 Backend, validation and work with the Database and Redis.
 
 ## Database
-<img src="https://raw.githubusercontent.com/uRepairPC/docs/master/public/database.png" alt="Database">
+<img src="https://raw.githubusercontent.com/uRepairPC/docs/master/public/server/database.png" alt="Database">
 
 ## Ecosystem
 | Project | Status | Description |
