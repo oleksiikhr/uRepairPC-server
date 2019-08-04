@@ -2,7 +2,7 @@
 
 namespace App\Http\Json;
 
-class GlobalFile extends JsonFile
+class GlobalFile extends Json
 {
     private const FILE_NAME = 'settings.json';
 

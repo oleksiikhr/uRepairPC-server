@@ -2,7 +2,9 @@
 
 namespace App;
 
+use App\Enums\Perm;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -65,7 +67,6 @@ class Request extends Model
         'title',
         'location',
         'description',
-        'equipment_id',
     ];
 
     /**
@@ -99,6 +100,48 @@ class Request extends Model
             ->leftJoin('request_statuses', 'requests.status_id', '=', 'request_statuses.id')
             ->leftJoin('equipments', 'requests.equipment_id', '=', 'equipments.id')
             ->leftJoin('equipment_models', 'equipments.model_id', '=', 'equipment_models.id');
+    }
+
+    /**
+     * @param  self  $request
+     * @param  User  $user
+     * @return bool
+     */
+    public static function hasAccessByPerm($request, $user): bool
+    {
+        if (! $user->perm(Perm::REQUESTS_VIEW_ALL)) {
+            if (! $user->perm(Perm::REQUESTS_VIEW_OWN)) {
+                return Gate::allows('assign', $request);
+            }
+            if (! $user->perm(Perm::REQUESTS_VIEW_ASSIGN)) {
+                return Gate::allows('owner', $request);
+            }
+
+            return Gate::allows('owner', $request) || Gate::allows('assign', $request);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param  $query
+     * @param  User  $user
+     * @return void
+     */
+    public static function buildQueryByPerm($query, $user): void
+    {
+        if (! $user->perm(Perm::REQUESTS_VIEW_ALL)) {
+            if (! $user->perm(Perm::REQUESTS_VIEW_OWN)) {
+                $query->where('requests.assign_id', $user->id);
+            } elseif (! $user->perm(Perm::REQUESTS_VIEW_ASSIGN)) {
+                $query->where('requests.user_id', $user->id);
+            } else {
+                $query->where(function ($query) use ($user) {
+                    $query->where('requests.user_id', $user->id);
+                    $query->orWhere('requests.assign_id', $user->id);
+                });
+            }
+        }
     }
 
     /* | -----------------------------------------------------------------------------------

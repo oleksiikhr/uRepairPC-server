@@ -6,19 +6,13 @@ use App\Events\Common\EUpdateBroadcast;
 
 class EUpdate extends EUpdateBroadcast
 {
-    /**
-     * @return string
-     */
-    public function event(): string
-    {
-        return 'requests';
-    }
+    use EModel;
 
     /**
      * @return array|string|null
      */
     public function rooms()
     {
-        return 'requests.'.$this->id;
+        return self::$roomName.".{$this->id}";
     }
 }

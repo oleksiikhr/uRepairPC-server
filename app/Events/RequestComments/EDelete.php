@@ -3,9 +3,12 @@
 namespace App\Events\RequestComments;
 
 use App\Events\Common\EDeleteBroadcast;
+use Illuminate\Database\Eloquent\Model;
 
 class EDelete extends EDeleteBroadcast
 {
+    use EModel;
+
     /**
      * @var int
      */
@@ -15,21 +18,13 @@ class EDelete extends EDeleteBroadcast
      * Create a new event instance.
      *
      * @param  int  $requestId
-     * @param  int  $id
+     * @param  Model  $model
      * @return void
      */
-    public function __construct(int $requestId, int $id)
+    public function __construct(int $requestId, Model $model)
     {
-        parent::__construct($id);
+        parent::__construct($model);
         $this->_requestId = $requestId;
-    }
-
-    /**
-     * @return string
-     */
-    public function event(): string
-    {
-        return 'request_comments';
     }
 
     /**
@@ -37,7 +32,7 @@ class EDelete extends EDeleteBroadcast
      */
     public function rooms()
     {
-        return 'request_comments.'.$this->_requestId;
+        return self::$roomName.".{$this->_requestId}.{$this->data['id']}";
     }
 
     /**
@@ -46,7 +41,7 @@ class EDelete extends EDeleteBroadcast
     public function params(): ?array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->data['id'],
             'request_id' => $this->_requestId,
         ];
     }

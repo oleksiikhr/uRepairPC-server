@@ -6,7 +6,6 @@ use JWTAuth;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\AuthRequest;
-use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -28,11 +27,11 @@ class AuthController extends Controller
      */
     public function profile()
     {
-        $user = Auth::user();
+        $user = auth()->user();
 
         return response()->json([
             'user' => $user,
-            'permissions' => $user->getAllPermissions()->pluck('name'),
+            'permissions' => $user->getAllPermNames(),
         ]);
     }
 
@@ -48,13 +47,13 @@ class AuthController extends Controller
             return response()->json(['message' => __('app.auth.login_error')], 422);
         }
 
-        $user = Auth::user();
+        $user = auth()->user();
 
         return response()->json([
             'message' => __('app.auth.login_success'),
             'token' => $token,
             'user' => $user,
-            'permissions' => $user->getAllPermissions()->pluck('name'),
+            'permissions' => $user->getAllPermNames(),
         ]);
     }
 

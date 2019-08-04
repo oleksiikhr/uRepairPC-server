@@ -45,11 +45,11 @@ class FilesHelper
                 continue;
             }
 
-            $fileModel->file = $uploadedUri;
+            $fileModel->path = $uploadedUri;
 
             if (! $fileModel->save()) {
                 $this->_errors[$file->getClientOriginalName()] = [__('app.database.save_error')];
-                FileHelper::delete($fileModel->file);
+                FileHelper::delete($fileModel->path, $fileModel->disk);
                 continue;
             }
 
@@ -100,9 +100,7 @@ class FilesHelper
         $deleteIds = [];
 
         foreach ($files as $file) {
-            $isDeleted = FileHelper::delete($file->file);
-
-            if ($isDeleted) {
+            if (FileHelper::delete($file->path)) {
                 $deleteIds[] = $file->id;
             }
         }

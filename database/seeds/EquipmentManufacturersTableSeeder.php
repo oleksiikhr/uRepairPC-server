@@ -17,6 +17,7 @@ class EquipmentManufacturersTableSeeder extends Seeder
         foreach ($names as $name) {
             EquipmentManufacturer::create([
                 'name' => $name,
+                'user_id' => 1,
             ]);
         }
     }

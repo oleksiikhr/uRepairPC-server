@@ -41,7 +41,30 @@ abstract class EBroadcast implements ShouldBroadcast, IBroadcastWebsocket
             'socketId' => request()->header('X-Socket-ID'),
             'rooms' => $this->rooms(),
             'params' => $this->params(),
-            'data' => $this->data(),
+            'data' => $this->transformData($this->data()),
+            'join' => $this->join(), // Only for CREATE event
         ];
+    }
+
+    /**
+     * @param  mixed  $data
+     * @return mixed
+     */
+    protected function transformData($data)
+    {
+        if ($data && method_exists($data, 'toArray')) {
+            return $data->toArray();
+        }
+
+        return $data;
+    }
+
+    /**
+     * Join to this room after broadcast.
+     * @return array|string
+     */
+    protected function join()
+    {
+        return '';
     }
 }

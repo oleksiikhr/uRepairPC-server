@@ -14,13 +14,13 @@ class CreateRequestsTable extends Migration
     public function up()
     {
         Schema::create('requests', function (Blueprint $table) {
-            $table->increments('id');
-            $table->unsignedInteger('user_id');
-            $table->unsignedInteger('assign_id')->nullable();
-            $table->unsignedInteger('type_id');
-            $table->unsignedInteger('priority_id');
-            $table->unsignedInteger('status_id');
-            $table->unsignedInteger('equipment_id')->nullable();
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('assign_id')->nullable();
+            $table->unsignedBigInteger('type_id');
+            $table->unsignedBigInteger('priority_id');
+            $table->unsignedBigInteger('status_id');
+            $table->unsignedBigInteger('equipment_id')->nullable();
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('location')->nullable();

@@ -14,8 +14,8 @@ class CreateRequestFileTable extends Migration
     public function up()
     {
         Schema::create('request_file', function (Blueprint $table) {
-            $table->unsignedInteger('request_id');
-            $table->unsignedInteger('file_id');
+            $table->unsignedBigInteger('request_id');
+            $table->unsignedBigInteger('file_id');
 
             $table->foreign('request_id')->references('id')->on('requests')
                 ->onDelete('cascade');

@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Enums\Perm;
 use App\RequestComment;
-use App\Enums\Permissions;
 use Illuminate\Http\Request;
 use App\Request as RequestModel;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use App\Events\RequestComments\EJoin;
 use App\Events\RequestComments\ECreate;
 use App\Events\RequestComments\EDelete;
 use App\Events\RequestComments\EUpdate;
@@ -18,12 +19,12 @@ class RequestCommentController extends Controller
     /**
      * @var RequestModel
      */
-    private $_requestModel;
+    private $_request;
 
     /**
      * @var User
      */
-    private $_currentUser;
+    private $_user;
 
     /**
      * Add middleware depends on user permissions.
@@ -33,32 +34,30 @@ class RequestCommentController extends Controller
      */
     public function permissions(Request $request): array
     {
-        if (! Auth::check()) {
+        $this->_user = auth()->user();
+
+        if (! $this->_user) {
             $this->middleware('jwt.auth');
 
             return [];
         }
 
         $requestId = (int) $request->route('request');
-        $this->_currentUser = Auth::user();
+        $this->_request = RequestModel::findOrFail($requestId);
 
-        if ($requestId) {
-            $this->_requestModel = RequestModel::findOrFail($requestId);
+        // Permissions on request before get a comments
+        if (! RequestModel::hasAccessByPerm($this->_request, $this->_user)) {
+            $this->middleware('permission:disable');
 
-            // If user created this request or assign
-            if ($this->_requestModel->user_id === $this->_currentUser->id ||
-                $this->_requestModel->assign_id === $this->_currentUser->id
-            ) {
-                return [];
-            }
+            return [];
         }
 
         return [
-            'index' => Permissions::REQUESTS_VIEW,
-            'show' => Permissions::REQUESTS_VIEW,
-            'store' => Permissions::REQUESTS_EDIT,
-            'update' => Permissions::REQUESTS_EDIT,
-            'destroy' => Permissions::REQUESTS_EDIT,
+            'index' => Perm::REQUESTS_COMMENTS_VIEW_ALL,
+            'show' => Perm::REQUESTS_COMMENTS_VIEW_ALL,
+            'store' => Perm::REQUESTS_COMMENTS_CREATE,
+            'update' => [Perm::REQUESTS_COMMENTS_EDIT_OWN, Perm::REQUESTS_COMMENTS_EDIT_ALL],
+            'destroy' => [Perm::REQUESTS_COMMENTS_DELETE_OWN, Perm::REQUESTS_COMMENTS_DELETE_ALL],
         ];
     }
 
@@ -70,9 +69,12 @@ class RequestCommentController extends Controller
      */
     public function index(int $requestId)
     {
+        $requestComments = $this->_request->comments()->get();
+        event(new EJoin($requestId, ...$requestComments));
+
         return response()->json([
             'message' => __('app.request_comments.index'),
-            'request_comments' => $this->_requestModel->comments,
+            'request_comments' => $requestComments,
         ]);
     }
 
@@ -88,14 +90,14 @@ class RequestCommentController extends Controller
         $requestComment = new RequestComment;
         $requestComment->fill($request->all());
         $requestComment->request_id = $requestId;
-        $requestComment->user_id = $this->_currentUser->id;
+        $requestComment->user_id = $this->_user->id;
 
         if (! $requestComment->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
-        $requestComment = $this->_requestModel->comments()->find($requestComment->id);
-        event(new ECreate($requestId, $requestComment->toArray()));
+        $requestComment = $this->_request->comments()->findOrFail($requestComment->id);
+        event(new ECreate($requestId, $requestComment));
 
         return response()->json([
             'message' => __('app.request_comments.store'),
@@ -107,12 +109,14 @@ class RequestCommentController extends Controller
      * Display the specified resource.
      *
      * @param  int  $requestId
-     * @param  int  $id
+     * @param  int  $commentId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(int $requestId, int $id)
+    public function show(int $requestId, int $commentId)
     {
-        $requestComment = $this->_requestModel->comments()->findOrFail($id);
+        $requestComment = $this->_request->comments()->findOrFail($commentId);
+
+        event(new EJoin($requestId, $requestComment));
 
         return response()->json([
             'message' => __('app.request_comments.show'),
@@ -125,24 +129,28 @@ class RequestCommentController extends Controller
      *
      * @param  RequestCommentRequest  $request
      * @param  int  $requestId
-     * @param  int  $id
+     * @param  int  $commentId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(RequestCommentRequest $request, int $requestId, int $id)
+    public function update(RequestCommentRequest $request, int $requestId, int $commentId)
     {
-        $requestComment = $this->_requestModel->comments()->findOrFail($id);
+        $requestComment = $this->_request->comments()->findOrFail($commentId);
+
+        // Show only own comment
+        if (! $this->_user->perm(Perm::REQUESTS_COMMENTS_EDIT_ALL) &&
+            Gate::denies('owner', $requestComment)
+        ) {
+            return $this->responseNoPermission();
+        }
+
         $requestComment->fill($request->all());
 
-        if (! $this->hasPermissionForAction($requestComment->user_id)) {
-            return response()->json(['message' => __('app.middleware.no_permission')], 422);
-        }
-
         if (! $requestComment->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
-        $requestComment = $this->_requestModel->comments()->find($requestComment->id);
-        event(new EUpdate($requestId, $id, $requestComment->toArray()));
+        $requestComment = $this->_request->comments()->findOrFail($requestComment->id);
+        event(new EUpdate($requestId, $commentId, $requestComment));
 
         return response()->json([
             'message' => __('app.request_comments.update'),
@@ -154,37 +162,29 @@ class RequestCommentController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $requestId
-     * @param  int  $id
+     * @param  int  $commentId
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
-    public function destroy(int $requestId, int $id)
+    public function destroy(int $requestId, int $commentId)
     {
-        $requestComment = $this->_requestModel->comments()->findOrFail($id);
+        $requestComment = $this->_request->comments()->findOrFail($commentId);
 
-        if (! $this->hasPermissionForAction($requestComment->user_id)) {
-            return response()->json(['message' => __('app.middleware.no_permission')], 422);
+        // Delete only own file
+        if (! $this->_user->perm(Perm::REQUESTS_COMMENTS_DELETE_ALL) &&
+            Gate::denies('owner', $requestComment)
+        ) {
+            return $this->responseNoPermission();
         }
 
         if (! $requestComment->delete()) {
-            return response()->json(['message' => __('app.database.destroy_error')], 422);
+            return $this->responseDatabaseDestroyError();
         }
 
-        event(new EDelete($requestId, $id));
+        event(new EDelete($requestId, $requestComment));
 
         return response()->json([
             'message' => __('app.request_comments.destroy'),
         ]);
-    }
-
-    /**
-     * Only author of comment or with REQUESTS_EDIT permission can update/delete.
-     *
-     * @param  int  $commentUserId
-     * @return bool
-     */
-    private function hasPermissionForAction($commentUserId)
-    {
-        return $this->_currentUser->can(Permissions::REQUESTS_EDIT) || $commentUserId === $this->_currentUser->id;
     }
 }

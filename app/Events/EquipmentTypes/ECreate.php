@@ -6,19 +6,21 @@ use App\Events\Common\ECreateBroadcast;
 
 class ECreate extends ECreateBroadcast
 {
-    /**
-     * @return string
-     */
-    public function event(): string
-    {
-        return 'equipment_types';
-    }
+    use EModel;
 
     /**
      * @return array|string|null
      */
     public function rooms()
     {
-        return 'equipment_types';
+        return self::$roomName;
+    }
+
+    /**
+     * @return array|string
+     */
+    protected function join()
+    {
+        return self::$roomName.".{$this->data['id']}";
     }
 }

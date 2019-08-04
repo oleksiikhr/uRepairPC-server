@@ -6,6 +6,8 @@ use App\Events\Common\ECreateBroadcast;
 
 class ECreate extends ECreateBroadcast
 {
+    use EModel;
+
     /**
      * @var int
      */
@@ -25,19 +27,11 @@ class ECreate extends ECreateBroadcast
     }
 
     /**
-     * @return string
-     */
-    public function event(): string
-    {
-        return 'request_comments';
-    }
-
-    /**
      * @return array|string|null
      */
     public function rooms()
     {
-        return 'request_comments.'.$this->_requestId;
+        return self::$roomName.".{$this->_requestId}";
     }
 
     /**
@@ -48,5 +42,13 @@ class ECreate extends ECreateBroadcast
         return [
             'request_id' => $this->_requestId,
         ];
+    }
+
+    /**
+     * @return array|string
+     */
+    protected function join()
+    {
+        return self::$roomName.".{$this->_requestId}.{$this->data['id']}";
     }
 }

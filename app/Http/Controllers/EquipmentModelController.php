@@ -2,16 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+use App\Enums\Perm;
 use App\EquipmentModel;
-use App\Enums\Permissions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use App\Events\EquipmentModels\EJoin;
 use App\Events\EquipmentModels\ECreate;
-use App\Events\EquipmentModels\EDelete;
 use App\Events\EquipmentModels\EUpdate;
 use App\Http\Requests\EquipmentModelRequest;
 
 class EquipmentModelController extends Controller
 {
+    /**
+     * @var User
+     */
+    private $_user;
+
     /**
      * Add middleware depends on user permissions.
      *
@@ -20,12 +27,14 @@ class EquipmentModelController extends Controller
      */
     public function permissions(Request $request): array
     {
+        $this->_user = auth()->user();
+
         return [
-            'index' => Permissions::EQUIPMENTS_CONFIG_VIEW,
-            'show' => Permissions::EQUIPMENTS_CONFIG_VIEW,
-            'store' => Permissions::EQUIPMENTS_CONFIG_CREATE,
-            'update' => Permissions::EQUIPMENTS_CONFIG_EDIT,
-            'destroy' => Permissions::EQUIPMENTS_CONFIG_DELETE,
+            'index' => Perm::EQUIPMENTS_CONFIG_VIEW_ALL,
+            'show' => Perm::EQUIPMENTS_CONFIG_VIEW_ALL,
+            'store' => Perm::EQUIPMENTS_CONFIG_CREATE,
+            'update' => [Perm::EQUIPMENTS_CONFIG_EDIT_OWN, Perm::EQUIPMENTS_CONFIG_EDIT_ALL],
+            'destroy' => [Perm::EQUIPMENTS_CONFIG_DELETE_OWN, Perm::EQUIPMENTS_CONFIG_DELETE_ALL],
         ];
     }
 
@@ -37,6 +46,8 @@ class EquipmentModelController extends Controller
     public function index()
     {
         $list = EquipmentModel::querySelectJoins()->get();
+
+        event(new EJoin(...$list));
 
         return response()->json($list);
     }
@@ -51,13 +62,14 @@ class EquipmentModelController extends Controller
     {
         $equipmentModel = new EquipmentModel;
         $equipmentModel->fill($request->all());
+        $equipmentModel->user_id = $this->_user->id;
 
         if (! $equipmentModel->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
-        $equipmentModel = EquipmentModel::querySelectJoins()->find($equipmentModel->id);
-        event(new ECreate($equipmentModel->toArray()));
+        $equipmentModel = EquipmentModel::querySelectJoins()->findOrFail($equipmentModel->id);
+        event(new ECreate($equipmentModel));
 
         return response()->json([
             'message' => __('app.equipment_model.store.store'),
@@ -75,6 +87,8 @@ class EquipmentModelController extends Controller
     {
         $equipmentModel = EquipmentModel::querySelectJoins()->findOrFail($id);
 
+        event(new EJoin($equipmentModel));
+
         return response()->json([
             'message' => __('app.equipment_model.show'),
             'equipment_model' => $equipmentModel,
@@ -91,14 +105,22 @@ class EquipmentModelController extends Controller
     public function update(EquipmentModelRequest $request, int $id)
     {
         $equipmentModel = EquipmentModel::findOrFail($id);
+
+        // Edit only own equipments config
+        if (! $this->_user->perm(Perm::EQUIPMENTS_CONFIG_EDIT_ALL) &&
+            Gate::denies('owner', $equipmentModel)
+        ) {
+            return $this->responseNoPermission();
+        }
+
         $equipmentModel->fill($request->all());
 
         if (! $equipmentModel->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
-        $equipmentModel = EquipmentModel::querySelectJoins()->find($equipmentModel->id);
-        event(new EUpdate($id, $equipmentModel->toArray()));
+        $equipmentModel = EquipmentModel::querySelectJoins()->findOrFail($equipmentModel->id);
+        event(new EUpdate($equipmentModel->id, $equipmentModel));
 
         return response()->json([
             'message' => __('app.equipment_model.update'),
@@ -114,11 +136,18 @@ class EquipmentModelController extends Controller
      */
     public function destroy(int $id)
     {
-        if (! EquipmentModel::destroy($id)) {
-            return response()->json(['message' => __('app.database.destroy_error')], 422);
+        $equipmentModel = EquipmentModel::findOrFail($id);
+
+        // Delete only own equipments config
+        if (! $this->_user->perm(Perm::EQUIPMENTS_CONFIG_DELETE_ALL) &&
+            Gate::denies('owner', $equipmentModel)
+        ) {
+            return $this->responseNoPermission();
         }
 
-        event(new EDelete($id));
+        if (! $equipmentModel->delete()) {
+            return $this->responseDatabaseDestroyError();
+        }
 
         return response()->json([
             'message' => __('app.equipment_model.destroy'),

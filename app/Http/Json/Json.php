@@ -5,7 +5,7 @@ namespace App\Http\Json;
 use App\Http\Helpers\FileHelper;
 use Illuminate\Support\Facades\Storage;
 
-abstract class JsonFile implements IJsonFile
+abstract class Json implements IJson
 {
     /**
      * @var bool

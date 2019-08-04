@@ -14,11 +14,17 @@ class CreateEquipmentManufacturersTable extends Migration
     public function up()
     {
         Schema::create('equipment_manufacturers', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('user_id');
             $table->string('name')->unique();
             $table->text('description')->nullable();
             $table->softDeletes();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')
+                ->onDelete('cascade');
+
+            $table->index('user_id');
         });
     }
 

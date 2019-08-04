@@ -37,7 +37,6 @@ Route::group(['prefix' => 'auth'], function () {
 Route::group(['middleware' => ['jwt.auth']], function () {
     Route::group(['prefix' => 'listeners'], function () {
         Route::post('sync', 'ListenerController@sync');
-        Route::post('join', 'ListenerController@join');
     });
 
     /*
@@ -56,7 +55,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         Route::put('{user}/email', 'UserController@updateEmail');
         Route::put('{user}/password', 'UserController@updatePassword');
         Route::put('{user}/roles', 'UserController@updateRoles');
-        Route::get('images/{imagePath?}', 'UserController@showImage')->where('imagePath', '(.*)');
+        Route::get('{user}/image', 'UserController@showImage');
         Route::post('{user}/image', 'UserController@updateImage');
         Route::delete('{user}/image', 'UserController@destroyImage');
     });

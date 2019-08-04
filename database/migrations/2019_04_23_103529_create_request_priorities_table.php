@@ -14,7 +14,8 @@ class CreateRequestPrioritiesTable extends Migration
     public function up()
     {
         Schema::create('request_priorities', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('user_id');
             $table->string('name')->unique();
             $table->string('color', 10)->nullable();
             $table->unsignedTinyInteger('value')->default(1);
@@ -22,6 +23,11 @@ class CreateRequestPrioritiesTable extends Migration
             $table->boolean('default')->default(false);
             $table->softDeletes();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')
+                ->onDelete('cascade');
+
+            $table->index('user_id');
         });
     }
 

@@ -2,22 +2,24 @@
 
 namespace App\Events\Common;
 
+use Illuminate\Database\Eloquent\Model;
+
 abstract class EDeleteBroadcast extends EBroadcast
 {
     /**
-     * @var int
+     * @var mixed
      */
-    protected $id;
+    protected $data;
 
     /**
      * Create a new event instance.
      *
-     * @param  int  $id
+     * @param  Model  $model
      * @return void
      */
-    public function __construct(int $id)
+    public function __construct($model)
     {
-        $this->id = $id;
+        $this->data = $this->transformData($model);
     }
 
     /**
@@ -34,7 +36,7 @@ abstract class EDeleteBroadcast extends EBroadcast
     public function params(): ?array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->data['id'],
         ];
     }
 

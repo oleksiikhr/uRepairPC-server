@@ -2,27 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use App\Events\JoinRooms;
-use App\Enums\Permissions;
 use Illuminate\Http\Request;
-use App\Request as RequestModel;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\ListenerRequest;
+use App\Events\Roles\EGlobal as RolesEvent;
+use App\Events\Users\EGlobal as UsersEvent;
+use App\Events\Requests\EGlobal as RequestsEvent;
+use App\Events\Equipments\EGlobal as EquipmentsEvent;
+use App\Events\RequestTypes\EGlobal as RequestTypesEvent;
+use App\Events\EquipmentTypes\EGlobal as EquipmentTypesEvent;
+use App\Events\EquipmentModels\EGlobal as EquipmentModelsEvent;
+use App\Events\RequestStatuses\EGlobal as RequestStatusesEvent;
+use App\Events\RequestPriorities\EGlobal as RequestPrioritiesEvent;
+use App\Events\EquipmentManufacturers\EGlobal as EquipmentManufacturersEvent;
 
 class ListenerController extends Controller
 {
-    /**
-     * @var User
-     */
-    private $_user;
-
-    public function __construct(Request $request)
-    {
-        parent::__construct($request);
-        $this->_user = Auth::user();
-    }
-
     /**
      * Add middleware depends on user permissions.
      *
@@ -37,103 +31,33 @@ class ListenerController extends Controller
     }
 
     /**
-     * Refresh all rooms to input socketId.
+     * Refresh all rooms for socketId and listen profile events.
      *
-     * @param  ListenerRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function sync(ListenerRequest $request)
+    public function sync()
     {
-        $rooms = $this->filterRoomsByPermissions($request->rooms ?? []);
+        // Listen events profile
+        $user = auth()->user();
+        $rooms = ["users.{$user->id}", "users.{$user->id}.roles"];
 
-        // Listen events for own profile
-        array_push($rooms, 'users.'.$this->_user->id, 'users.'.$this->_user->id.'.roles');
+        // Listen events from other section (if can)
+        $rooms = array_merge($rooms, UsersEvent::getRooms());
+        $rooms = array_merge($rooms, RolesEvent::getRooms());
+        $rooms = array_merge($rooms, EquipmentsEvent::getRooms());
+        $rooms = array_merge($rooms, EquipmentTypesEvent::getRooms());
+        $rooms = array_merge($rooms, EquipmentModelsEvent::getRooms());
+        $rooms = array_merge($rooms, EquipmentManufacturersEvent::getRooms());
+        $rooms = array_merge($rooms, RequestsEvent::getRooms());
+        $rooms = array_merge($rooms, RequestTypesEvent::getRooms());
+        $rooms = array_merge($rooms, RequestStatusesEvent::getRooms());
+        $rooms = array_merge($rooms, RequestPrioritiesEvent::getRooms());
 
-        // Listen settings
-        if ($this->_user->can(Permissions::EQUIPMENTS_CONFIG_VIEW)) {
-            array_push($rooms, 'equipment_types', 'equipment_manufacturers', 'equipment_models');
-        }
-
-        // Listen settings
-        if ($this->_user->can(Permissions::REQUESTS_CONFIG_VIEW)) {
-            array_push($rooms, 'request_statuses', 'request_priorities', 'request_types');
-        }
-
+        // Send all rooms to listen
         event(new JoinRooms($rooms, true));
 
         return response()->json([
             'rooms' => $rooms,
         ]);
-    }
-
-    /**
-     * Send event to Redis for join in rooms.
-     *
-     * @param  ListenerRequest  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function join(ListenerRequest $request)
-    {
-        $rooms = $this->filterRoomsByPermissions($request->rooms ?? []);
-        event(new JoinRooms($rooms, false));
-
-        return response()->json([
-            'rooms' => $rooms,
-        ]);
-    }
-
-    /**
-     * TODO Optimize.
-     *
-     * @param  array  $rooms
-     * @return array
-     */
-    private function filterRoomsByPermissions(array $rooms): array
-    {
-        $filterRooms = [];
-
-        foreach ($rooms as $room) {
-            $explode = explode('.', $room);
-
-            // section
-            switch ($explode[0]) {
-                case 'equipments':
-                    if ($this->_user->can(Permissions::EQUIPMENTS_VIEW)) {
-                        $filterRooms[] = $room;
-                    }
-                    break;
-                case 'equipment_files':
-                    if ($this->_user->can(Permissions::EQUIPMENTS_FILES_VIEW)) {
-                        $filterRooms[] = $room;
-                    }
-                    break;
-                case 'users':
-                    if ($this->_user->can(Permissions::USERS_VIEW)) {
-                        $filterRooms[] = $room;
-                    }
-                    if ($this->_user->can(Permissions::ROLES_VIEW)) {
-                        $filterRooms[] = $room.'.roles';
-                    }
-                    break;
-                case 'roles':
-                    if ($this->_user->can(Permissions::ROLES_VIEW)) {
-                        $filterRooms[] = $room;
-                    }
-                    break;
-                case 'request_comments':
-                case 'request_files':
-                case 'requests':
-                    if ($this->_user->can(Permissions::REQUESTS_VIEW) ||
-                        RequestModel::where('user_id', $this->_user->id)
-                            ->orWhere('assign_id', $this->_user->id)
-                            ->exists()
-                    ) {
-                        $filterRooms[] = $room;
-                    }
-                    break;
-            }
-        }
-
-        return $filterRooms;
     }
 }

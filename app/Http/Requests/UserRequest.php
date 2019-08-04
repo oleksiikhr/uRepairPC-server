@@ -36,14 +36,12 @@ class UserRequest extends FormRequest
                 'columns.*' => 'string|in:'.implode(',', User::ALLOW_COLUMNS_SEARCH),
                 'sortColumn' => 'string|in:'.implode(',', User::ALLOW_COLUMNS_SORT),
                 'sortOrder' => 'string|in:ascending,descending',
-                'filterRoleById' => 'integer',
+                'request_access' => 'boolean',
             ];
         }
 
         if ($method === Request::METHOD_DELETE) {
-            return [
-                'image_delete' => 'boolean',
-            ];
+            return [];
         }
 
         $rules = [

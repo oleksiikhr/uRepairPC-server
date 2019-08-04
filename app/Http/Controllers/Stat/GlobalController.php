@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Stat;
 
-use App\Enums\Permissions;
+use App\Enums\Perm;
 use Illuminate\Http\Request;
 use App\Http\Json\GlobalFile;
 use App\Http\Controllers\Controller;
@@ -21,7 +21,7 @@ class GlobalController extends Controller
     public function permissions(Request $request): array
     {
         return [
-            'store' => Permissions::GLOBAL_SETTINGS,
+            'store' => Perm::GLOBAL_SETTINGS_EDIT,
         ];
     }
 
@@ -52,7 +52,7 @@ class GlobalController extends Controller
         $globalFile->mergeAndSaveToFile($data);
 
         $jsonResource = new GlobalJsonResource($data);
-        event(new EGlobalUpdate($jsonResource));
+        event(new EGlobalUpdate($jsonResource->jsonSerialize()));
 
         return response()->json([
             'message' => __('app.settings.global'),

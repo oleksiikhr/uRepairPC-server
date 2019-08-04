@@ -17,7 +17,7 @@ abstract class ECreateBroadcast extends EBroadcast
      */
     public function __construct($data)
     {
-        $this->data = $data;
+        $this->data = $this->transformData($data);
     }
 
     /**

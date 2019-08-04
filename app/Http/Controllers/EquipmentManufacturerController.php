@@ -2,16 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\Permissions;
+use App\User;
+use App\Enums\Perm;
 use Illuminate\Http\Request;
 use App\EquipmentManufacturer;
+use Illuminate\Support\Facades\Gate;
+use App\Events\EquipmentManufacturers\EJoin;
 use App\Events\EquipmentManufacturers\ECreate;
-use App\Events\EquipmentManufacturers\EDelete;
 use App\Events\EquipmentManufacturers\EUpdate;
 use App\Http\Requests\EquipmentManufacturerRequest;
 
 class EquipmentManufacturerController extends Controller
 {
+    /**
+     * @var User
+     */
+    private $_user;
+
     /**
      * Add middleware depends on user permissions.
      *
@@ -20,12 +27,14 @@ class EquipmentManufacturerController extends Controller
      */
     public function permissions(Request $request): array
     {
+        $this->_user = auth()->user();
+
         return [
-            'index' => Permissions::EQUIPMENTS_CONFIG_VIEW,
-            'show' => Permissions::EQUIPMENTS_CONFIG_VIEW,
-            'store' => Permissions::EQUIPMENTS_CONFIG_CREATE,
-            'update' => Permissions::EQUIPMENTS_CONFIG_EDIT,
-            'destroy' => Permissions::EQUIPMENTS_CONFIG_DELETE,
+            'index' => Perm::EQUIPMENTS_CONFIG_VIEW_ALL,
+            'show' => Perm::EQUIPMENTS_CONFIG_VIEW_ALL,
+            'store' => Perm::EQUIPMENTS_CONFIG_CREATE,
+            'update' => [Perm::EQUIPMENTS_CONFIG_EDIT_OWN, Perm::EQUIPMENTS_CONFIG_EDIT_ALL],
+            'destroy' => [Perm::EQUIPMENTS_CONFIG_DELETE_OWN, Perm::EQUIPMENTS_CONFIG_DELETE_ALL],
         ];
     }
 
@@ -37,6 +46,8 @@ class EquipmentManufacturerController extends Controller
     public function index()
     {
         $list = EquipmentManufacturer::all();
+
+        event(new EJoin(...$list));
 
         return response()->json($list);
     }
@@ -51,9 +62,10 @@ class EquipmentManufacturerController extends Controller
     {
         $equipmentManufacturer = new EquipmentManufacturer;
         $equipmentManufacturer->fill($request->all());
+        $equipmentManufacturer->user_id = $this->_user->id;
 
         if (! $equipmentManufacturer->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
         event(new ECreate($equipmentManufacturer));
@@ -74,6 +86,8 @@ class EquipmentManufacturerController extends Controller
     {
         $equipmentManufacturer = EquipmentManufacturer::findOrFail($id);
 
+        event(new EJoin($equipmentManufacturer));
+
         return response()->json([
             'message' => __('app.equipment_manufacturers.show'),
             'equipment_manufacturer' => $equipmentManufacturer,
@@ -90,13 +104,21 @@ class EquipmentManufacturerController extends Controller
     public function update(EquipmentManufacturerRequest $request, int $id)
     {
         $equipmentManufacturer = EquipmentManufacturer::findOrFail($id);
+
+        // Edit only own equipments config
+        if (! $this->_user->perm(Perm::EQUIPMENTS_CONFIG_EDIT_ALL) &&
+            Gate::denies('owner', $equipmentManufacturer)
+        ) {
+            return $this->responseNoPermission();
+        }
+
         $equipmentManufacturer->fill($request->all());
 
         if (! $equipmentManufacturer->save()) {
-            return response()->json(['message' => __('app.database.save_error')], 422);
+            return $this->responseDatabaseSaveError();
         }
 
-        event(new EUpdate($id, $equipmentManufacturer));
+        event(new EUpdate($equipmentManufacturer->id, $equipmentManufacturer));
 
         return response()->json([
             'message' => __('app.equipment_manufacturers.update'),
@@ -112,11 +134,18 @@ class EquipmentManufacturerController extends Controller
      */
     public function destroy(int $id)
     {
-        if (! EquipmentManufacturer::destroy($id)) {
-            return response()->json(['message' => __('app.database.destroy_error')], 422);
+        $equipmentManufacturer = EquipmentManufacturer::findOrFail($id);
+
+        // Delete only own equipments config
+        if (! $this->_user->perm(Perm::EQUIPMENTS_CONFIG_DELETE_ALL) &&
+            Gate::denies('owner', $equipmentManufacturer)
+        ) {
+            return $this->responseNoPermission();
         }
 
-        event(new EDelete($id));
+        if (! $equipmentManufacturer->delete()) {
+            return $this->responseDatabaseDestroyError();
+        }
 
         return response()->json([
             'message' => __('app.equipment_manufacturers.destroy'),
