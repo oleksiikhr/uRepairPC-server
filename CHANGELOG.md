@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/uRepairPC/server/compare/v2.0.0...v3.0.0) (2019-08-04)
+
+
+### Bug Fixes
+
+* after create request - missing relationship data ([963581e](https://github.com/uRepairPC/server/commit/963581e))
+* check permission for comment/file action ([11a1171](https://github.com/uRepairPC/server/commit/11a1171))
+* join to rooms after create events (support array) ([69f2d14](https://github.com/uRepairPC/server/commit/69f2d14))
+* logout (invalidate token uncomment) ([177ea92](https://github.com/uRepairPC/server/commit/177ea92))
+* name of class IJsonFile to IJsonFIle ([67cb077](https://github.com/uRepairPC/server/commit/67cb077))
+* permissions for download files + PAGINATE_DEFAULT set to 25 ([8ce3bb2](https://github.com/uRepairPC/server/commit/8ce3bb2))
+* send events with roles (user edited), without permission ([fd44596](https://github.com/uRepairPC/server/commit/fd44596))
+* **socket:** broadcast equipment with relationship after create ([ad358df](https://github.com/uRepairPC/server/commit/ad358df))
+* show requests for assign_id user ([1b2e4db](https://github.com/uRepairPC/server/commit/1b2e4db))
+* typo ([e1ffb19](https://github.com/uRepairPC/server/commit/e1ffb19))
+* update permissions ([3b79c69](https://github.com/uRepairPC/server/commit/3b79c69))
+
+
+### Features
+
+* add request comments ([c6c63be](https://github.com/uRepairPC/server/commit/c6c63be))
+* new socket system, change migrations, permissions, docs, observers ([740a564](https://github.com/uRepairPC/server/commit/740a564))
+* rewrite role system, fix many bugs, improved code, change migration ([58bc51f](https://github.com/uRepairPC/server/commit/58bc51f))
+* rewrite socket (events) system, correct roles, add more events ([6a6462a](https://github.com/uRepairPC/server/commit/6a6462a))
+
+
+### BREAKING CHANGES
+
+* new socket system, change migrations, permissions, docs, observers
+* rewrite socket (events) system, correct roles, add more events
+* rewrite role system, fix many bugs, improved code, change migration
+
+
+
 ## [2.1.0](https://github.com/uRepairPC/server/compare/v2.0.0...v2.1.0) (2019-05-26)
 
 
