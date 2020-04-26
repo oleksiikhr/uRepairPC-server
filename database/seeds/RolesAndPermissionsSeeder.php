@@ -1,7 +1,7 @@
 <?php
 
-use App\Role;
 use App\Enums\Perm;
+use App\Role;
 use App\RolePermission;
 use Illuminate\Database\Seeder;
 

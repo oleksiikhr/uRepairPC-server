@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use App\Enums\Perm;
-use App\RequestType;
-use Illuminate\Http\Request;
-use App\Events\RequestTypes\EJoin;
 use App\Events\RequestTypes\ECreate;
+use App\Events\RequestTypes\EJoin;
 use App\Events\RequestTypes\EUpdate;
-use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\RequestTypeRequest;
+use App\RequestType;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class RequestTypeController extends Controller
 {

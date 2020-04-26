@@ -2,8 +2,8 @@
 
 namespace App\Events\EquipmentFiles;
 
-use Illuminate\Support\Collection;
 use App\Events\Common\ECreateBroadcast;
+use Illuminate\Support\Collection;
 
 class ECreate extends ECreateBroadcast
 {

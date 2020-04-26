@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Http\Request;
 use App\Request as RequestModel;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 
 class RequestRequest extends FormRequest
 {

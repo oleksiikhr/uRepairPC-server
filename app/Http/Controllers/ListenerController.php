@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\EquipmentManufacturers\EGlobal as EquipmentManufacturersEvent;
+use App\Events\EquipmentModels\EGlobal as EquipmentModelsEvent;
+use App\Events\Equipments\EGlobal as EquipmentsEvent;
+use App\Events\EquipmentTypes\EGlobal as EquipmentTypesEvent;
 use App\Events\JoinRooms;
-use Illuminate\Http\Request;
+use App\Events\RequestPriorities\EGlobal as RequestPrioritiesEvent;
+use App\Events\Requests\EGlobal as RequestsEvent;
+use App\Events\RequestStatuses\EGlobal as RequestStatusesEvent;
+use App\Events\RequestTypes\EGlobal as RequestTypesEvent;
 use App\Events\Roles\EGlobal as RolesEvent;
 use App\Events\Users\EGlobal as UsersEvent;
-use App\Events\Requests\EGlobal as RequestsEvent;
-use App\Events\Equipments\EGlobal as EquipmentsEvent;
-use App\Events\RequestTypes\EGlobal as RequestTypesEvent;
-use App\Events\EquipmentTypes\EGlobal as EquipmentTypesEvent;
-use App\Events\EquipmentModels\EGlobal as EquipmentModelsEvent;
-use App\Events\RequestStatuses\EGlobal as RequestStatusesEvent;
-use App\Events\RequestPriorities\EGlobal as RequestPrioritiesEvent;
-use App\Events\EquipmentManufacturers\EGlobal as EquipmentManufacturersEvent;
+use Illuminate\Http\Request;
 
 class ListenerController extends Controller
 {

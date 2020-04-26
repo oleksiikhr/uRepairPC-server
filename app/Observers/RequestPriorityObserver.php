@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
-use App\RequestPriority;
 use App\Events\RequestPriorities\EDelete;
+use App\RequestPriority;
 
 class RequestPriorityObserver
 {

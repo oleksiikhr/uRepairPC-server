@@ -2,10 +2,10 @@
 
 namespace App\Observers;
 
-use App\User;
 use App\Events\Users\ECreate;
 use App\Events\Users\EDelete;
 use App\Events\Users\EUpdate;
+use App\User;
 
 class UserObserver
 {

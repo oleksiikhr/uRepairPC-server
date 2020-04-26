@@ -67,10 +67,10 @@ class Role extends Model
                     $active = in_array($permission, $permissions);
 
                     $temp[] = (object) [
-                         'name' => $permission,
-                         'action' => $action,
-                         'active' => $active,
-                     ];
+                        'name' => $permission,
+                        'action' => $action,
+                        'active' => $active,
+                    ];
 
                     if ($active) {
                         $permissionsActive[] = $permission;

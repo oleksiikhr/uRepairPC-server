@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Stat;
 
 use App\Enums\Perm;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use App\Http\Json\ManifestFile;
-use App\Http\Helpers\FileHelper;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\ManifestRequest;
 use App\Events\Settings\EManifestUpdate;
+use App\Http\Controllers\Controller;
+use App\Http\Helpers\FileHelper;
+use App\Http\Json\ManifestFile;
+use App\Http\Requests\ManifestRequest;
 use App\Http\Resources\ManifestJsonResource;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ManifestController extends Controller
 {

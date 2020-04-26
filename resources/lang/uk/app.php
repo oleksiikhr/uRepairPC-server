@@ -2,7 +2,7 @@
 
 return [
 
-//    TODO Translate to en, ru
+    //    TODO Translate to en, ru
 
     /*
      * Middleware.

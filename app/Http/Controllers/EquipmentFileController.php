@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\Equipment;
 use App\Enums\Perm;
-use Illuminate\Http\Request;
-use App\Http\Helpers\FilesHelper;
-use App\Http\Requests\FileRequest;
-use App\Events\EquipmentFiles\EJoin;
-use Illuminate\Support\Facades\Gate;
+use App\Equipment;
 use App\Events\EquipmentFiles\ECreate;
 use App\Events\EquipmentFiles\EDelete;
+use App\Events\EquipmentFiles\EJoin;
 use App\Events\EquipmentFiles\EUpdate;
+use App\Http\Helpers\FilesHelper;
+use App\Http\Requests\FileRequest;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class EquipmentFileController extends Controller

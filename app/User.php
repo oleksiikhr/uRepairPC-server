@@ -3,12 +3,12 @@
 namespace App;
 
 use App\Enums\Perm;
-use Illuminate\Support\Str;
-use App\Traits\ModelHelperTrait;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Traits\ModelHasPermissionsTrait;
+use App\Traits\ModelHelperTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Str;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {

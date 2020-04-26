@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Role;
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 
 class RoleRequest extends FormRequest
 {

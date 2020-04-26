@@ -63,11 +63,11 @@ abstract class Json implements IJson
         foreach ($attributes as $key => $type) {
             if (array_key_exists($key, $data)) {
                 switch ($type) {
-                    case 'bool': {
+                    case 'bool':
                         $data[$key] = (bool) $data[$key];
                         break;
-                    }
-                    case 'file': {
+
+                    case 'file':
                         // Delete old file
                         if (array_key_exists($key, $json)) {
                             FileHelper::delete($json[$key], $this->_disk);
@@ -81,10 +81,10 @@ abstract class Json implements IJson
                             $data[$key] = null;
                         }
                         break;
-                    }
-                    default: {
+
+                    default:
                         $data[$key] = $data[$key] ?? '';
-                    }
+
                 }
             }
         }

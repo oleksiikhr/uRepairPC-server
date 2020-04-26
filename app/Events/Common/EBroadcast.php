@@ -2,11 +2,11 @@
 
 namespace App\Events\Common;
 
-use Illuminate\Queue\SerializesModels;
 use App\Interfaces\IBroadcastWebsocket;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 abstract class EBroadcast implements ShouldBroadcast, IBroadcastWebsocket
 {

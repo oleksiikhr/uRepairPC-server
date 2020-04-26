@@ -2,29 +2,29 @@
 
 namespace App\Providers;
 
-use App\Role;
-use App\User;
-use App\Request;
 use App\Equipment;
-use App\Http\Kernel;
-use App\RequestType;
-use App\EquipmentType;
-use App\RequestStatus;
-use App\EquipmentModel;
-use App\RequestPriority;
 use App\EquipmentManufacturer;
+use App\EquipmentModel;
+use App\EquipmentType;
+use App\Http\Kernel;
+use App\Observers\EquipmentManufacturerObserver;
+use App\Observers\EquipmentModelObserver;
+use App\Observers\EquipmentObserver;
+use App\Observers\EquipmentTypeObserver;
+use App\Observers\RequestObserver;
+use App\Observers\RequestPriorityObserver;
+use App\Observers\RequestStatusObserver;
+use App\Observers\RequestTypeObserver;
 use App\Observers\RoleObserver;
 use App\Observers\UserObserver;
-use App\Observers\RequestObserver;
-use App\Observers\EquipmentObserver;
-use App\Observers\RequestTypeObserver;
+use App\Request;
+use App\RequestPriority;
+use App\RequestStatus;
+use App\RequestType;
+use App\Role;
+use App\User;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
-use App\Observers\EquipmentTypeObserver;
-use App\Observers\RequestStatusObserver;
-use App\Observers\EquipmentModelObserver;
-use App\Observers\RequestPriorityObserver;
-use App\Observers\EquipmentManufacturerObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
