@@ -15,6 +15,10 @@
   <a href="https://github.com/uRepairPC/server" rel="nofollow"><img src="https://img.shields.io/github/license/urepairpc/server.svg" alt="License"></a>
 </p>
 
+## Repository moved
+
+https://github.com/uRepairPC/uRepairPC
+
 ## Links
 - [Website](https://urepairpc.com/)
 - [Demo](https://demo.urepairpc.com/)
