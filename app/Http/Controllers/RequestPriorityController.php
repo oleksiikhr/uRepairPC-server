@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use App\Enums\Perm;
-use App\RequestPriority;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-use App\Events\RequestPriorities\EJoin;
 use App\Events\RequestPriorities\ECreate;
+use App\Events\RequestPriorities\EJoin;
 use App\Events\RequestPriorities\EUpdate;
 use App\Http\Requests\RequestPriorityRequest;
+use App\RequestPriority;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class RequestPriorityController extends Controller
 {

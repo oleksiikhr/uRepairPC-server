@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
-use App\RequestStatus;
 use App\Events\RequestStatuses\EDelete;
+use App\RequestStatus;
 
 class RequestStatusObserver
 {

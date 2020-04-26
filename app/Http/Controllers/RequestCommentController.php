@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use App\Enums\Perm;
-use App\RequestComment;
-use Illuminate\Http\Request;
-use App\Request as RequestModel;
-use Illuminate\Support\Facades\Gate;
-use App\Events\RequestComments\EJoin;
 use App\Events\RequestComments\ECreate;
 use App\Events\RequestComments\EDelete;
+use App\Events\RequestComments\EJoin;
 use App\Events\RequestComments\EUpdate;
 use App\Http\Requests\RequestCommentRequest;
+use App\Request as RequestModel;
+use App\RequestComment;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class RequestCommentController extends Controller
 {

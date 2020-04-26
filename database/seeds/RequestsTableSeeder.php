@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Seeder;
 use App\Request as RequestModel;
+use Illuminate\Database\Seeder;
 
 class RequestsTableSeeder extends Seeder
 {

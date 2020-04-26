@@ -3,8 +3,8 @@
 namespace App\Events\Requests;
 
 use App\Events\Common\EJoinBroadcast;
-use App\Events\RequestFiles\EGlobal as RequestFiles;
 use App\Events\RequestComments\EGlobal as RequestComments;
+use App\Events\RequestFiles\EGlobal as RequestFiles;
 
 class EJoin extends EJoinBroadcast
 {

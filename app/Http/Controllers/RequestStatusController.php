@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use App\Enums\Perm;
-use App\RequestStatus;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-use App\Events\RequestStatuses\EJoin;
 use App\Events\RequestStatuses\ECreate;
+use App\Events\RequestStatuses\EJoin;
 use App\Events\RequestStatuses\EUpdate;
 use App\Http\Requests\RequestStatusRequest;
+use App\RequestStatus;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class RequestStatusController extends Controller
 {

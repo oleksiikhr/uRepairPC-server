@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Role;
 use App\Enums\Perm;
-use App\Events\Roles\EJoin;
-use Illuminate\Http\Request;
 use App\Events\Roles\ECreate;
+use App\Events\Roles\EJoin;
 use App\Events\Roles\EUpdate;
 use App\Http\Requests\RoleRequest;
+use App\Role;
+use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {

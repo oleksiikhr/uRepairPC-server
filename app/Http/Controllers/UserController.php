@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\File;
-use App\Role;
-use App\User;
 use App\Enums\Perm;
+use App\Events\Users\EJoin;
+use App\Events\Users\EUpdate;
+use App\Events\Users\EUpdateRoles;
+use App\File;
+use App\Http\Helpers\FileHelper;
+use App\Http\Requests\ImageRequest;
+use App\Http\Requests\UserRequest;
 use App\Mail\EmailChange;
 use App\Mail\UserCreated;
-use App\Events\Users\EJoin;
+use App\Role;
+use App\User;
 use Illuminate\Http\Request;
-use App\Events\Users\EUpdate;
-use App\Http\Helpers\FileHelper;
-use App\Events\Users\EUpdateRoles;
-use App\Http\Requests\UserRequest;
-use App\Http\Requests\ImageRequest;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 

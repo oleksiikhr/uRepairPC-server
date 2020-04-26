@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\Equipment;
 use App\Enums\Perm;
-use Illuminate\Http\Request;
-use App\Events\Equipments\EJoin;
-use App\Http\Helpers\FilesHelper;
+use App\Equipment;
 use App\Events\Equipments\ECreate;
+use App\Events\Equipments\EJoin;
 use App\Events\Equipments\EUpdate;
-use Illuminate\Support\Facades\Gate;
+use App\Http\Helpers\FilesHelper;
 use App\Http\Requests\EquipmentRequest;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class EquipmentController extends Controller
 {

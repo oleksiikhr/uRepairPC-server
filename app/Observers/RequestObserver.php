@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
-use App\Request;
 use App\Events\Requests\EDelete;
+use App\Request;
 
 class RequestObserver
 {

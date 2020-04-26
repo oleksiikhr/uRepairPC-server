@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use App\Enums\Perm;
 use App\EquipmentModel;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-use App\Events\EquipmentModels\EJoin;
 use App\Events\EquipmentModels\ECreate;
+use App\Events\EquipmentModels\EJoin;
 use App\Events\EquipmentModels\EUpdate;
 use App\Http\Requests\EquipmentModelRequest;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class EquipmentModelController extends Controller
 {

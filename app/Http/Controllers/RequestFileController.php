@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use App\Enums\Perm;
-use Illuminate\Http\Request;
-use App\Request as RequestModel;
-use App\Http\Helpers\FilesHelper;
-use App\Events\RequestFiles\EJoin;
-use App\Http\Requests\FileRequest;
 use App\Events\RequestFiles\ECreate;
 use App\Events\RequestFiles\EDelete;
+use App\Events\RequestFiles\EJoin;
 use App\Events\RequestFiles\EUpdate;
+use App\Http\Helpers\FilesHelper;
+use App\Http\Requests\FileRequest;
+use App\Request as RequestModel;
+use App\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 

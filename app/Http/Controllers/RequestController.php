@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\Equipment;
 use App\Enums\Perm;
-use App\RequestType;
-use App\RequestStatus;
-use App\RequestPriority;
-use Illuminate\Http\Request;
-use App\Events\Requests\EJoin;
+use App\Equipment;
 use App\Events\Requests\ECreate;
+use App\Events\Requests\EJoin;
 use App\Events\Requests\EUpdate;
-use App\Request as RequestModel;
 use App\Http\Helpers\FilesHelper;
-use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\RequestRequest;
+use App\Request as RequestModel;
+use App\RequestPriority;
+use App\RequestStatus;
+use App\RequestType;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class RequestController extends Controller
 {
